@@ -14,15 +14,13 @@ from pymhlib.demos.misp import MISPInstance, MISPSolution
 import src.plotting as p
 from IPython.display import clear_output
 
-# plot settings
-plt.rcParams['figure.figsize'] = (13,5)
-plt.rcParams['figure.autolayout'] = True
-plt.rcParams['axes.facecolor'] = 'w'
+
 
 def load_visualisation_settings():
 
         interface = InterfaceVisualisation()
         interface.display_widgets()
+
 
 
 
@@ -42,9 +40,7 @@ class InterfaceVisualisation():
                                 options = handler.get_instances(Problem(self.problemWidget.value)),
                                 description = 'Instance'
                                 )
-                self.optionsWidget = widgets.VBox()
-
-                self.runButton = widgets.Button(description = 'Run')
+                self.optionsWidget = widgets.VBox() #container which holds all options
 
                 self.optionsHandles = {} #used to store references to relevant children of optionsWidget Box
 
@@ -55,10 +51,11 @@ class InterfaceVisualisation():
                 self.controls = self.init_controls()
 
                 self.controls.layout.visibility = 'hidden'
+                self.run_button =  widgets.Button(description = 'Run')
 
 
         def init_controls(self):
-
+                print('init controls')
                 out = widgets.Output()
 
                 def animate(event):
@@ -93,6 +90,7 @@ class InterfaceVisualisation():
                 self.instanceWidget.options = handler.get_instances(Problem(change.new))
                 self.optionsHandles = {}
 
+
     
         def on_change_algo(self, change):
 
@@ -124,8 +122,10 @@ class InterfaceVisualisation():
 
                 # starts call to pymhlib in handler module
                 self.log_data, instance = handler.run_algorithm(params)
+
                 # initialize graph from instance
                 self.plot_instance = p.get_visualisation(params['prob'],params['algo'], instance)
+
                 self.controls.children[1].value = 0
                 self.controls.children[0].max = self.controls.children[1].max = len(self.log_data) - 3
                 # start drawing
@@ -137,9 +137,9 @@ class InterfaceVisualisation():
 
                 self.problemWidget.observe(self.on_change_problem, names='value')
                 self.algoWidget.observe(self.on_change_algo, names='value')
-                self.runButton.on_click(self.run_visualisation)
                 self.optionsWidget.children = self.get_options(Algorithm(self.algoWidget.value))
-                display(widgets.VBox([self.problemWidget,self.instanceWidget,self.algoWidget,self.optionsWidget,self.runButton]))
+                self.run_button.on_click(self.run_visualisation)
+                display(widgets.VBox([self.problemWidget,self.instanceWidget,self.algoWidget,self.optionsWidget,self.run_button]))
                 display(self.controls)
 
                 
@@ -159,25 +159,19 @@ class InterfaceVisualisation():
         def get_gvns_options(self, options: dict):
 
                 ch = widgets.Dropdown( options = [m[0] for m in options[Option.CH]],
-                                description = 'Initial Solution')
-
+                                description = Option.CH.value)
+                ch_box = widgets.VBox([ch])
                 self.optionsHandles[Option.CH] = ch
 
-                li = self.get_neighborhood_options(options, Option.LI)
-                sh = self.get_neighborhood_options(options, Option.SH)
+                li_box = self.get_neighborhood_options(options, Option.LI)
+                sh_box = self.get_neighborhood_options(options, Option.SH)
 
-                return (ch,li,sh)
+                return (ch_box,li_box,sh_box)
 
 
         def get_grasp_options(self, options: dict):
 
-                # TODO needed for grasp?
-                #ch = widgets.Dropdown( options = [m[0] for m in options[Option.CH]],
-                #        description = 'Initial Solution')
-
-                #self.optionsHandles[Option.CH] = ch
-
-                li = self.get_neighborhood_options(options, Option.LI)
+                li_box = self.get_neighborhood_options(options, Option.LI)
                 rcl = widgets.RadioButtons(options=[m[0] for m in options[Option.RCL]],
                                                 description=Option.RCL.value)
                 k_best = widgets.IntText(value=1,description='k:',layout=widgets.Layout(width='150px', display='None'))
@@ -199,10 +193,10 @@ class InterfaceVisualisation():
                 self.optionsHandles[Option.RCL] = rcl_box
                 set_param({'new':rcl.value})
 
-                return (li,rcl_box)
+                return (li_box,rcl_box)
 
 
-        # helper functions to create widget block for li/sh neighborhoods
+        # helper functions to create widget box for li/sh neighborhoods
         def get_neighborhood_options(self, options: dict, phase: Option):
                 available = widgets.Dropdown(
                                 options = [m[0] for m in options[phase]],
@@ -220,34 +214,35 @@ class InterfaceVisualisation():
 
                 self.optionsHandles[phase] = selected
 
-                add.on_click(self.on_add)
-                remove.on_click(self.on_remove)
+                add.on_click(self.on_add_neighborhood)
+                remove.on_click(self.on_remove_neighborhood)
 
                 middle = widgets.Box([size, add, remove],layout=widgets.Layout(display='flex',flex_flow='column',align_items='flex-end'))
                 
                 return widgets.HBox([available,middle,selected])        
 
                 
-        def on_add(self,event):
+        def on_add_neighborhood(self,event):
 
-                parent = None
-                if event.tooltip[-2:] == Option.LI.name:
-                        parent = self.optionsWidget.children[1 if self.algoWidget.value == 'GVNS' else 0]
-                if event.tooltip[-2:] == Option.SH.name:
-                        parent = self.optionsWidget.children[2]
-                size = parent.children[1].children[0].value
-                sel = parent.children[0].value
-                parent.children[2].options += (f'{sel}, k={max(1,size)}',)
+                phase = event.tooltip.split(' ')[1]
+                descr = dict(Option.__members__.items()).get(phase).value
+                n_block = [c for c in self.optionsWidget.children if c.children[0].description == descr][0]
 
-        def on_remove(self,event):
+                size = n_block.children[1].children[0].value
+                sel = n_block.children[0].value
+                n_block.children[2].options += (f'{sel}, k={max(1,size)}',)
 
-                selected = None
-                if event.tooltip[-2:] == Option.LI.name:
-                        selected = self.optionsWidget.children[1].children[2]
-                if event.tooltip[-2:] == Option.SH.name:
-                        selected = self.optionsWidget.children[2].children[2]
+
+        def on_remove_neighborhood(self,event):
+
+                phase = event.tooltip.split(' ')[1]
+                descr = dict(Option.__members__.items()).get(phase).value
+                n_block = [c for c in self.optionsWidget.children if c.children[0].description == descr][0]
+                selected = n_block.children[2]
+                
                 if len(selected.options) == 0:
                         return
+
                 to_remove = selected.value
                 options = list(selected.options)
                 options.remove(to_remove)

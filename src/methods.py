@@ -21,31 +21,16 @@ def greedy_randomized_construction(sol: Solution, par, _result):
             pos = sum([1 for i in clauses if v in i])
             neg = sum([1 for i in clauses if -v in i])
             candidates[v], candidates[-v] = pos, neg
+
         logger_step.info(f'CL: {candidates}')
         logger_step.info(f'X_START: {x}')
         logger_step.info(f'UNFUL: {len(clauses)}')
-        rcl = restricted_candidate_list(candidates, par) #list of restricted candidate literals
-        # If an unsatisfied clause contains only one non instantiated variable, then try to satisfy this clause
-        # otherwise, select an element from RCL randomly
-        logger_step.info(f'RCL: {rcl}')
-        single_lit = []
-        for c in clauses:
-            single_lit =  single_lit + [[v for v in c if abs(v) in variables]]
-        
-        single_lit = [c for c in single_lit if len(c)==1]
 
-        e = 0
-        if len(single_lit) > 0 :
-            e = [c[0] for c in single_lit if c[0] in rcl] # TODO is this choice independent from rlc?
-            if len(e) == 0:
-                e = random.choice(rcl)
-                logger_step.info(f'SEL: {e}')
-            else:
-                e = random.choice(e)
-                logger_step.info(f'SEL: {e}')
-        else:
-            e = random.choice(rcl)      # choose random element from rcl
-            logger_step.info(f'SEL: {e}')
+        rcl = restricted_candidate_list(candidates, par)
+        logger_step.info(f'RCL: {rcl}')
+
+        e = random.choice(rcl)      # choose random element from rcl
+        logger_step.info(f'SEL: {e}')
         
         logger_step.info(f'ADDED_C: {candidates[e]}')
         x[abs(e)-1] = 0 if e < 0 else 1   # add e to solution

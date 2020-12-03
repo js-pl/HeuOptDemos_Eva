@@ -54,7 +54,7 @@ class Algorithm(enum.Enum):
     GRASP = 'GRASP'
 
 class Option(enum.Enum):
-    CH = 'Construction'
+    CH = 'Initial Solution'
     LI = 'Local Improvement'
     SH = 'Shaking'
     RCL = 'Restricted Candidate List'
