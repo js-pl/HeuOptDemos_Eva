@@ -100,7 +100,7 @@ class InterfaceVisualisation():
 
 
         def run_visualisation(self, event):
-                if Problem(self.problemWidget.value).name == 'MISP':
+                if Problem(self.problemWidget.value).name == 'MISP' and Algorithm(self.algoWidget.value).name == 'GRASP':
                         self.optionsWidget.children += (widgets.Label(value='This feature will be available soon!'),)
                         return
                 
@@ -124,7 +124,7 @@ class InterfaceVisualisation():
 
                 # starts call to pymhlib in handler module
                 self.log_data, instance = handler.run_algorithm(params)
-
+                print(self.log_data)
                 # initialize graph from instance
                 self.plot_instance = p.get_visualisation(params['prob'],params['algo'], instance)
 

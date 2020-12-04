@@ -41,6 +41,9 @@ def get_visualisation(prob: Problem, alg: Algorithm, instance):
                  #       f.set_size_inches(5,5, forward=True)
                 return init_maxsat_graph(instance)
 
+        if prob == Problem.MISP and alg == Algorithm.GVNS:
+                return init_misp_graph(instance)
+
 
 
 def get_animation(i: int, log_data: list(), graph):
@@ -354,6 +357,13 @@ def init_maxsat_graph(instance: MAXSATInstance):
 
 
 
+def init_misp_graph(instance: MISPInstance):
+
+        graph = instance.graph
+        pos = nx.kamada_kawai_layout(graph)
+
+        nx.set_node_attributes(graph, 'lightgray', name='color')
+        nx.set_node_attributes(graph, pos, 'pos')
 
 
 

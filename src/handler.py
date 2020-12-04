@@ -131,7 +131,7 @@ class MISP(ProblemDefinition):
         options = {Algorithm.GVNS: {
                                 Option.CH: [('random', MISPSolution.construct, 0)],
                                 Option.LI: [('two-exchange random fill neighborhood search', MISPSolution.local_improve, 2)],
-                                Option.SH: [('remove k and random flip', MISPSolution.shaking, int)]
+                                Option.SH: [('remove k and random fill', MISPSolution.shaking, int)]
                                 }
                                 ,
                     Algorithm.GRASP: {
