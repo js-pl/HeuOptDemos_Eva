@@ -248,7 +248,7 @@ def get_gvns_log_data(prob: Problem, alg: Algorithm):
                 status = 'rcl'
                 rcl_data['cl'] = cast_solution(line)
             if line.startswith('X'):
-                rcl_data['x'] = cast_solution(line)
+                rcl_data['current'] = cast_solution(line)
             if line.startswith('UNFUL'):
                 rcl_data['unful'] = int(line.split(':')[1].strip())
             if line.startswith('THRESH'):
@@ -261,9 +261,9 @@ def get_gvns_log_data(prob: Problem, alg: Algorithm):
                 rcl_data['sel'] = int(line.split(':')[1].strip())
             if line.startswith('ADDED'):
                 rcl_data['added'] = int(line.split(':')[1].strip())
-                data.append({'status':'cl', 'cl':rcl_data['cl'], 'unful':rcl_data['unful'], 'x':rcl_data['x']})
+                data.append({'status':'cl', 'cl':rcl_data['cl'], 'unful':rcl_data['unful'], 'current':rcl_data['current']})
                 par = method[2:]
-                rcl = {'status':'rcl', 'cl':rcl_data['cl'], 'rcl':rcl_data['rcl'], 'x':rcl_data['x']}
+                rcl = {'status':'rcl', 'cl':rcl_data['cl'], 'rcl':rcl_data['rcl'], 'current':rcl_data['current']}
                 if 'max' in rcl_data:
                     rcl['max'] = rcl_data['max']
                     rcl['thresh'] = rcl_data['thresh']
@@ -271,9 +271,9 @@ def get_gvns_log_data(prob: Problem, alg: Algorithm):
                 else:
                     rcl['k'] = int(par)
                 data.append(rcl)
-                x = rcl_data['x']
+                x = [x for x in rcl_data['current']]
                 x[abs(rcl_data['sel'])-1] = 0 if rcl_data['sel'] < 0 else 1
-                data.append({'status':'sel', 'cl':rcl_data['cl'], 'rcl':rcl_data['rcl'], 'x':x, 'sel':rcl_data['sel'], 'added':rcl_data['added']})
+                data.append({'status':'sel', 'cl':rcl_data['cl'], 'rcl':rcl_data['rcl'], 'current':x, 'sel':rcl_data['sel'], 'added':rcl_data['added']})
                 rcl_data = {}
 
         logf.close()

@@ -56,7 +56,7 @@ def restricted_candidate_list(candidates: dict(), par):
         return rcl
 
     if type(par) == float:
-        maximum = candidates[max(candidates, key=candidates.get)]
+        maximum = max(candidates.values())
         logger_step.info(f'MAX: {maximum}')
         logger_step.info(f'THRESH: {round(maximum*par,2)}')
         rcl = np.array([k for k,v in candidates.items() if v >= maximum * par],dtype=int)

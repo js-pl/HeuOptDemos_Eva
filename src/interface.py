@@ -55,7 +55,7 @@ class InterfaceVisualisation():
 
 
         def init_controls(self):
-                print('init controls')
+
                 out = widgets.Output()
 
                 def animate(event):
