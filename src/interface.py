@@ -89,13 +89,14 @@ class InterfaceVisualisation():
                 self.optionsWidget.children = self.get_options(Algorithm(self.algoWidget.value))
                 self.instanceWidget.options = handler.get_instances(Problem(change.new))
                 self.optionsHandles = {}
+                self.on_change_algo(None)
 
 
     
         def on_change_algo(self, change):
 
                 self.optionsHandles = {} #reset references
-                self.optionsWidget.children = self.get_options(Algorithm(change.new))
+                self.optionsWidget.children = self.get_options(Algorithm(self.algoWidget.value))
 
 
         def run_visualisation(self, event):
@@ -108,6 +109,7 @@ class InterfaceVisualisation():
                 params = {'prob':Problem(self.problemWidget.value),
                                 'algo':Algorithm(self.algoWidget.value),
                                 'inst':self.instanceWidget.value}
+                
 
                 # extend if further options are needed
                 if Option.CH in self.optionsHandles:
