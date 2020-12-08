@@ -1,3 +1,6 @@
+import sys
+sys.path.append('..\\HeuOptDemos_Eva')
+
 import networkx as nx
 import numpy as np
 import matplotlib.pyplot as plt
@@ -9,39 +12,51 @@ from pymhlib.demos.maxsat import MAXSATInstance, MAXSATSolution
 from pymhlib.demos.misp import MISPInstance, MISPSolution
 from src.handler import Problem, Algorithm
 
+
+
+
 # plot settings
-plt.rcParams['figure.figsize'] = (12,4)
+plt.rcParams['figure.figsize'] = (12,5)
 plt.rcParams['figure.dpi'] = 80
 plt.rcParams['figure.autolayout'] = True
 plt.rcParams['axes.facecolor'] = 'w'
+plt.rcParams['axes.spines.left'] = False
+plt.rcParams['axes.spines.right'] = False
+plt.rcParams['axes.spines.top'] = False
+plt.rcParams['axes.spines.bottom'] = False
 f = None
 ax = None
 
-plot_description = {'phase': 'Starting',
-                        'comment': 'press "play" to start',
+plot_description = {'phase': '',
+                        'comment': [],
                         'best': 0,
-                        'current': 0,
+                        'obj': 0,
                         }
 
-phases = {'ch':'Construction', 'li': 'Local Search', 'sh': 'Shaking', 'rc': 'Randomized Greedy Construction', 'cl':'Candidate List', 'rcl': 'Restricted Candidate List', 'sel':'Selection from RCL'}
+phases = {'ch':'Construction', 'li': 'Local Search', 'sh': 'Shaking', 'rc': 'Randomized Greedy Construction', 
+                'cl':'Candidate List', 'rcl': 'Restricted Candidate List', 'sel':'Selection from RCL'}
 
 def get_visualisation(prob: Problem, alg: Algorithm, instance):
         global f
         global ax
+
         if not f:
                 f = plt.figure(num = f'Solving {prob.value} with {alg.value}')
                 ax = f.add_subplot(111)
         else:
                 f = plt.gcf()
                 ax = f.gca()
-                f.canvas.set_window_title(f'Solving {prob.value} with {alg.value}')
+
+        #f.set_size_inches(7,5) # resets the window title..?
+
+
+        f.canvas.set_window_title(f'Solving {prob.value} with {alg.value}')
 
         if prob == Problem.MAXSAT and (alg == Algorithm.GVNS or alg == Algorithm.GRASP):
-                #if alg == Algorithm.GRASP:
-                 #       f.set_size_inches(5,5, forward=True)
                 return init_maxsat_graph(instance)
 
         if prob == Problem.MISP and alg == Algorithm.GVNS:
+
                 return init_misp_graph(instance)
 
 
@@ -52,16 +67,28 @@ def get_animation(i: int, log_data: list(), graph):
                 get_gvns_maxsat_animation(i, log_data[2:], graph)
         if log_data[0] == 'MAXSAT' and log_data[1] == 'GRASP':
                 get_grasp_maxsat_animation(i, log_data[2:], graph)
+        if log_data[0] == 'MISP' and log_data[1] == 'GVNS':
+                get_gvns_misp_animation(i, log_data[2:], graph)
                 
 
 
 
-def add_description():
+def add_description(log_info: dict()):
+
+        if log_info.get('status') == 'start' and log_info.get('m').startswith('ch'):
+                log_info['best'] = 0
+                log_info['obj'] = 0
+        else:
+                plot_description['phase'] = phases.get(log_info['status'],'') + phases.get(log_info.get('m','   ')[:2],'')
+
 
         ax.text(0,1, '\n'.join((
-        '%s%s' % (plot_description['phase'], '' if plot_description['comment'] == '' else ': ' + plot_description['comment'] ),
-        'Best Objective: %d' % (plot_description['best'], ),
-        'Current Objective: %d' % (plot_description['current'],))), horizontalalignment='left', verticalalignment='top', transform=ax.transAxes)
+        '%s: %s' % (plot_description['phase'], ', '.join(plot_description['comment']) ),
+        'Best Objective: %d' % (log_info.get('best',plot_description['best']), ),
+        'Current Objective: %d' % (log_info.get('obj',plot_description['obj']),))), horizontalalignment='left', verticalalignment='top', transform=ax.transAxes)
+
+        #reset description
+        plot_description.update({'phase': '', 'comment': [], 'best':0, 'obj':0})
 
 
 
@@ -74,19 +101,17 @@ def get_gvns_maxsat_animation(value: int, log_data: list(), graph):
         clauses = [i for i,t in graph.nodes(data='type') if t=='clause']
 
         if value == 0:
-                plot_description['phase'] = f'MAX-SAT Instance: {len(variables)} variables, {len(clauses)} clauses'
-                plot_description['comment'] = f'press "play" to start'
+                plot_description['phase'] = f'MAX-SAT Instance'
+                plot_description['comment'] = [f'{len(variables)} variables, {len(clauses)} clauses']
                 draw_maxsat_graph(graph, [])
+                add_description(log_data[value])
                 return
         
-
         info = log_data[value]
         if value == 1:
                 log_data[0]['current'] = [-1 for _ in info['current']]
+                plot_description['comment'].append('random') # TODO make generic to be able to used with other methods than random
         flipped_nodes = []
-        comment = 'random' # TODO make generic to be able to used with other methods than random
-        phase = phases['ch'] if value == 1 else phases[info['m'][:2]]
-
 
         nx.set_node_attributes(graph, {k: 'r' if info['inc'][graph.nodes[k]['nr']-1] == 0 else 'b' for k in incumbent}, name='color')
         nx.set_node_attributes(graph, {k: 'r' if info['current'][graph.nodes[k]['nr']-1] == 0 else 'b' for k in variables}, name='color')
@@ -94,36 +119,29 @@ def get_gvns_maxsat_animation(value: int, log_data: list(), graph):
         added, removed, pos_literals = color_and_get_changed_clauses(value, log_data, graph, info['status'] == 'start')
 
         if value > 1:
-                comp = 0
-                if info['status'] == 'start':
-                        comp = value + 1
-                else:
-                        comp = value -1
+                comp = value + (info['status'] == 'start') - (info['status'] == 'end')
                 flipped_nodes = [i+1 for i in range(len(variables)) if info['current'][i]!=log_data[comp]['current'][i] ]
                 flipped_nodes = [n for n in variables if graph.nodes[n]['nr'] in flipped_nodes]
 
                 if info['status'] == 'start':
-                        comment = f'flipping {len(flipped_nodes)} variable(s)'          
+                        plot_description['comment'].append(f'flipping {len(flipped_nodes)} variable(s)')          
                 else:
-                        prev = log_data[value-1]['obj'] if value > 1 else 0
-                        comment = f"objective gain: {info['obj'] - prev}"
+                        
                         nx.set_edge_attributes(graph, {edge: 'black' for edge in graph.edges() if set(edge) & set(flipped_nodes)}, 'color')
-                        comment += ', no improvement - reached local optimum' if len(flipped_nodes) == 0 else ''
+                        prev = log_data[value-1]['obj'] if value > 1 else 0
+                        plot_description['comment'].append(f"objective gain: {info['obj'] - prev}")
+                        if len(flipped_nodes) == 0:
+                                plot_description['comment'].append('no improvement - reached local optimum')
                         flipped_nodes = []
 
 
         if info.get('better', False):
                 flipped_nodes += [n for n in incumbent]
-                comment += ', found new incumbent'
-
-        # fill description with text
-        plot_description['phase'] = phase
-        plot_description['comment'] = comment
-        plot_description['best'] = info.get('best', 0)
-        plot_description['current'] = info.get('obj', 0)
+                plot_description['comment'].append('found new incumbent')
 
         draw_maxsat_graph(graph, flipped_nodes + list(added.union(removed)))
         write_literal_info(pos_literals,graph)
+        add_description(info)
 
 def color_and_get_changed_clauses(value,log_data, graph, start=True):
 
@@ -164,54 +182,6 @@ def color_clauses_and_count_literals(log_data: dict(), graph, literals=True):
 
 
 
-def draw_maxsat_graph(graph, pos_change):
-
-        ax.clear()
-        plt.axis('off')
-        add_description()
-        ax.set_ylim(bottom=-0.14,top=0.37)
-        ax.set_xlim(left=-1,right=1)
-
-        for i in ['right','top','bottom','left']:
-            plt.gca().spines[i].set_visible(False)
-
-        var_inc_nodes = [n for n,t in nx.get_node_attributes(graph, 'type').items() if  t in ['variable', 'incumbent']]
-        var_inc_color = [graph.nodes[n]['color'] for n in var_inc_nodes]
-        var_inc_lcol = ['black' if graph.nodes[n]['type'] == 'variable' else 'yellow' for n in var_inc_nodes if n in pos_change]
-        var_inc_lw = [4 if n in pos_change else 0 for n in var_inc_nodes]
-
-        cl_nodes = [n for n,t in nx.get_node_attributes(graph, 'type').items() if  t =='clause']
-        cl_color = [graph.nodes[n]['color'] for n in cl_nodes]
-        cl_lcol = ['yellow' for n in cl_nodes]
-        cl_lw = [3 if n in pos_change else 0 for n in cl_nodes]
-
-        edges = list(graph.edges())
-        # draw gray and black edges seperately to avoid overpainting black edges
-        e_list_gray = [e for i,e in enumerate(edges) if graph.edges[e]['color'] !='black']
-        e_style_gray = [graph.edges[e]['style'] for e in e_list_gray]
-
-        e_list_black = [e for i,e in enumerate(edges) if graph.edges[e]['color'] =='black']
-        e_style_black = [graph.edges[e]['style'] for e in e_list_black]
-
-        var_labels = {v:graph.nodes[v]['label'] for v in graph.nodes() if graph.nodes[v]['type'] == 'variable'} # nicht unbedingt notwendig?
-
-        pos = nx.get_node_attributes(graph, 'pos')
-
-        nx.draw_networkx_nodes(graph, pos, nodelist=var_inc_nodes, node_color=var_inc_color, edgecolors=var_inc_lcol, linewidths=var_inc_lw, node_shape='s', node_size=500,ax=ax)
-        nx.draw_networkx_nodes(graph, pos, nodelist=cl_nodes, node_color=cl_color, edgecolors=cl_lcol, linewidths=cl_lw, node_shape='o',node_size=150,ax=ax)
-        nx.draw_networkx_edges(graph,pos, edgelist=e_list_gray, style=e_style_gray,ax=ax, edge_color='lightgray')
-        nx.draw_networkx_edges(graph,pos, edgelist=e_list_black, style=e_style_black,ax=ax, edge_color='black')
-        nx.draw_networkx_labels(graph,pos,labels=var_labels,ax=ax)
-
-
-
-
-def reset_maxsat_graph(graph):
-        
-        nx.set_node_attributes(graph, {n: 'lightgray' if graph.nodes[n]['type'] != 'incumbent' else 'white' for n in graph.nodes()}, name='color')
-        nx.set_edge_attributes(graph, 'lightgray', name='color')
-
-
 def get_grasp_maxsat_animation(i: int, log_data: list(), graph):
 
         if log_data[i].get('m','').startswith('rc') or log_data[i].get('status','') not in ['start','end']:
@@ -222,7 +192,6 @@ def get_grasp_maxsat_animation(i: int, log_data: list(), graph):
 
                
 
-
 def get_grasp_maxsat_rcl_animation(i: int, log_data: list(), graph):
         reset_maxsat_graph(graph)
 
@@ -232,26 +201,21 @@ def get_grasp_maxsat_rcl_animation(i: int, log_data: list(), graph):
         info = log_data[i]
 
         if log_data[i]['status'] == 'start':
-                plot_description.update({'phase': phases['rc'],
-                        'comment': 'start with empty solution',
-                        'best': log_data[i]['best'],
-                        'current': 0,
-                        })
+                plot_description['comment'].append('start with empty solution')
+                info['obj'] = 0
                 draw_maxsat_graph(graph, [])
                 write_literal_info(dict.fromkeys(clauses,0),graph)
+                add_description(info)
                 return
 
         if log_data[i]['status'] == 'end':
-                plot_description.update({'phase': phases['rc'],
-                'comment': f'constructed complete solution' + (', found new incumbent' if info['better'] else ''),
-                'best': info['best'],
-                'current': info['obj']
-                })
+                plot_description['comment'].append(f'constructed complete solution' + (', found new incumbent' if info['better'] else ''))
                 nx.set_node_attributes(graph, {k: 'r' if info['inc'][graph.nodes[k]['nr']-1] == 0 else 'b' for k in incumbent}, name='color')
                 nx.set_node_attributes(graph, {k: 'r' if info['current'][graph.nodes[k]['nr']-1] == 0 else 'b' for k in variables}, name='color')
                 _,_,pos_literals = color_and_get_changed_clauses(i,log_data, graph)
                 draw_maxsat_graph(graph, incumbent if info['better'] else [])
                 write_literal_info(pos_literals,graph)
+                add_description(info)
                 return
 
 
@@ -280,22 +244,22 @@ def get_grasp_maxsat_rcl_animation(i: int, log_data: list(), graph):
         while log_data[j]['status'] != 'start':
                 j = j-1
 
-        plot_description.update({'phase': phases[info['status']],
-                'comment': comments.get(info['status']) + (f', objective gain: {len(added)}' if info['status'] == 'sel' else ''),
+        plot_description.update({
                 'best': log_data[j]['best'], 
-                'current': sum(p > 0 for p in pos_literals.values())
+                'obj': sum(p > 0 for p in pos_literals.values())
                 })
-
+        plot_description['comment'].append(comments.get(info['status']) + (f', objective gain: {len(added)}' if info['status'] == 'sel' else ''))
         # draw graph and print textual information
         draw_maxsat_graph(graph,([abs(sel)] if sel != 0 else []) + list(added))
         write_literal_info(pos_literals,graph)
         write_cl_info(cl, rcl, sel, graph)
+        add_description(info)
 
 
 
 def write_literal_info(literal_info: dict(),graph):
 
-        literal_info.update( {n:(v,[graph.nodes[n]['pos'][0],graph.nodes[n]['pos'][1]-0.025]) for n,v in literal_info.items()})
+        literal_info.update( {n:(v,[graph.nodes[n]['pos'][0],graph.nodes[n]['pos'][1]-0.1]) for n,v in literal_info.items()})
 
         for n,data in literal_info.items():
                 ax.text(data[1][0],data[1][1],data[0],{'color': 'black', 'ha': 'center', 'va': 'center', 'fontsize':'small'})
@@ -311,7 +275,7 @@ def write_cl_info(cl: dict(), rcl: list(), sel: int, graph):
                 pos = cl_positions[abs(k)]
                 c = col[np.sign(k)] if len(rcl)==0 or k in rcl else col[0]
                 bbox = dict(boxstyle="circle",fc="white", ec=c, pad=0.2) if k == sel else None
-                ax.text(pos[0],pos[1]+0.06+(0.015*np.sign(k)), v, {'color': c, 'ha': 'center', 'va': 'center','fontweight':'bold','bbox': bbox})
+                ax.text(pos[0],pos[1]+0.2+(0.05*np.sign(k)), v, {'color': c, 'ha': 'center', 'va': 'center','fontweight':'bold','bbox': bbox})
 
 
 def init_maxsat_graph(instance: MAXSATInstance):
@@ -333,10 +297,10 @@ def init_maxsat_graph(instance: MAXSATInstance):
 
         ### calculate positions for nodes
         step = 2/(n+1)
-        pos = {v:[-1 + i*step, 0.2] for i,v in enumerate(variables, start=1)}
-        pos.update({i:[-1 +j*step,0.25] for j,i in enumerate(incumbent, start=1)})
+        pos = {v:[-1 + i*step, 0.4] for i,v in enumerate(variables, start=1)}
+        pos.update({i:[-1 +j*step,0.6] for j,i in enumerate(incumbent, start=1)})
         step = 2/(m+1)
-        pos.update({c:[-1+ i*step,-0.1] for i,c in enumerate(clauses_sorted, start=1)})
+        pos.update({c:[-1+ i*step,-0.4] for i,c in enumerate(clauses_sorted, start=1)})
 
         # create nodes with data
         v = [(x, {'type':'variable', 'nr':x-m, 'color':'lightgray', 'pos':pos[x], 'label':f'x{x-m}','usage':clause}) for x,clause in enumerate(instance.variable_usage, start=m+1)]  #[m+1,...,m+n]
@@ -356,14 +320,145 @@ def init_maxsat_graph(instance: MAXSATInstance):
         return graph
 
 
+def draw_maxsat_graph(graph, pos_change):
+
+        ax.clear()
+        plt.axis('off')
+        ax.set_ylim(bottom=-1,top=1.2)
+        ax.set_xlim(left=-1,right=1)
+
+        for i in ['right','top','bottom','left']:
+            plt.gca().spines[i].set_visible(False)
+
+        var_inc_nodes = [n for n,t in nx.get_node_attributes(graph, 'type').items() if  t in ['variable', 'incumbent']]
+        var_inc_color = [graph.nodes[n]['color'] for n in var_inc_nodes]
+        var_inc_lcol = ['black' if graph.nodes[n]['type'] == 'variable' else 'gold' for n in var_inc_nodes if n in pos_change]
+        var_inc_lw = [4 if n in pos_change else 0 for n in var_inc_nodes]
+
+        cl_nodes = [n for n,t in nx.get_node_attributes(graph, 'type').items() if  t =='clause']
+        cl_color = [graph.nodes[n]['color'] for n in cl_nodes]
+        cl_lcol = ['gold' for n in cl_nodes]
+        cl_lw = [3 if n in pos_change else 0 for n in cl_nodes]
+
+        edges = list(graph.edges())
+        # draw gray and black edges seperately to avoid overpainting black edges
+        e_list_gray = [e for i,e in enumerate(edges) if graph.edges[e]['color'] !='black']
+        e_style_gray = [graph.edges[e]['style'] for e in e_list_gray]
+
+        e_list_black = [e for i,e in enumerate(edges) if graph.edges[e]['color'] =='black']
+        e_style_black = [graph.edges[e]['style'] for e in e_list_black]
+
+        var_labels = {v:graph.nodes[v]['label'] for v in graph.nodes() if graph.nodes[v]['type'] == 'variable'}
+
+        pos = nx.get_node_attributes(graph, 'pos')
+
+        nx.draw_networkx_nodes(graph, pos, nodelist=var_inc_nodes, node_color=var_inc_color, edgecolors=var_inc_lcol, linewidths=var_inc_lw, node_shape='s', node_size=500,ax=ax)
+        nx.draw_networkx_nodes(graph, pos, nodelist=cl_nodes, node_color=cl_color, edgecolors=cl_lcol, linewidths=cl_lw, node_shape='o',node_size=150,ax=ax)
+        nx.draw_networkx_edges(graph,pos, edgelist=e_list_gray, style=e_style_gray,ax=ax, edge_color='lightgray')
+        nx.draw_networkx_edges(graph,pos, edgelist=e_list_black, style=e_style_black,ax=ax, edge_color='black')
+        nx.draw_networkx_labels(graph,pos,labels=var_labels,ax=ax)
+
+
+def reset_maxsat_graph(graph):
+        
+        nx.set_node_attributes(graph, {n: 'lightgray' if graph.nodes[n]['type'] != 'incumbent' else 'white' for n in graph.nodes()}, name='color')
+        nx.set_edge_attributes(graph, 'lightgray', name='color')
+
+
 
 def init_misp_graph(instance: MISPInstance):
 
         graph = instance.graph
+        #TODO find better layout
+        nodelist = graph.nodes()
+        #pos = nx.kamada_kawai_layout(graph, dist={n: {nn: 0.1 for nn in nodelist if nn != n} for n in nodelist})
         pos = nx.kamada_kawai_layout(graph)
-
         nx.set_node_attributes(graph, 'lightgray', name='color')
         nx.set_node_attributes(graph, pos, 'pos')
+        nx.set_edge_attributes(graph, 'lightgray', 'color')
 
+        return graph
+
+
+
+def draw_misp_graph(graph, pos_change: list()):
+        ax.clear()
+        plt.axis('off')
+        ax.set_ylim(bottom=-1.1,top=1.2)
+        ax.set_xlim(left=-1.1,right=1.1) #TODO maybe adapt these to positions of outer nodes
+
+        nodelist = graph.nodes()
+
+        pos = nx.get_node_attributes(graph,'pos')
+
+        color = [graph.nodes[n]['color'] for n in nodelist]
+        linewidth = [3 if n in pos_change else 0 for n in nodelist]
+        lcol = ['gold' for n in nodelist]
+        #labels = {n:f'{n}{l}' for n,l in nx.get_node_attributes(graph, 'label').items()}
+        labels = nx.get_node_attributes(graph, 'label')
+        
+        nx.draw_networkx(graph, pos, nodelist=nodelist, with_labels=True, labels=labels,font_weight='heavy', font_size=14, ax=ax,  
+                        node_color=color, edgecolors=lcol, edge_color='lightgray', linewidths=linewidth, node_size=500)
+
+
+
+def get_gvns_misp_animation(i: int, log_data: list(), graph):
+        reset_misp_graph(graph)
+        comments = {'ch':'random','sh':'start from incumbent', 'li':'improve solution'}
+
+        if i == 0:
+                plot_description.update({'phase': f'MAX-Independent Set Instance',
+                                                'comment': [f'{len(graph.nodes())} nodes, {len(graph.edges())} edges']})
+                log_data[i]['best'] = log_data[i]['obj'] = 0
+                draw_misp_graph(graph, [])
+                add_description(log_data[i])
+                return
+
+        info = log_data[i]
+
+        compare_i = i + (info.get('status') == 'start') - (info.get('status') == 'end')
+        compare_sol = set(log_data[compare_i].get('current'))
+        current_sol = set(info.get('current'))
+
+        #set color of current solution
+        nx.set_node_attributes(graph, {n:'green' for n in info.get('current')}, 'color')
+
+        remove = current_sol - compare_sol if info.get('status') == 'start' else compare_sol - current_sol
+        add = current_sol - compare_sol if info.get('status') == 'end' else compare_sol - current_sol
+        if info.get('status') == 'start':
+                plot_description['comment'].append(comments[info['m'][:2]])
+                #set labels for elements to be removed/added
+                nx.set_node_attributes(graph, {n:'+' for n in add}, 'label')
+                nx.set_node_attributes(graph, {n:'-' for n in remove}, 'label')
+                plot_description['comment'].append(f'remove {len(remove)} node(s), add {len(add)} node(s)')
+        if info.get('status') == 'end' and not (add or remove) and info.get('m')[:2] == 'li':
+                plot_description['comment'].append('no improvement - reached local optimum')
+
+
+        if info.get('better',False):
+                plot_description['comment'].append('found new incumbent')
+                nx.set_node_attributes(graph, {n:'gold' for n in info.get('inc')}, 'color')
+
+        if info.get('status') == 'end':
+                plot_description['comment'].append(f'objective gain: {info["obj"] - log_data[i-1]["obj"]}')
+
+        draw_misp_graph(graph, info['inc'])
+        add_description(info)
+
+
+
+
+
+def reset_misp_graph(graph):
+        nx.set_node_attributes(graph, 'lightgray', name='color')
+        nx.set_edge_attributes(graph, 'lightgray', name='color')
+        nx.set_node_attributes(graph, '', name='label')
+
+
+
+#only used for debugging
+if __name__ == '__main__':
+        graph = init_misp_graph(MISPInstance('gnm-30-60'))
+        get_animation(0,['MISP','GVNS'], graph)
 
 

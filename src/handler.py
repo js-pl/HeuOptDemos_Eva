@@ -3,6 +3,9 @@ handler module which provides information for widgets in interface module and us
 to issue pymhlib calls
 """
 
+import sys
+sys.path.append('..\\HeuOptDemos_Eva')
+
 from abc import ABC, abstractmethod
 import enum
 import os
@@ -123,7 +126,6 @@ class MAXSAT(ProblemDefinition):
         return MAXSATSolution(instance)
 
 
-
 class MISP(ProblemDefinition):
 
     def __init__(self, name: str):
@@ -136,7 +138,7 @@ class MISP(ProblemDefinition):
                                 ,
                     Algorithm.GRASP: {
                                 Option.CH: [('random', MISPSolution.construct, 0)],   #not needed for grasp
-                                Option.LI: [('two-exchange random fill neighborhood search', MAXSATSolution.local_improve, 2)],
+                                Option.LI: [('two-exchange random fill neighborhood search', MISPSolution.local_improve, 2)],
                                 Option.RCL: [('k-best', None, int),('alpha', None, float)]
                               }
                     }
@@ -152,6 +154,8 @@ class MISP(ProblemDefinition):
         if len(inst) == 0:
             return ['random']
         return inst
+
+
 
 
 
@@ -243,37 +247,26 @@ def get_gvns_log_data(prob: Problem, alg: Algorithm):
                 data.append(entry[status])
                 entry[status] = {}
 
-            ### TODO specific to maxsat, has to be adapted to other problems!!!!
             if line.startswith('CL'):
                 status = 'rcl'
                 rcl_data['cl'] = cast_solution(line)
             if line.startswith('X'):
                 rcl_data['current'] = cast_solution(line)
-            if line.startswith('UNFUL'):
-                rcl_data['unful'] = int(line.split(':')[1].strip())
-            if line.startswith('THRESH'):
-                rcl_data['thresh'] = float(line.split(':')[1].strip())
-            if line.startswith('MAX'):
-                rcl_data['max'] = int(line.split(':')[1].strip())
             if line.startswith('RCL'):
                 rcl_data['rcl'] = cast_solution(line)
             if line.startswith('SEL'):
                 rcl_data['sel'] = int(line.split(':')[1].strip())
-            if line.startswith('ADDED'):
-                rcl_data['added'] = int(line.split(':')[1].strip())
-                data.append({'status':'cl', 'cl':rcl_data['cl'], 'unful':rcl_data['unful'], 'current':rcl_data['current']})
+                data.append({'status':'cl', 'cl':rcl_data['cl'], 'current':rcl_data['current']})
                 par = method[2:]
                 rcl = {'status':'rcl', 'cl':rcl_data['cl'], 'rcl':rcl_data['rcl'], 'current':rcl_data['current']}
-                if 'max' in rcl_data:
-                    rcl['max'] = rcl_data['max']
-                    rcl['thresh'] = rcl_data['thresh']
-                    rcl['alpha'] = float(par)
-                else:
+                if re.match(r"(?<![\d.])[0-9]+(?![\d.])", par):
                     rcl['k'] = int(par)
+                else:
+                    rcl['alpha'] = float(par)
                 data.append(rcl)
                 x = [x for x in rcl_data['current']]
                 x[abs(rcl_data['sel'])-1] = 0 if rcl_data['sel'] < 0 else 1
-                data.append({'status':'sel', 'cl':rcl_data['cl'], 'rcl':rcl_data['rcl'], 'current':x, 'sel':rcl_data['sel'], 'added':rcl_data['added']})
+                data.append({'status':'sel', 'cl':rcl_data['cl'], 'rcl':rcl_data['rcl'], 'current':x, 'sel':rcl_data['sel']})
                 rcl_data = {}
 
         logf.close()
@@ -355,7 +348,6 @@ def run_gvns(solution, options: dict):
 
 
     prob = problems[options['prob']]
-
     ch = [ prob.get_method(Algorithm.GVNS, Option.CH, m[0], m[1]) for m in options[Option.CH] ]
     li = [ prob.get_method(Algorithm.GVNS, Option.LI, m[0], m[1]) for m in options[Option.LI] ]
     sh = [ prob.get_method(Algorithm.GVNS, Option.SH, m[0], m[1]) for m in options[Option.SH] ]
@@ -377,10 +369,20 @@ def run_grasp(solution, options: dict):
     li = [ prob.get_method(Algorithm.GRASP, Option.LI, m[0], m[1]) for m in options[Option.LI] ]
     rcl = [ prob.get_method(Algorithm.GRASP, Option.RCL, m[0], m[1]) for m in options[Option.RCL] ]
 
+    # for now the overwritten gvns is called
     alg = MyGVNS(logger_step, solution,ch,li,rcl,consider_initial_sol=True)
     alg.run()
     alg.method_statistics()
     alg.main_results()
+
+    
+
+# only used for debugging
+if __name__ == '__main__':
+        run_gvns(MISPSolution(MISPInstance('gnm-50-60')), {'prob':Problem.MISP,Option.CH:[('random',0)],
+            Option.LI:[('two-exchange random fill neighborhood search',2)],
+            Option.SH:[('remove k and random fill',3),('remove k and random fill',5)]})
+        log_data = get_gvns_log_data(Problem.MISP, Algorithm.GVNS)
 
 
 

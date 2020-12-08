@@ -7,6 +7,7 @@ import logging
 logger_step = logging.getLogger("step-by-step")
 
 
+
 def greedy_randomized_construction(sol: Solution, par, _result):
 
 
@@ -24,7 +25,7 @@ def greedy_randomized_construction(sol: Solution, par, _result):
 
         logger_step.info(f'CL: {candidates}')
         logger_step.info(f'X_START: {x}')
-        logger_step.info(f'UNFUL: {len(clauses)}')
+
 
         rcl = restricted_candidate_list(candidates, par)
         logger_step.info(f'RCL: {rcl}')
@@ -32,7 +33,7 @@ def greedy_randomized_construction(sol: Solution, par, _result):
         e = random.choice(rcl)      # choose random element from rcl
         logger_step.info(f'SEL: {e}')
         
-        logger_step.info(f'ADDED_C: {candidates[e]}')
+
         x[abs(e)-1] = 0 if e < 0 else 1   # add e to solution
         clauses = [c for c in clauses if e not in c] # remove fulfilled clauses
 
@@ -57,7 +58,5 @@ def restricted_candidate_list(candidates: dict(), par):
 
     if type(par) == float:
         maximum = max(candidates.values())
-        logger_step.info(f'MAX: {maximum}')
-        logger_step.info(f'THRESH: {round(maximum*par,2)}')
         rcl = np.array([k for k,v in candidates.items() if v >= maximum * par],dtype=int)
         return rcl
