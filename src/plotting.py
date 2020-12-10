@@ -55,7 +55,7 @@ def get_visualisation(prob: Problem, alg: Algorithm, instance):
         if prob == Problem.MAXSAT and (alg == Algorithm.GVNS or alg == Algorithm.GRASP):
                 return init_maxsat_graph(instance)
 
-        if prob == Problem.MISP and alg == Algorithm.GVNS:
+        if prob == Problem.MISP and (alg == Algorithm.GVNS or alg == Algorithm.GRASP):
 
                 return init_misp_graph(instance)
 
@@ -69,6 +69,8 @@ def get_animation(i: int, log_data: list(), graph):
                 get_grasp_maxsat_animation(i, log_data[2:], graph)
         if log_data[0] == Problem.MISP.name.lower() and log_data[1] == Algorithm.GVNS.name.lower():
                 get_gvns_misp_animation(i, log_data[2:], graph)
+        if log_data[0] == Problem.MISP.name.lower() and log_data[1] == Algorithm.GRASP.name.lower():
+                get_grasp_misp_animation(i, log_data[2:], graph)
                 
 
 
@@ -382,7 +384,7 @@ def init_misp_graph(instance: MISPInstance):
 
 
 
-def draw_misp_graph(graph, pos_change: list()):
+def draw_misp_graph(graph, pos_change: list() = [], sel_color='gold'):
         ax.clear()
         plt.axis('off')
         ax.set_ylim(bottom=-1.1,top=1.2)
@@ -394,7 +396,7 @@ def draw_misp_graph(graph, pos_change: list()):
 
         color = [graph.nodes[n]['color'] for n in nodelist]
         linewidth = [3 if n in pos_change else 0 for n in nodelist]
-        lcol = ['gold' for n in nodelist]
+        lcol = [sel_color for n in nodelist]
         #labels = {n:f'{n}{l}' for n,l in nx.get_node_attributes(graph, 'label').items()}
         labels = nx.get_node_attributes(graph, 'label')
         
@@ -447,7 +449,57 @@ def get_gvns_misp_animation(i: int, log_data: list(), graph):
         add_description(info)
 
 
+def get_grasp_misp_animation(i: int, log_data:list(), graph):
 
+        if log_data[i].get('m','').startswith('rgc') or log_data[i].get('status','') not in ['start','end']:
+                
+                get_grasp_misp_rcl_animation(i, log_data, graph)
+        else:
+                get_gvns_misp_animation(i, log_data, graph)
+
+
+
+def get_grasp_misp_rcl_animation(i:int, log_data: list(), graph):
+        reset_misp_graph(graph)
+        info = log_data[i] 
+        # TODO add vis for start and end
+        if info['status'] == 'start':
+                plot_description.update({'comment':['start with empty solution'], 'best':info.get('best')})
+                draw_misp_graph(graph)
+                add_description(log_data[i])
+                return
+        if info['status'] == 'end':
+                plot_description.update({'comment':['created complete solution'], 'best':info.get('best'), 'obj':info.get('obj')})
+                if info.get('better',False):
+                        plot_description['comment'].append('found new incumbent')
+                        nx.set_node_attributes(graph, {n:'gold' for n in info.get('sol')}, name='color')
+                else:
+                        nx.set_node_attributes(graph, {n:'green' for n in info.get('sol')}, name='color')
+                draw_misp_graph(graph,info.get('inc'))
+                add_description(log_data[i])
+                return
+        #set labels according to candidate list
+        nx.set_node_attributes(graph, info.get('cl',{}), 'label')
+
+        # set color of selected nodes
+        nx.set_node_attributes(graph, {n: 'green' for n in info.get('sol', [])}, name='color')
+        if info.get('sel'):
+                graph.nodes[info.get('sel')]['color'] = 'gold'
+
+        j = i
+        while not (log_data[j]['status'] == 'start'):
+                j -= 1
+
+        par = info.get('par',0.)
+        mn = min(info.get('cl').values())
+        comments = {'cl': 'remaining degree (unblocked neighbors)',
+                        'rcl':  f'{par}-best' if type(par)==int else f'alpha: {par}, threshold: {round(mn*par,2)}',
+                        'sel': f'random, objective gain: 1'}
+
+        plot_description['comment'].append(comments.get(info['status']))
+        plot_description.update({'best': log_data[j]['best'], 'obj':len(info.get('sol'))})
+        draw_misp_graph(graph, info.get('rcl',[]), sel_color='black')
+        add_description(log_data[i])
 
 
 def reset_misp_graph(graph):

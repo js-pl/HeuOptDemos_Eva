@@ -178,7 +178,11 @@ class InterfaceVisualisation():
                 rcl = widgets.RadioButtons(options=[m[0] for m in options[Option.RGC]],
                                                 description=Option.RGC.value)
                 k_best = widgets.IntText(value=1,description='k:',layout=widgets.Layout(width='150px', display='None'))
-                alpha = widgets.FloatSlider(value=0.95, description='alpha:',layout=widgets.Layout(display='None'), orientation='horizontal', min=0, max=1)
+                val = 0.85 if self.problemWidget.value == Problem.MAXSAT.value else 1.5
+                mini = 0 if self.problemWidget.value == Problem.MAXSAT.value else 1
+                maxi = 1 if self.problemWidget.value == Problem.MAXSAT.value else 5
+                alpha = widgets.FloatSlider(value=val, description='alpha:',step=0.05,layout=widgets.Layout(display='None'), orientation='horizontal', min=mini, max=maxi)
+
                 param = widgets.HBox([k_best,alpha])
                 rcl_box = widgets.VBox()
 
