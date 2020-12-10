@@ -33,7 +33,7 @@ plot_description = {'phase': '',
                         'obj': 0,
                         }
 
-phases = {'ch':'Construction', 'li': 'Local Search', 'sh': 'Shaking', 'rc': 'Randomized Greedy Construction', 
+phases = {'ch':'Construction', 'li': 'Local Search', 'sh': 'Shaking', 'rgc': 'Randomized Greedy Construction', 
                 'cl':'Candidate List', 'rcl': 'Restricted Candidate List', 'sel':'Selection from RCL'}
 
 def get_visualisation(prob: Problem, alg: Algorithm, instance):
@@ -63,11 +63,11 @@ def get_visualisation(prob: Problem, alg: Algorithm, instance):
 
 def get_animation(i: int, log_data: list(), graph):
 
-        if log_data[0] == 'MAXSAT' and log_data[1] == 'GVNS':
+        if log_data[0] == Problem.MAXSAT.name.lower() and log_data[1] == Algorithm.GVNS.name.lower():
                 get_gvns_maxsat_animation(i, log_data[2:], graph)
-        if log_data[0] == 'MAXSAT' and log_data[1] == 'GRASP':
+        if log_data[0] == Problem.MAXSAT.name.lower() and log_data[1] == Algorithm.GRASP.name.lower():
                 get_grasp_maxsat_animation(i, log_data[2:], graph)
-        if log_data[0] == 'MISP' and log_data[1] == 'GVNS':
+        if log_data[0] == Problem.MISP.name.lower() and log_data[1] == Algorithm.GVNS.name.lower():
                 get_gvns_misp_animation(i, log_data[2:], graph)
                 
 
@@ -79,7 +79,7 @@ def add_description(log_info: dict()):
                 log_info['best'] = 0
                 log_info['obj'] = 0
         else:
-                plot_description['phase'] = phases.get(log_info['status'],'') + phases.get(log_info.get('m','   ')[:2],'')
+                plot_description['phase'] = phases.get(log_info['status'],'') + phases.get(log_info.get('m','   '),'')
 
 
         ax.text(0,1, '\n'.join((
@@ -109,18 +109,18 @@ def get_gvns_maxsat_animation(value: int, log_data: list(), graph):
         
         info = log_data[value]
         if value == 1:
-                log_data[0]['current'] = [-1 for _ in info['current']]
+                log_data[0]['sol'] = [-1 for _ in info['sol']]
                 plot_description['comment'].append('random') # TODO make generic to be able to used with other methods than random
         flipped_nodes = []
 
         nx.set_node_attributes(graph, {k: 'r' if info['inc'][graph.nodes[k]['nr']-1] == 0 else 'b' for k in incumbent}, name='color')
-        nx.set_node_attributes(graph, {k: 'r' if info['current'][graph.nodes[k]['nr']-1] == 0 else 'b' for k in variables}, name='color')
+        nx.set_node_attributes(graph, {k: 'r' if info['sol'][graph.nodes[k]['nr']-1] == 0 else 'b' for k in variables}, name='color')
         
         added, removed, pos_literals = color_and_get_changed_clauses(value, log_data, graph, info['status'] == 'start')
 
         if value > 1:
                 comp = value + (info['status'] == 'start') - (info['status'] == 'end')
-                flipped_nodes = [i+1 for i in range(len(variables)) if info['current'][i]!=log_data[comp]['current'][i] ]
+                flipped_nodes = [i+1 for i in range(len(variables)) if info['sol'][i]!=log_data[comp]['sol'][i] ]
                 flipped_nodes = [n for n in variables if graph.nodes[n]['nr'] in flipped_nodes]
 
                 if info['status'] == 'start':
@@ -130,7 +130,7 @@ def get_gvns_maxsat_animation(value: int, log_data: list(), graph):
                         nx.set_edge_attributes(graph, {edge: 'black' for edge in graph.edges() if set(edge) & set(flipped_nodes)}, 'color')
                         prev = log_data[value-1]['obj'] if value > 1 else 0
                         plot_description['comment'].append(f"objective gain: {info['obj'] - prev}")
-                        if len(flipped_nodes) == 0:
+                        if len(flipped_nodes) == 0 and info['m'] == 'li':
                                 plot_description['comment'].append('no improvement - reached local optimum')
                         flipped_nodes = []
 
@@ -164,7 +164,7 @@ def color_clauses_and_count_literals(log_data: dict(), graph, literals=True):
 
         for n,clause in clauses.items():
                 for v in clause:
-                        if log_data['current'][abs(v)-1] == (1 if v > 0 else 0):
+                        if log_data['sol'][abs(v)-1] == (1 if v > 0 else 0):
                                 fulfilled.add(n)
                                 graph.nodes[n]['color'] = 'green'
                                 break
@@ -175,7 +175,7 @@ def color_clauses_and_count_literals(log_data: dict(), graph, literals=True):
                 num_literals = dict.fromkeys(clauses,0)
                 for fc in fulfilled:
                         for v in clauses[fc]:
-                             if log_data['current'][abs(v)-1] == (1 if v > 0 else 0):
+                             if log_data['sol'][abs(v)-1] == (1 if v > 0 else 0):
                                      num_literals[fc] += 1
         
         return fulfilled,num_literals
@@ -184,7 +184,7 @@ def color_clauses_and_count_literals(log_data: dict(), graph, literals=True):
 
 def get_grasp_maxsat_animation(i: int, log_data: list(), graph):
 
-        if log_data[i].get('m','').startswith('rc') or log_data[i].get('status','') not in ['start','end']:
+        if log_data[i].get('m','').startswith('rgc') or log_data[i].get('status','') not in ['start','end']:
                 
                 get_grasp_maxsat_rcl_animation(i, log_data, graph)
         else:
@@ -211,18 +211,13 @@ def get_grasp_maxsat_rcl_animation(i: int, log_data: list(), graph):
         if log_data[i]['status'] == 'end':
                 plot_description['comment'].append(f'constructed complete solution' + (', found new incumbent' if info['better'] else ''))
                 nx.set_node_attributes(graph, {k: 'r' if info['inc'][graph.nodes[k]['nr']-1] == 0 else 'b' for k in incumbent}, name='color')
-                nx.set_node_attributes(graph, {k: 'r' if info['current'][graph.nodes[k]['nr']-1] == 0 else 'b' for k in variables}, name='color')
+                nx.set_node_attributes(graph, {k: 'r' if info['sol'][graph.nodes[k]['nr']-1] == 0 else 'b' for k in variables}, name='color')
                 _,_,pos_literals = color_and_get_changed_clauses(i,log_data, graph)
                 draw_maxsat_graph(graph, incumbent if info['better'] else [])
                 write_literal_info(pos_literals,graph)
                 add_description(info)
                 return
 
-
-        mx = max(info['cl'].values())
-        comments = {'cl': 'number of additionally fulfilled clauses',
-                        'rcl':  ''.join([str(info.get('k', 'alpha: ')) + str(info.get('alpha',' best'))] + [f', threshold: {round(info.get("alpha",1) * mx,2)}' if info.get('alpha') else '']),
-                        'sel': 'random'}
 
         #map variable ids to node ids
         keys = {v:k for k,v in nx.get_node_attributes(graph,'nr').items() if graph.nodes[k]['type'] == 'variable'}
@@ -236,7 +231,7 @@ def get_grasp_maxsat_rcl_animation(i: int, log_data: list(), graph):
 
         #set colors for edges and variables
         nx.set_edge_attributes(graph, {edge: 'black' for edge in graph.edges() if abs(sel) in edge}, 'color')
-        nx.set_node_attributes(graph, {n: 'r' if info['current'][graph.nodes[n]['nr']-1] == 0 else 'b' for n in selected if n != 0}, name='color')
+        nx.set_node_attributes(graph, {n: 'r' if info['sol'][graph.nodes[n]['nr']-1] == 0 else 'b' for n in selected if n != 0}, name='color')
         #set colors for clauses
         added,_,pos_literals = color_and_get_changed_clauses(i,log_data,graph,start=not (info['status'] == 'sel'))
 
@@ -244,11 +239,17 @@ def get_grasp_maxsat_rcl_animation(i: int, log_data: list(), graph):
         while log_data[j]['status'] != 'start':
                 j = j-1
 
+        mx = max(info['cl'].values())
+        par = info.get('par', 0)
+        comments = {'cl': 'number of additionally fulfilled clauses',
+                        'rcl':  f'{par}-best' if type(par)==int else f'alpha: {par}, threshold: {round(mx*par,2)}',
+                        'sel': f'random, objective gain: {len(added)}'}
+
         plot_description.update({
                 'best': log_data[j]['best'], 
                 'obj': sum(p > 0 for p in pos_literals.values())
                 })
-        plot_description['comment'].append(comments.get(info['status']) + (f', objective gain: {len(added)}' if info['status'] == 'sel' else ''))
+        plot_description['comment'].append(comments.get(info['status']))
         # draw graph and print textual information
         draw_maxsat_graph(graph,([abs(sel)] if sel != 0 else []) + list(added))
         write_literal_info(pos_literals,graph)
@@ -417,21 +418,21 @@ def get_gvns_misp_animation(i: int, log_data: list(), graph):
         info = log_data[i]
 
         compare_i = i + (info.get('status') == 'start') - (info.get('status') == 'end')
-        compare_sol = set(log_data[compare_i].get('current'))
-        current_sol = set(info.get('current'))
+        compare_sol = set(log_data[compare_i].get('sol'))
+        current_sol = set(info.get('sol'))
 
-        #set color of current solution
-        nx.set_node_attributes(graph, {n:'green' for n in info.get('current')}, 'color')
+        #set color of sol solution
+        nx.set_node_attributes(graph, {n:'green' for n in info.get('sol')}, 'color')
 
         remove = current_sol - compare_sol if info.get('status') == 'start' else compare_sol - current_sol
         add = current_sol - compare_sol if info.get('status') == 'end' else compare_sol - current_sol
         if info.get('status') == 'start':
-                plot_description['comment'].append(comments[info['m'][:2]])
+                plot_description['comment'].append(comments[info['m']])
                 #set labels for elements to be removed/added
                 nx.set_node_attributes(graph, {n:'+' for n in add}, 'label')
                 nx.set_node_attributes(graph, {n:'-' for n in remove}, 'label')
                 plot_description['comment'].append(f'remove {len(remove)} node(s), add {len(add)} node(s)')
-        if info.get('status') == 'end' and not (add or remove) and info.get('m')[:2] == 'li':
+        if info.get('status') == 'end' and not (add or remove) and info.get('m') == 'li':
                 plot_description['comment'].append('no improvement - reached local optimum')
 
 

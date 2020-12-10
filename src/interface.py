@@ -100,9 +100,9 @@ class InterfaceVisualisation():
 
 
         def run_visualisation(self, event):
-                if Problem(self.problemWidget.value).name == 'MISP' and Algorithm(self.algoWidget.value).name == 'GRASP':
-                        self.optionsWidget.children += (widgets.Label(value='This feature will be available soon!'),)
-                        return
+                #if Problem(self.problemWidget.value).name == 'MISP' and Algorithm(self.algoWidget.value).name == 'GRASP':
+                 #       self.optionsWidget.children += (widgets.Label(value='This feature will be available soon!'),)
+                 #       return
                 
                 # prepare current widget parameters for call to run algorithm
                 # store each option as list of tuples (<name>,<parameter>)
@@ -119,11 +119,12 @@ class InterfaceVisualisation():
                         params[Option.LI] = [(name.split(',')[0], int(name.split('=')[1])) for name in list(self.optionsHandles.get(Option.LI).options)]
                 if Option.SH in self.optionsHandles:
                         params[Option.SH] = [(name.split(',')[0], int(name.split('=')[1])) for name in list(self.optionsHandles.get(Option.SH).options)]
-                if Option.RCL in self.optionsHandles:
-                        params[Option.RCL] = [(self.optionsHandles[Option.RCL].children[0].value,self.optionsHandles[Option.RCL].children[1].value)]
+                if Option.RGC in self.optionsHandles:
+                        params[Option.RGC] = [(self.optionsHandles[Option.RGC].children[0].value,self.optionsHandles[Option.RGC].children[1].value)]
 
                 # starts call to pymhlib in handler module
                 self.log_data, instance = handler.run_algorithm(params)
+
                
                 # initialize graph from instance
                 self.plot_instance = p.get_visualisation(params['prob'],params['algo'], instance)
@@ -174,8 +175,8 @@ class InterfaceVisualisation():
         def get_grasp_options(self, options: dict):
 
                 li_box = self.get_neighborhood_options(options, Option.LI)
-                rcl = widgets.RadioButtons(options=[m[0] for m in options[Option.RCL]],
-                                                description=Option.RCL.value)
+                rcl = widgets.RadioButtons(options=[m[0] for m in options[Option.RGC]],
+                                                description=Option.RGC.value)
                 k_best = widgets.IntText(value=1,description='k:',layout=widgets.Layout(width='150px', display='None'))
                 alpha = widgets.FloatSlider(value=0.95, description='alpha:',layout=widgets.Layout(display='None'), orientation='horizontal', min=0, max=1)
                 param = widgets.HBox([k_best,alpha])
@@ -192,7 +193,7 @@ class InterfaceVisualisation():
                                 rcl_box.children = (rcl,alpha)
 
                 rcl.observe(set_param, names='value')
-                self.optionsHandles[Option.RCL] = rcl_box
+                self.optionsHandles[Option.RGC] = rcl_box
                 set_param({'new':rcl.value})
 
                 return (li_box,rcl_box)

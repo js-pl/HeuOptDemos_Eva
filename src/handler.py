@@ -28,7 +28,9 @@ from pymhlib.scheduler import Result
 from typing import List
 import time
 
-from src.methods import greedy_randomized_construction
+from src.maxsat_methods import greedy_randomized_construction as maxsat_greedy_randomized_construction
+from src.misp_methods import greedy_randomized_construction as misp_greedy_randomized_construction
+from src.logdata import get_log_data
 
 
 if not settings.__dict__: parse_settings(args='')
@@ -60,7 +62,7 @@ class Option(enum.Enum):
     CH = 'Initial Solution'
     LI = 'Local Improvement'
     SH = 'Shaking'
-    RCL = 'Restricted Candidate List'
+    RGC = 'Randomized Greedy Construction'
 
 
 
@@ -98,7 +100,7 @@ class ProblemDefinition(ABC):
 
     def get_method(self, algo:Algorithm, opt: Option, name: str, par):
         m = [t for t in self.options[algo][opt] if t[0] == name][0]
-        method = Method(f'{opt.name.lower()[0:2]}{par if type(m[2]) == type else m[2]}', m[1], par)
+        method = Method(f'{opt.name.lower()}{par if type(m[2]) == type else m[2]}', m[1], par)
         return method
 
 
@@ -115,7 +117,7 @@ class MAXSAT(ProblemDefinition):
                     Algorithm.GRASP: {
                                 Option.CH: [('random', MAXSATSolution.construct, 0)],   #not needed for grasp
                                 Option.LI: [('k-flip neighborhood search', MAXSATSolution.local_improve, int)],
-                                Option.RCL: [('k-best', greedy_randomized_construction, int),('alpha', greedy_randomized_construction, float)]
+                                Option.RGC: [('k-best', maxsat_greedy_randomized_construction, int),('alpha', maxsat_greedy_randomized_construction, float)]
                                 }
                     }
 
@@ -139,7 +141,7 @@ class MISP(ProblemDefinition):
                     Algorithm.GRASP: {
                                 Option.CH: [('random', MISPSolution.construct, 0)],   #not needed for grasp
                                 Option.LI: [('two-exchange random fill neighborhood search', MISPSolution.local_improve, 2)],
-                                Option.RCL: [('k-best', None, int),('alpha', None, float)]
+                                Option.RGC: [('k-best', misp_greedy_randomized_construction, int),('alpha', misp_greedy_randomized_construction, float)]
                               }
                     }
 
@@ -199,95 +201,12 @@ def run_algorithm(options: dict):
     # run specified algorithm
     if options['algo'] == Algorithm.GVNS:
         run_gvns(solution, options)
-        return get_gvns_log_data(options['prob'], Algorithm.GVNS), solution.inst
+        return get_log_data(options['prob'].name.lower(), Algorithm.GVNS.name.lower()), solution.inst
     if options['algo'] == Algorithm.GRASP:
         run_grasp(solution, options)
-        return get_gvns_log_data(options['prob'], Algorithm.GRASP), solution.inst
+        return get_log_data(options['prob'].name.lower(), Algorithm.GRASP.name.lower()), solution.inst
    
     return [], None
-
-
-def get_gvns_log_data(prob: Problem, alg: Algorithm):
-    file_path = 'logs' + os.path.sep + prob.name.lower() + os.path.sep + alg.name.lower() + os.path.sep + alg.name.lower() + '.log'
-
-    data = list()
-    entry_start = {}
-    entry_end = {}
-    entry = {'start': {}, 'end': {}}
-    rcl_data = {}
-    with open(file_path) as logf:
-        status = ''
-        method = ''
-        for i,line in enumerate(logf):
-            if i <2:
-                data.append(line.strip())
-                continue
-
-            if line.startswith('START') or line.startswith('END'):
-                status = line.split(':')[0].lower()
-                current = cast_solution(line)
-                entry[status]['status'] = status
-                entry[status]['current'] = current
-            if line.startswith('OBJ'):
-                obj = int(line.split(':')[1].strip())    #TODO could be necessary to cast to float, depends on problems
-                entry[status]['obj'] = obj
-            if line.startswith('INC'):
-                inc = cast_solution(line)
-                entry[status]['inc'] = inc
-            if line.startswith('M:'):
-                m = line.split(':')[1].strip()
-                entry[status]['m'] = m
-                method = line.split(':')[1].strip()
-            if line.startswith('BETTER'):
-                better = line.split(':')[1].strip()
-                entry[status]['better'] = True if better=='True' else False
-            if line.startswith('BEST'):
-                best = int(line.split(':')[1].strip())    #TODO could be necessary to cast to float, depends on problems
-                entry[status]['best'] = best
-                data.append(entry[status])
-                entry[status] = {}
-
-            if line.startswith('CL'):
-                status = 'rcl'
-                rcl_data['cl'] = cast_solution(line)
-            if line.startswith('X'):
-                rcl_data['current'] = cast_solution(line)
-            if line.startswith('RCL'):
-                rcl_data['rcl'] = cast_solution(line)
-            if line.startswith('SEL'):
-                rcl_data['sel'] = int(line.split(':')[1].strip())
-                data.append({'status':'cl', 'cl':rcl_data['cl'], 'current':rcl_data['current']})
-                par = method[2:]
-                rcl = {'status':'rcl', 'cl':rcl_data['cl'], 'rcl':rcl_data['rcl'], 'current':rcl_data['current']}
-                if re.match(r"(?<![\d.])[0-9]+(?![\d.])", par):
-                    rcl['k'] = int(par)
-                else:
-                    rcl['alpha'] = float(par)
-                data.append(rcl)
-                x = [x for x in rcl_data['current']]
-                x[abs(rcl_data['sel'])-1] = 0 if rcl_data['sel'] < 0 else 1
-                data.append({'status':'sel', 'cl':rcl_data['cl'], 'rcl':rcl_data['rcl'], 'current':x, 'sel':rcl_data['sel']})
-                rcl_data = {}
-
-        logf.close()
-    return data
-
-
-
-def cast_solution(sol: str):
-
-    x = re.search(r'(?<=\[)(.*?)(?=\])', sol.strip())
-
-    if x: #solution is a list
-        x = x.group()
-        x = ' '.join(x.split())
-        x = "[" + x.replace(" ",",") + "]"
-        return ast.literal_eval(x)
-    # string is dict
-    x = re.search(r'(?<=\{)(.*?)(?=\})', sol.strip())
-
-    x = "{" + x.group() + "}"
-    return ast.literal_eval(x)
 
 
 ######################### overwrite GVNS to log necessary information 
@@ -314,7 +233,7 @@ class MyGVNS(GVNS):
         res = Result()
         obj_old = sol.obj()
         t_start = time.process_time()
-        step_info = f'START: {sol}\nOBJ: {obj_old}\nM: {method.name}\nINC: {self.incumbent}\nBEST: {self.incumbent.obj()}'
+        step_info = f'START\nSOL: {sol}\nOBJ: {obj_old}\nM: {method.name}\nPAR: {method.par}\nINC: {self.incumbent}\nBEST: {self.incumbent.obj()}'
         self.logger_step.info(step_info)
         method.func(sol, method.par, res)
         t_end = time.process_time()
@@ -331,7 +250,7 @@ class MyGVNS(GVNS):
                 ms.obj_gain += obj_new - obj_old
         self.iteration += 1
         new_incumbent = self.update_incumbent(sol, t_end - self.time_start)
-        step_info = f'END: {sol}\nOBJ: {sol.obj()}\nM: {method.name}\nBETTER: {new_incumbent}\nINC: {self.incumbent}\nBEST: {self.incumbent.obj()}'
+        step_info = f'END\nSOL: {sol}\nOBJ: {sol.obj()}\nM: {method.name}\nPAR: {method.par}\nINC: {self.incumbent}\nBEST: {self.incumbent.obj()}\nBETTER: {new_incumbent}'
         self.logger_step.info(step_info)
         terminate = self.check_termination()
         self.log_iteration(method.name, obj_old, sol, new_incumbent, terminate, res.log_info)
@@ -352,7 +271,7 @@ def run_gvns(solution, options: dict):
     li = [ prob.get_method(Algorithm.GVNS, Option.LI, m[0], m[1]) for m in options[Option.LI] ]
     sh = [ prob.get_method(Algorithm.GVNS, Option.SH, m[0], m[1]) for m in options[Option.SH] ]
     
-    ### TODO for now, the overwritten GVNS is called
+    ### for now, the overwritten GVNS is called
     alg = MyGVNS(logger_step, solution, ch, li, sh)
 
     alg.run()
@@ -364,13 +283,12 @@ def run_grasp(solution, options: dict):
     
     prob = problems[options['prob']]
 
-    #ch = [ prob.get_method(Algorithm.GRASP, Option.CH, 'random', 0) ]
     ch = []
     li = [ prob.get_method(Algorithm.GRASP, Option.LI, m[0], m[1]) for m in options[Option.LI] ]
-    rcl = [ prob.get_method(Algorithm.GRASP, Option.RCL, m[0], m[1]) for m in options[Option.RCL] ]
+    RGC = [ prob.get_method(Algorithm.GRASP, Option.RGC, m[0], m[1]) for m in options[Option.RGC] ]
 
     # for now the overwritten gvns is called
-    alg = MyGVNS(logger_step, solution,ch,li,rcl,consider_initial_sol=True)
+    alg = MyGVNS(logger_step, solution,ch,li,RGC,consider_initial_sol=True)
     alg.run()
     alg.method_statistics()
     alg.main_results()
@@ -379,10 +297,12 @@ def run_grasp(solution, options: dict):
 
 # only used for debugging
 if __name__ == '__main__':
-        run_gvns(MISPSolution(MISPInstance('gnm-50-60')), {'prob':Problem.MISP,Option.CH:[('random',0)],
+        log_data, _ = run_algorithm({'prob':Problem.MISP, Option.CH:[('random',0)], 'inst':'random','algo':Algorithm.GRASP,
             Option.LI:[('two-exchange random fill neighborhood search',2)],
-            Option.SH:[('remove k and random fill',3),('remove k and random fill',5)]})
-        log_data = get_gvns_log_data(Problem.MISP, Algorithm.GVNS)
+            Option.RGC:[('k-best',5)]})
+
+        #print(log_data)
+
 
 
 

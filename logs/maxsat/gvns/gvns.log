@@ -1,673 +1,497 @@
 MAXSAT
 GVNS
-START: [False False False False False False False]
+START
+SOL: [False False False False False False False]
 OBJ: 37
 M: ch0
+PAR: 0
 INC: [False False False False False False False]
 BEST: 37
-END: [False  True  True False  True  True False]
-OBJ: 42
+END
+SOL: [False  True False  True  True False  True]
+OBJ: 41
 M: ch0
+PAR: 0
+INC: [False  True False  True  True False  True]
+BEST: 41
 BETTER: True
-INC: [False  True  True False  True  True False]
-BEST: 42
-START: [False  True  True False  True  True False]
-OBJ: 42
-M: li1
-INC: [False  True  True False  True  True False]
-BEST: 42
-END: [ True  True  True False  True  True False]
-OBJ: 44
-M: li1
-BETTER: True
-INC: [ True  True  True False  True  True False]
-BEST: 44
-START: [ True  True  True False  True  True False]
-OBJ: 44
-M: li1
-INC: [ True  True  True False  True  True False]
-BEST: 44
-END: [ True  True  True False  True  True False]
-OBJ: 44
-M: li1
-BETTER: False
-INC: [ True  True  True False  True  True False]
-BEST: 44
-START: [ True  True  True False  True  True False]
-OBJ: 44
-M: sh1
-INC: [ True  True  True False  True  True False]
-BEST: 44
-END: [ True  True  True False False  True False]
-OBJ: 39
-M: sh1
-BETTER: False
-INC: [ True  True  True False  True  True False]
-BEST: 44
-START: [ True  True  True False False  True False]
-OBJ: 39
-M: li1
-INC: [ True  True  True False  True  True False]
-BEST: 44
-END: [ True  True  True False  True  True False]
-OBJ: 44
-M: li1
-BETTER: False
-INC: [ True  True  True False  True  True False]
-BEST: 44
-START: [ True  True  True False  True  True False]
-OBJ: 44
-M: li1
-INC: [ True  True  True False  True  True False]
-BEST: 44
-END: [ True  True  True False  True  True False]
-OBJ: 44
-M: li1
-BETTER: False
-INC: [ True  True  True False  True  True False]
-BEST: 44
-START: [ True  True  True False  True  True False]
-OBJ: 44
-M: sh1
-INC: [ True  True  True False  True  True False]
-BEST: 44
-END: [False  True  True False  True  True False]
-OBJ: 42
-M: sh1
-BETTER: False
-INC: [ True  True  True False  True  True False]
-BEST: 44
-START: [False  True  True False  True  True False]
-OBJ: 42
-M: li1
-INC: [ True  True  True False  True  True False]
-BEST: 44
-END: [ True  True  True False  True  True False]
-OBJ: 44
-M: li1
-BETTER: False
-INC: [ True  True  True False  True  True False]
-BEST: 44
-START: [ True  True  True False  True  True False]
-OBJ: 44
-M: li1
-INC: [ True  True  True False  True  True False]
-BEST: 44
-END: [ True  True  True False  True  True False]
-OBJ: 44
-M: li1
-BETTER: False
-INC: [ True  True  True False  True  True False]
-BEST: 44
-START: [ True  True  True False  True  True False]
-OBJ: 44
-M: sh1
-INC: [ True  True  True False  True  True False]
-BEST: 44
-END: [ True  True  True  True  True  True False]
-OBJ: 44
-M: sh1
-BETTER: False
-INC: [ True  True  True False  True  True False]
-BEST: 44
-START: [ True  True  True  True  True  True False]
-OBJ: 44
-M: li1
-INC: [ True  True  True False  True  True False]
-BEST: 44
-END: [ True  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-BETTER: True
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-START: [ True  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-END: [ True  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-BETTER: False
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-START: [ True  True  True  True  True  True  True]
-OBJ: 45
-M: sh1
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-END: [ True  True  True  True  True  True False]
-OBJ: 44
-M: sh1
-BETTER: False
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-START: [ True  True  True  True  True  True False]
-OBJ: 44
-M: li1
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-END: [ True  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-BETTER: False
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-START: [ True  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-END: [ True  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-BETTER: False
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-START: [ True  True  True  True  True  True  True]
-OBJ: 45
-M: sh1
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-END: [ True False  True  True  True  True  True]
-OBJ: 45
-M: sh1
-BETTER: False
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-START: [ True False  True  True  True  True  True]
-OBJ: 45
-M: li1
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-END: [ True False  True  True  True  True  True]
-OBJ: 45
-M: li1
-BETTER: False
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-START: [ True  True  True  True  True  True  True]
-OBJ: 45
-M: sh1
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-END: [ True  True  True  True  True False  True]
-OBJ: 43
-M: sh1
-BETTER: False
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-START: [ True  True  True  True  True False  True]
-OBJ: 43
-M: li1
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-END: [ True  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-BETTER: False
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-START: [ True  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-END: [ True  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-BETTER: False
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-START: [ True  True  True  True  True  True  True]
-OBJ: 45
-M: sh1
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-END: [ True  True  True  True False  True  True]
-OBJ: 42
-M: sh1
-BETTER: False
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-START: [ True  True  True  True False  True  True]
-OBJ: 42
-M: li1
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-END: [ True  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-BETTER: False
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-START: [ True  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-END: [ True  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-BETTER: False
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-START: [ True  True  True  True  True  True  True]
-OBJ: 45
-M: sh1
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-END: [ True  True  True False  True  True  True]
-OBJ: 43
-M: sh1
-BETTER: False
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-START: [ True  True  True False  True  True  True]
-OBJ: 43
-M: li1
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-END: [ True  True  True False  True  True False]
-OBJ: 44
-M: li1
-BETTER: False
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-START: [ True  True  True False  True  True False]
-OBJ: 44
-M: li1
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-END: [ True  True  True False  True  True False]
-OBJ: 44
-M: li1
-BETTER: False
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-START: [ True  True  True  True  True  True  True]
-OBJ: 45
-M: sh1
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-END: [ True  True  True  True False  True  True]
-OBJ: 42
-M: sh1
-BETTER: False
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-START: [ True  True  True  True False  True  True]
-OBJ: 42
-M: li1
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-END: [ True  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-BETTER: False
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-START: [ True  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-END: [ True  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-BETTER: False
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-START: [ True  True  True  True  True  True  True]
-OBJ: 45
-M: sh1
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-END: [False  True  True  True  True  True  True]
-OBJ: 45
-M: sh1
-BETTER: False
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-START: [False  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-INC: [ True  True  True  True  True  True  True]
-BEST: 45
-END: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-BETTER: True
-INC: [False  True  True  True  True False  True]
-BEST: 46
-START: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-INC: [False  True  True  True  True False  True]
-BEST: 46
-END: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-BETTER: False
-INC: [False  True  True  True  True False  True]
-BEST: 46
-START: [False  True  True  True  True False  True]
-OBJ: 46
-M: sh1
-INC: [False  True  True  True  True False  True]
-BEST: 46
-END: [False  True  True  True False False  True]
-OBJ: 46
-M: sh1
-BETTER: False
-INC: [False  True  True  True  True False  True]
-BEST: 46
-START: [False  True  True  True False False  True]
-OBJ: 46
-M: li1
-INC: [False  True  True  True  True False  True]
-BEST: 46
-END: [False  True  True  True False False  True]
-OBJ: 46
-M: li1
-BETTER: False
-INC: [False  True  True  True  True False  True]
-BEST: 46
-START: [False  True  True  True  True False  True]
-OBJ: 46
-M: sh1
-INC: [False  True  True  True  True False  True]
-BEST: 46
-END: [False  True  True  True  True False False]
-OBJ: 43
-M: sh1
-BETTER: False
-INC: [False  True  True  True  True False  True]
-BEST: 46
-START: [False  True  True  True  True False False]
-OBJ: 43
-M: li1
-INC: [False  True  True  True  True False  True]
-BEST: 46
-END: [False  True  True  True  True  True False]
-OBJ: 44
-M: li1
-BETTER: False
-INC: [False  True  True  True  True False  True]
-BEST: 46
-START: [False  True  True  True  True  True False]
-OBJ: 44
-M: li1
-INC: [False  True  True  True  True False  True]
-BEST: 46
-END: [False  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-BETTER: False
-INC: [False  True  True  True  True False  True]
-BEST: 46
-START: [False  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-INC: [False  True  True  True  True False  True]
-BEST: 46
-END: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-BETTER: False
-INC: [False  True  True  True  True False  True]
-BEST: 46
-START: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-INC: [False  True  True  True  True False  True]
-BEST: 46
-END: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-BETTER: False
-INC: [False  True  True  True  True False  True]
-BEST: 46
-START: [False  True  True  True  True False  True]
-OBJ: 46
-M: sh1
-INC: [False  True  True  True  True False  True]
-BEST: 46
-END: [False  True  True  True False False  True]
-OBJ: 46
-M: sh1
-BETTER: False
-INC: [False  True  True  True  True False  True]
-BEST: 46
-START: [False  True  True  True False False  True]
-OBJ: 46
-M: li1
-INC: [False  True  True  True  True False  True]
-BEST: 46
-END: [False  True  True  True False False  True]
-OBJ: 46
-M: li1
-BETTER: False
-INC: [False  True  True  True  True False  True]
-BEST: 46
-START: [False  True  True  True  True False  True]
-OBJ: 46
-M: sh1
-INC: [False  True  True  True  True False  True]
-BEST: 46
-END: [False  True  True False  True False  True]
-OBJ: 41
-M: sh1
-BETTER: False
-INC: [False  True  True  True  True False  True]
-BEST: 46
-START: [False  True  True False  True False  True]
+START
+SOL: [False  True False  True  True False  True]
 OBJ: 41
 M: li1
-INC: [False  True  True  True  True False  True]
-BEST: 46
-END: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-BETTER: False
-INC: [False  True  True  True  True False  True]
-BEST: 46
-START: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-INC: [False  True  True  True  True False  True]
-BEST: 46
-END: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-BETTER: False
-INC: [False  True  True  True  True False  True]
-BEST: 46
-START: [False  True  True  True  True False  True]
-OBJ: 46
-M: sh1
-INC: [False  True  True  True  True False  True]
-BEST: 46
-END: [False False  True  True  True False  True]
-OBJ: 45
-M: sh1
-BETTER: False
-INC: [False  True  True  True  True False  True]
-BEST: 46
-START: [False False  True  True  True False  True]
-OBJ: 45
-M: li1
-INC: [False  True  True  True  True False  True]
-BEST: 46
-END: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-BETTER: False
-INC: [False  True  True  True  True False  True]
-BEST: 46
-START: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-INC: [False  True  True  True  True False  True]
-BEST: 46
-END: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-BETTER: False
-INC: [False  True  True  True  True False  True]
-BEST: 46
-START: [False  True  True  True  True False  True]
-OBJ: 46
-M: sh1
-INC: [False  True  True  True  True False  True]
-BEST: 46
-END: [ True  True  True  True  True False  True]
-OBJ: 43
-M: sh1
-BETTER: False
-INC: [False  True  True  True  True False  True]
-BEST: 46
-START: [ True  True  True  True  True False  True]
+PAR: 1
+INC: [False  True False  True  True False  True]
+BEST: 41
+END
+SOL: [False  True False  True False False  True]
 OBJ: 43
 M: li1
-INC: [False  True  True  True  True False  True]
-BEST: 46
-END: [ True  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-BETTER: False
-INC: [False  True  True  True  True False  True]
-BEST: 46
-START: [ True  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-INC: [False  True  True  True  True False  True]
-BEST: 46
-END: [ True  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-BETTER: False
-INC: [False  True  True  True  True False  True]
-BEST: 46
-START: [False  True  True  True  True False  True]
-OBJ: 46
-M: sh1
-INC: [False  True  True  True  True False  True]
-BEST: 46
-END: [ True  True  True  True  True False  True]
-OBJ: 43
-M: sh1
-BETTER: False
-INC: [False  True  True  True  True False  True]
-BEST: 46
-START: [ True  True  True  True  True False  True]
+PAR: 1
+INC: [False  True False  True False False  True]
+BEST: 43
+BETTER: True
+START
+SOL: [False  True False  True False False  True]
 OBJ: 43
 M: li1
-INC: [False  True  True  True  True False  True]
-BEST: 46
-END: [ True  True  True  True  True  True  True]
-OBJ: 45
+PAR: 1
+INC: [False  True False  True False False  True]
+BEST: 43
+END
+SOL: [False  True  True  True False False  True]
+OBJ: 46
 M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: True
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
 BETTER: False
-INC: [False  True  True  True  True False  True]
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: sh4
+PAR: 4
+INC: [False  True  True  True False False  True]
 BEST: 46
-START: [ True  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-INC: [False  True  True  True  True False  True]
+END
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: sh4
+PAR: 4
+INC: [False  True  True  True False False  True]
 BEST: 46
-END: [ True  True  True  True  True  True  True]
-OBJ: 45
-M: li1
 BETTER: False
-INC: [False  True  True  True  True False  True]
-BEST: 46
-START: [False  True  True  True  True False  True]
-OBJ: 46
-M: sh1
-INC: [False  True  True  True  True False  True]
-BEST: 46
-END: [False  True  True  True False False  True]
-OBJ: 46
-M: sh1
-BETTER: False
-INC: [False  True  True  True  True False  True]
-BEST: 46
-START: [False  True  True  True False False  True]
+START
+SOL: [False  True  True  True False False  True]
 OBJ: 46
 M: li1
-INC: [False  True  True  True  True False  True]
+PAR: 1
+INC: [False  True  True  True False False  True]
 BEST: 46
-END: [False  True  True  True False False  True]
+END
+SOL: [False  True  True  True False False  True]
 OBJ: 46
 M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
 BETTER: False
-INC: [False  True  True  True  True False  True]
-BEST: 46
-START: [False  True  True  True  True False  True]
+START
+SOL: [False  True  True  True False False  True]
 OBJ: 46
-M: sh1
-INC: [False  True  True  True  True False  True]
+M: sh4
+PAR: 4
+INC: [False  True  True  True False False  True]
 BEST: 46
-END: [False  True  True False  True False  True]
+END
+SOL: [False  True  True False  True False  True]
 OBJ: 41
-M: sh1
-BETTER: False
-INC: [False  True  True  True  True False  True]
+M: sh4
+PAR: 4
+INC: [False  True  True  True False False  True]
 BEST: 46
-START: [False  True  True False  True False  True]
+BETTER: False
+START
+SOL: [False  True  True False  True False  True]
 OBJ: 41
 M: li1
-INC: [False  True  True  True  True False  True]
+PAR: 1
+INC: [False  True  True  True False False  True]
 BEST: 46
-END: [False  True  True  True  True False  True]
+END
+SOL: [False  True  True  True  True False  True]
 OBJ: 46
 M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
 BETTER: False
-INC: [False  True  True  True  True False  True]
-BEST: 46
-START: [False  True  True  True  True False  True]
+START
+SOL: [False  True  True  True  True False  True]
 OBJ: 46
 M: li1
-INC: [False  True  True  True  True False  True]
+PAR: 1
+INC: [False  True  True  True False False  True]
 BEST: 46
-END: [False  True  True  True  True False  True]
+END
+SOL: [False  True  True  True  True False  True]
 OBJ: 46
 M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
 BETTER: False
-INC: [False  True  True  True  True False  True]
-BEST: 46
-START: [False  True  True  True  True False  True]
+START
+SOL: [False  True  True  True False False  True]
 OBJ: 46
-M: sh1
-INC: [False  True  True  True  True False  True]
+M: sh5
+PAR: 5
+INC: [False  True  True  True False False  True]
 BEST: 46
-END: [False  True  True  True  True  True  True]
+END
+SOL: [ True False  True  True False  True  True]
+OBJ: 41
+M: sh5
+PAR: 5
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [ True False  True  True False  True  True]
+OBJ: 41
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [ True  True  True  True False  True  True]
+OBJ: 42
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [ True  True  True  True False  True  True]
+OBJ: 42
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True False  True  True]
+OBJ: 44
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False  True  True]
+OBJ: 44
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: sh4
+PAR: 4
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: sh4
+PAR: 4
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: sh5
+PAR: 5
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False False  True  True False False  True]
 OBJ: 45
-M: sh1
-BETTER: False
-INC: [False  True  True  True  True False  True]
+M: sh5
+PAR: 5
+INC: [False  True  True  True False False  True]
 BEST: 46
-START: [False  True  True  True  True  True  True]
+BETTER: False
+START
+SOL: [False False  True  True False False  True]
 OBJ: 45
 M: li1
-INC: [False  True  True  True  True False  True]
+PAR: 1
+INC: [False  True  True  True False False  True]
 BEST: 46
-END: [False  True  True  True  True False  True]
+END
+SOL: [False  True  True  True False False  True]
 OBJ: 46
 M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
 BETTER: False
-INC: [False  True  True  True  True False  True]
-BEST: 46
-START: [False  True  True  True  True False  True]
+START
+SOL: [False  True  True  True False False  True]
 OBJ: 46
 M: li1
-INC: [False  True  True  True  True False  True]
+PAR: 1
+INC: [False  True  True  True False False  True]
 BEST: 46
-END: [False  True  True  True  True False  True]
+END
+SOL: [False  True  True  True False False  True]
 OBJ: 46
 M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
 BETTER: False
-INC: [False  True  True  True  True False  True]
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: sh4
+PAR: 4
+INC: [False  True  True  True False False  True]
 BEST: 46
+END
+SOL: [ True  True  True  True False  True  True]
+OBJ: 42
+M: sh4
+PAR: 4
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [ True  True  True  True False  True  True]
+OBJ: 42
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [ True  True  True  True  True  True  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [ True  True  True  True  True  True  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [ True  True  True  True  True  True  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: sh5
+PAR: 5
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True False  True  True]
+OBJ: 44
+M: sh5
+PAR: 5
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False  True  True]
+OBJ: 44
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: sh4
+PAR: 4
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False False  True  True False False False]
+OBJ: 42
+M: sh4
+PAR: 4
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False False  True  True False False False]
+OBJ: 42
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False False  True  True False False  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False False  True  True False False  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: sh5
+PAR: 5
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False False  True  True False  True False]
+OBJ: 41
+M: sh5
+PAR: 5
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False False  True  True False  True False]
+OBJ: 41
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False False  True  True False False False]
+OBJ: 42
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False False  True  True False False False]
+OBJ: 42
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False False  True  True False False  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False False  True  True False False  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
