@@ -35,7 +35,7 @@ from src.logdata import get_log_data
 
 if not settings.__dict__: parse_settings(args='')
 
-logger_step = logging.getLogger("step-by-step")
+
 
 
 
@@ -44,9 +44,10 @@ settings.mh_titer = 100
 settings.mh_lfreq = 1
 #settings.mh_tciter = 30
 settings.mh_out = "logs" + os.path.sep + "summary.log"
-settings.mh_log = "logs" + os.path.sep + "iter.log" # TODO logging to file not working
+settings.mh_log = "logs" + os.path.sep + "iter.log"
 init_logger()
-
+logger_step = logging.getLogger("step-by-step")
+logger_step.setLevel(logging.INFO)
 instance_path = "instances" + os.path.sep
 
 # extend enums as needed, they hold the string values which are used for representation in widgets
@@ -184,16 +185,21 @@ def get_options(prob: Problem, algo: Algorithm):
 
 def run_algorithm(options: dict):
 
+    iter_fh = logging.FileHandler(f"logs/iter.log", mode="w")
+    iter_logger = logging.getLogger("pymhlib_iter")
+    iter_logger.handlers = []
+    iter_logger.addHandler(iter_fh)
+    
+
     fh = logging.FileHandler(f"logs/{options['prob'].name.lower()}/{options['algo'].name.lower()}/{options['algo'].name.lower()}.log", mode="w")
     logger_step.handlers = []
     logger_step.addHandler(fh)
-    logger_step.setLevel(logging.INFO)
     logger_step.info(f"{options['prob'].name}\n{options['algo'].name}")
 
     file_path = instance_path + problems[options['prob']].name + os.path.sep + options['inst']
 
     if options['inst'] == 'random': #only available for misp so far
-        file_path = "gnm-30-60"
+        file_path = "gnm-50-70"
 
     # initialize solution for problem
     solution = problems[options['prob']].get_solution(file_path)
@@ -233,8 +239,9 @@ class MyGVNS(GVNS):
         res = Result()
         obj_old = sol.obj()
         t_start = time.process_time()
-        step_info = f'START\nSOL: {sol}\nOBJ: {obj_old}\nM: {method.name}\nPAR: {method.par}\nINC: {self.incumbent}\nBEST: {self.incumbent.obj()}'
+        step_info = f'START\nSOL: {"[ "+" ".join([str(i) for i in sol.x[:sol.sel]]) +" ]"}\nOBJ: {obj_old}\nM: {method.name}\nPAR: {method.par}'
         self.logger_step.info(step_info)
+        self.logger_step.info(f'INC: {"[ "+" ".join([str(i) for i in self.incumbent.x[:self.incumbent.sel]]) +" ]"}\nBEST: {self.incumbent.obj()}')
         method.func(sol, method.par, res)
         t_end = time.process_time()
         if __debug__ and self.own_settings.mh_checkit:
@@ -250,8 +257,9 @@ class MyGVNS(GVNS):
                 ms.obj_gain += obj_new - obj_old
         self.iteration += 1
         new_incumbent = self.update_incumbent(sol, t_end - self.time_start)
-        step_info = f'END\nSOL: {sol}\nOBJ: {sol.obj()}\nM: {method.name}\nPAR: {method.par}\nINC: {self.incumbent}\nBEST: {self.incumbent.obj()}\nBETTER: {new_incumbent}'
+        step_info = f'END\nSOL: {"[ "+" ".join([str(i) for i in sol.x[:sol.sel]]) +" ]"}\nOBJ: {sol.obj()}\nM: {method.name}\nPAR: {method.par}'
         self.logger_step.info(step_info)
+        self.logger_step.info(f'INC: {"[ "+" ".join([str(i) for i in self.incumbent.x[:self.incumbent.sel]]) +" ]"}\nBEST: {self.incumbent.obj()}\nBETTER: {new_incumbent}')
         terminate = self.check_termination()
         self.log_iteration(method.name, obj_old, sol, new_incumbent, terminate, res.log_info)
         if terminate:
@@ -277,6 +285,7 @@ def run_gvns(solution, options: dict):
     alg.run()
     alg.method_statistics()
     alg.main_results()
+    logging.getLogger("pymhlib_iter").handlers[0].flush()
 
 
 def run_grasp(solution, options: dict):
@@ -292,16 +301,18 @@ def run_grasp(solution, options: dict):
     alg.run()
     alg.method_statistics()
     alg.main_results()
+    logging.getLogger("pymhlib_iter").handlers[0].flush()
 
     
 
 # only used for debugging
 if __name__ == '__main__':
         log_data, _ = run_algorithm({'prob':Problem.MISP, Option.CH:[('random',0)], 'inst':'random','algo':Algorithm.GRASP,
-            Option.LI:[('two-exchange random fill neighborhood search',2)],
-            Option.RGC:[('k-best',5)]})
+           Option.LI:[('two-exchange random fill neighborhood search',2)],
+          Option.RGC:[('k-best',5)]})
 
         #print(log_data)
+
 
 
 

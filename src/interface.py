@@ -21,6 +21,10 @@ def load_visualisation_settings():
         interface = InterfaceVisualisation()
         interface.display_widgets()
 
+def load_runtime_settings():
+
+        interface = InterfaceRuntimeAnalysis()
+        interface.display_widgets()
 
 
 
@@ -101,6 +105,21 @@ class InterfaceVisualisation():
 
         def run_visualisation(self, event):
 
+                params = self.prepare_parameters()
+
+                # starts call to pymhlib in handler module
+                self.log_data, instance = handler.run_algorithm(params)
+
+                # initialize graph from instance
+                self.plot_instance = p.get_visualisation(params['prob'],params['algo'], instance)
+
+                self.controls.children[1].value = 0
+                self.controls.children[0].max = self.controls.children[1].max = len(self.log_data) - 3
+                # start drawing
+                p.get_animation(self.controls.children[1].value, self.log_data, self.plot_instance)
+                self.controls.layout.visibility = 'visible'
+
+        def prepare_parameters(self):
                 # prepare current widget parameters for call to run algorithm
                 # store each option as list of tuples (<name>,<parameter>)
                 params = {'prob':Problem(self.problemWidget.value),
@@ -119,18 +138,7 @@ class InterfaceVisualisation():
                 if Option.RGC in self.optionsHandles:
                         params[Option.RGC] = [(self.optionsHandles[Option.RGC].children[0].value,self.optionsHandles[Option.RGC].children[1].value)]
 
-                # starts call to pymhlib in handler module
-                self.log_data, instance = handler.run_algorithm(params)
-
-               
-                # initialize graph from instance
-                self.plot_instance = p.get_visualisation(params['prob'],params['algo'], instance)
-
-                self.controls.children[1].value = 0
-                self.controls.children[0].max = self.controls.children[1].max = len(self.log_data) - 3
-                # start drawing
-                p.get_animation(self.controls.children[1].value, self.log_data, self.plot_instance)
-                self.controls.layout.visibility = 'visible'
+                return params
 
 
         def display_widgets(self):
@@ -175,10 +183,7 @@ class InterfaceVisualisation():
                 rcl = widgets.RadioButtons(options=[m[0] for m in options[Option.RGC]],
                                                 description=Option.RGC.value)
                 k_best = widgets.IntText(value=1,description='k:',layout=widgets.Layout(width='150px', display='None'))
-                val = 0.85 if self.problemWidget.value == Problem.MAXSAT.value else 1.5
-                mini = 0 if self.problemWidget.value == Problem.MAXSAT.value else 1
-                maxi = 1 if self.problemWidget.value == Problem.MAXSAT.value else 5
-                alpha = widgets.FloatSlider(value=val, description='alpha:',step=0.05,layout=widgets.Layout(display='None'), orientation='horizontal', min=mini, max=maxi)
+                alpha = widgets.FloatSlider(value=0.85, description='alpha:',step=0.05,layout=widgets.Layout(display='None'), orientation='horizontal', min=0, max=1)
 
                 param = widgets.HBox([k_best,alpha])
                 rcl_box = widgets.VBox()
@@ -295,6 +300,40 @@ class InterfaceVisualisation():
                 selected.index = to_down +1
                 
                         
+
+class InterfaceRuntimeAnalysis(InterfaceVisualisation):
+
+        def __init__(self):
+                super().__init__()
+                self.add_instance = widgets.Button(description='Add configuration')
+                self.instances = []
+                self.selectedInstances = widgets.Select(options=[])
+
+        def display_widgets(self):
+
+                self.problemWidget.observe(self.on_change_problem, names='value')
+                self.algoWidget.observe(self.on_change_algo, names='value')
+                self.optionsWidget.children = self.get_options(Algorithm(self.algoWidget.value))
+                self.add_instance.on_click(self.on_add_instance)
+                self.run_button.on_click(self.run_visualisation)
+                display(widgets.VBox([self.problemWidget,self.instanceWidget,self.algoWidget,self.optionsWidget,self.add_instance,self.selectedInstances,self.run_button]))
+                #display(self.controls)
+
+        def on_add_instance(self, event):
+                params = self.prepare_parameters()
+                params['name'] = f'{params.get("prob").name.lower()}-{params.get("algo").name.lower()}'
+                #TODO add name/identifier for instance
+                self.instances.append(params)
+                self.problemWidget.disabled = True
+                self.instanceWidget.disabled = True
+                # TODO enable widgets when all instances are deleted
+                options = [o[3:] for o in list(self.selectedInstances.options)]
+                options.append(f'{params.get("prob").name.lower()}-{params.get("algo").name.lower()}')
+                self.selectedInstances.options = [f'{i}. ' + o for i,o in enumerate(options, start=1)]
+                print(params)
+
+        def run_visualisation(self, event):
+                pass
 
 
 

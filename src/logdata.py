@@ -4,8 +4,6 @@ import re
 import os
 import sys
 sys.path.append('..\\HeuOptDemos_Eva')
-#from src.handler import Problem, Algorithm, Option
-
 
 
 def get_log_data(prob: str, alg: str):
@@ -16,7 +14,6 @@ def get_log_data(prob: str, alg: str):
         for line in logfile:
             data.append(cast_line(line.strip()))
         logfile.close()
-        #print(data)
     
     return create_log_data(data)
 
@@ -58,7 +55,6 @@ def create_gvns_data(data: list()):
 def create_grasp_data(data: list()):
 
     entries = [create_gvns_data(data[:7])]
-    #par = entries[0].get('m')[1]
 
     greedy_data = data[7:-8]
 

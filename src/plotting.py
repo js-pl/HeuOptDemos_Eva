@@ -494,8 +494,9 @@ def get_grasp_misp_rcl_animation(i:int, log_data: list(), graph):
 
         par = info.get('par',0.)
         mn = min(info.get('cl').values())
+        mx = max(info.get('cl').values())
         comments = {'cl': 'remaining degree (number of unblocked neighbors)',
-                        'rcl':  f'{par}-best' if type(par)==int else f'alpha: {par}, threshold: {round(mn*par,2)}',
+                        'rcl':  f'{par}-best' if type(par)==int else f'alpha: {par}, threshold: {round(mn + par * (mx-mn),2)}',
                         'sel': f'random, objective gain: 1'}
 
         plot_description['comment'].append(comments.get(info['status']))

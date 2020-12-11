@@ -59,8 +59,9 @@ def restricted_candidate_list(sol: Solution, cl: dict(), par):
             candidates.pop(key)
 
     if type(par) == float:
-        minimum = min(cl.values())
-        rcl = [k for k,v in cl.items() if v <= minimum * par]
+        mini = min(cl.values())
+        maxi = max(cl.values())
+        rcl = [k for k,v in cl.items() if v <= mini + par * (maxi-mini)]
  
     return np.array(rcl)
 
@@ -73,16 +74,20 @@ def greedy_randomized_construction(sol: Solution, par, _result):
 
     while not is_complete_solution(greedy_sol):
 
-        log = f'SOL: {greedy_sol}\n'
-
+        sol_str = '[ ' + ' '.join([str(s) for s in greedy_sol.x[:greedy_sol.sel]])+ ' ]'
+        logger_step.info(f'SOL: {sol_str}')
         cl = candidate_list(greedy_sol)
         rcl = restricted_candidate_list(greedy_sol, cl, par)
         sel = random.choice(rcl)
 
         update_solution(greedy_sol,sel)
 
-        log += f'CL: {cl}\nPAR: {par}\nRCL: {rcl}\nSEL: {sel}'
-        logger_step.info(log)
+        #log += f'CL: {cl}\nPAR: {par}\nRCL: {rcl}\nSEL: {sel}'
+        #logger_step.info(log)
+        logger_step.info(f'CL: {cl}\nPAR: {par}')
+        rcl_str = '[ ' + ' '.join([str(r) for r in rcl]) + ' ]'
+        logger_step.info(f'RCL: {rcl_str}')
+        logger_step.info(f'SEL: {sel}')
 
     sol.copy_from(greedy_sol)
     sol.obj()
