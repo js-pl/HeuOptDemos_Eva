@@ -73,8 +73,8 @@ class InterfaceVisualisation():
                 def click_next(event):
                         slider.value = slider.value + 1
 
-                prev_iter = widgets.Button(description='<',tooltip='previous', layout=widgets.Layout(width='50px'))
-                next_iter = widgets.Button(description='>', tooltip='next', layout=widgets.Layout(width='50px'))
+                prev_iter = widgets.Button(description='',icon='step-backward',tooltip='previous', layout=widgets.Layout(width='50px'))
+                next_iter = widgets.Button(description='',icon='step-forward', tooltip='next', layout=widgets.Layout(width='50px'))
                 prev_iter.on_click(click_prev)
                 next_iter.on_click(click_next)
                 widgets.jslink((play, 'value'), (slider, 'value'))
@@ -100,10 +100,7 @@ class InterfaceVisualisation():
 
 
         def run_visualisation(self, event):
-                #if Problem(self.problemWidget.value).name == 'MISP' and Algorithm(self.algoWidget.value).name == 'GRASP':
-                 #       self.optionsWidget.children += (widgets.Label(value='This feature will be available soon!'),)
-                 #       return
-                
+
                 # prepare current widget parameters for call to run algorithm
                 # store each option as list of tuples (<name>,<parameter>)
                 params = {'prob':Problem(self.problemWidget.value),
@@ -211,8 +208,10 @@ class InterfaceVisualisation():
                 )
 
                 size = widgets.IntText(value=1,description='k: ',layout=widgets.Layout(width='150px'))
-                add = widgets.Button(description='>',layout=widgets.Layout(width='50px'), tooltip='add ' + phase.name)
-                remove = widgets.Button(description='<',layout=widgets.Layout(width='50px'), tooltip='remove ' + phase.name)
+                add = widgets.Button(description='',icon='chevron-right',layout=widgets.Layout(width='60px'), tooltip='add ' + phase.name)
+                remove = widgets.Button(description='',icon='chevron-left',layout=widgets.Layout(width='60px'), tooltip='remove ' + phase.name)
+                up = widgets.Button(description='',icon='chevron-up',layout=widgets.Layout(width='30px'), tooltip='up ' + phase.name)
+                down = widgets.Button(description='',icon='chevron-down',layout=widgets.Layout(width='30px'), tooltip='down ' + phase.name)
 
                 selected = widgets.Select(
                                 options = [],
@@ -223,10 +222,13 @@ class InterfaceVisualisation():
 
                 add.on_click(self.on_add_neighborhood)
                 remove.on_click(self.on_remove_neighborhood)
+                up.on_click(self.on_up_neighborhood)
+                down.on_click(self.on_down_neighborhood)
 
                 middle = widgets.Box([size, add, remove],layout=widgets.Layout(display='flex',flex_flow='column',align_items='flex-end'))
+                sort = widgets.VBox([up,down])
                 
-                return widgets.HBox([available,middle,selected])        
+                return widgets.HBox([available,middle,selected,sort])        
 
                 
         def on_add_neighborhood(self,event):
@@ -234,10 +236,11 @@ class InterfaceVisualisation():
                 phase = event.tooltip.split(' ')[1]
                 descr = dict(Option.__members__.items()).get(phase).value
                 n_block = [c for c in self.optionsWidget.children if c.children[0].description == descr][0]
-
+                selected = n_block.children[2]
                 size = n_block.children[1].children[0].value
                 sel = n_block.children[0].value
-                n_block.children[2].options += (f'{sel}, k={max(1,size)}',)
+                selected.options += (f'{sel}, k={max(1,size)}',)
+                selected.index = len(selected.options) -1
 
 
         def on_remove_neighborhood(self,event):
@@ -250,10 +253,47 @@ class InterfaceVisualisation():
                 if len(selected.options) == 0:
                         return
 
-                to_remove = selected.value
+                to_remove = selected.index
                 options = list(selected.options)
-                options.remove(to_remove)
+                del options[to_remove]
                 selected.options = tuple(options)
+
+        def on_up_neighborhood(self,event):
+
+                phase = event.tooltip.split(' ')[1]
+                descr = dict(Option.__members__.items()).get(phase).value
+                n_block = [c for c in self.optionsWidget.children if c.children[0].description == descr][0]
+                selected = n_block.children[2]
+
+                if len(selected.options) == 0:
+                        return
+
+                to_up = selected.index
+                if to_up == 0:
+                        return
+                options = list(selected.options)
+                options[to_up -1], options[to_up] = options[to_up], options[to_up-1]
+                selected.options = tuple(options)
+                selected.index = to_up -1
+
+        def on_down_neighborhood(self,event):
+
+                phase = event.tooltip.split(' ')[1]
+                descr = dict(Option.__members__.items()).get(phase).value
+                n_block = [c for c in self.optionsWidget.children if c.children[0].description == descr][0]
+                selected = n_block.children[2]
+
+                if len(selected.options) == 0:
+                        return
+
+                to_down = selected.index
+                if to_down == (len(selected.options) - 1):
+                        return
+                options = list(selected.options)
+                options[to_down +1], options[to_down] = options[to_down], options[to_down+1]
+                selected.options = tuple(options)
+                selected.index = to_down +1
+                
                         
 
 

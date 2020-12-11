@@ -42,7 +42,7 @@ logger_step = logging.getLogger("step-by-step")
 # TODO: pymhlib settings
 settings.mh_titer = 100
 settings.mh_lfreq = 1
-settings.mh_tciter = 30
+#settings.mh_tciter = 30
 settings.mh_out = "logs" + os.path.sep + "summary.log"
 settings.mh_log = "logs" + os.path.sep + "iter.log" # TODO logging to file not working
 init_logger()
@@ -100,7 +100,7 @@ class ProblemDefinition(ABC):
 
     def get_method(self, algo:Algorithm, opt: Option, name: str, par):
         m = [t for t in self.options[algo][opt] if t[0] == name][0]
-        method = Method(f'{opt.name.lower()}{par if type(m[2]) == type else m[2]}', m[1], par)
+        method = Method(f'{opt.name.lower()}{par if type(m[2]) == type else m[2]}', m[1], par if type(m[2]) == type else m[2])
         return method
 
 

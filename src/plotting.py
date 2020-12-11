@@ -126,6 +126,7 @@ def get_gvns_maxsat_animation(value: int, log_data: list(), graph):
                 flipped_nodes = [n for n in variables if graph.nodes[n]['nr'] in flipped_nodes]
 
                 if info['status'] == 'start':
+                        plot_description['comment'].append(f'k={info.get("par")}')
                         plot_description['comment'].append(f'flipping {len(flipped_nodes)} variable(s)')          
                 else:
                         
@@ -430,6 +431,7 @@ def get_gvns_misp_animation(i: int, log_data: list(), graph):
         add = current_sol - compare_sol if info.get('status') == 'end' else compare_sol - current_sol
         if info.get('status') == 'start':
                 plot_description['comment'].append(comments[info['m']])
+                plot_description['comment'].append(f'k={info.get("par")}')
                 #set labels for elements to be removed/added
                 nx.set_node_attributes(graph, {n:'+' for n in add}, 'label')
                 nx.set_node_attributes(graph, {n:'-' for n in remove}, 'label')
@@ -483,7 +485,7 @@ def get_grasp_misp_rcl_animation(i:int, log_data: list(), graph):
 
         # set color of selected nodes
         nx.set_node_attributes(graph, {n: 'green' for n in info.get('sol', [])}, name='color')
-        if info.get('sel'):
+        if info.get('status') == 'sel':
                 graph.nodes[info.get('sel')]['color'] = 'gold'
 
         j = i
@@ -492,7 +494,7 @@ def get_grasp_misp_rcl_animation(i:int, log_data: list(), graph):
 
         par = info.get('par',0.)
         mn = min(info.get('cl').values())
-        comments = {'cl': 'remaining degree (unblocked neighbors)',
+        comments = {'cl': 'remaining degree (number of unblocked neighbors)',
                         'rcl':  f'{par}-best' if type(par)==int else f'alpha: {par}, threshold: {round(mn*par,2)}',
                         'sel': f'random, objective gain: 1'}
 
