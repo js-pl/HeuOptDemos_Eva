@@ -12,6 +12,7 @@ import os
 import logging
 import re
 import numpy as np
+import pandas as pd
 import random
 import ast
 
@@ -21,6 +22,7 @@ from pymhlib.log import init_logger
 from pymhlib.demos.maxsat import MAXSATInstance, MAXSATSolution
 from pymhlib.demos.misp import MISPInstance, MISPSolution
 from pymhlib.gvns import GVNS, Method
+import pymhlib.demos as demos
 
 #needed for overwriting gnvs
 from pymhlib.solution import Solution
@@ -49,6 +51,7 @@ init_logger()
 logger_step = logging.getLogger("step-by-step")
 logger_step.setLevel(logging.INFO)
 instance_path = "instances" + os.path.sep
+demo_data_path = os.path.dirname(demos.__file__) + os.path.sep + 'data'
 
 # extend enums as needed, they hold the string values which are used for representation in widgets
 class Problem(enum.Enum):
@@ -92,7 +95,7 @@ class ProblemDefinition(ABC):
     def get_solution(self, instance_path: str):
         pass
 
-    def get_instances(self):
+    def get_instances(self,visualisation):
         instance_path = "instances" + os.path.sep
         if os.path.isdir(instance_path + self.name):
             instances = os.listdir(instance_path + self.name)
@@ -128,6 +131,12 @@ class MAXSAT(ProblemDefinition):
         instance = MAXSATInstance(instance_path)
         return MAXSATSolution(instance)
 
+    def get_instances(self,visualisation):
+        if visualisation:
+            return super().get_instances(True)
+        else: 
+            instances = os.listdir(demo_data_path)
+            return [i for i in instances if i[-3:] == 'cnf']
 
 class MISP(ProblemDefinition):
 
@@ -149,14 +158,19 @@ class MISP(ProblemDefinition):
         super().__init__(name, options)
 
     def get_solution(self, instance_path):
-        instance = MISPInstance(instance_path)
+        file_path = instance_path
+        if instance_path[-6:] == 'random':
+            file_path = "gnm-50-70"
+        instance = MISPInstance(file_path)
         return MISPSolution(instance)
 
-    def get_instances(self):
-        inst = super().get_instances()
-        if len(inst) == 0:
-            return ['random']
-        return inst
+    def get_instances(self, visualisation):
+        if visualisation:
+            inst = super().get_instances(True)
+            return inst + ['random']
+        else: 
+            instances = os.listdir(demo_data_path)
+            return [i for i in instances if i[-3:] == 'mis']
 
 
 
@@ -173,8 +187,8 @@ problems = {
 def get_problems():
     return [p.value for p,_ in problems.items()]
 
-def get_instances(prob: Problem):
-    return problems[prob].get_instances()
+def get_instances(prob: Problem,visualisation):
+    return problems[prob].get_instances(visualisation)
 
 def get_algorithms(prob: Problem):
     return problems[prob].get_algorithms()
@@ -183,14 +197,7 @@ def get_options(prob: Problem, algo: Algorithm):
     return problems[prob].get_options(algo)
 
 
-def run_algorithm(options: dict):
-
-    iter_fh = logging.FileHandler(f"logs/iter.log", mode="w")
-    iter_logger = logging.getLogger("pymhlib_iter")
-    iter_logger.handlers = []
-    iter_logger.addHandler(iter_fh)
-    
-
+def run_algorithm_visualisation(options: dict):
     fh = logging.FileHandler(f"logs/{options['prob'].name.lower()}/{options['algo'].name.lower()}/{options['algo'].name.lower()}.log", mode="w")
     logger_step.handlers = []
     logger_step.addHandler(fh)
@@ -198,31 +205,59 @@ def run_algorithm(options: dict):
 
     file_path = instance_path + problems[options['prob']].name + os.path.sep + options['inst']
 
-    if options['inst'] == 'random': #only available for misp so far
-        file_path = "gnm-50-70"
+    # initialize solution for problem
+    #solution = problems[options['prob']].get_solution(file_path)
+    solution = run_algorithm(options, file_path)
+    return get_log_data(options['prob'].name.lower(), options['algo'].name.lower()), solution.inst
+
+
+
+def run_algorithm_comparison(configs: list()):
+
+    log_df = pd.DataFrame({'iteration':[]})
+    
+    for config in configs:
+
+        iter_fh = logging.FileHandler(f"logs/iter.log", mode="w")
+        iter_logger = logging.getLogger("pymhlib_iter")
+        iter_logger.handlers = []
+        iter_logger.addHandler(iter_fh)
+
+        file_path = demo_data_path + os.path.sep + config['inst']
+
+        name = config['name']
+        _ = run_algorithm(config,file_path, visualisation=False)
+
+        df = pd.read_csv('logs' + os.path.sep + 'iter.log', sep=r'\s+', usecols=['iteration','obj_new'])
+        df.rename(columns = {'obj_new':name}, inplace=True)
+        log_df = pd.merge(log_df, df, how = 'outer', on = 'iteration')
+
+    return log_df
+
+
+def run_algorithm(options: dict, file_path: str, visualisation=True):
 
     # initialize solution for problem
     solution = problems[options['prob']].get_solution(file_path)
 
     # run specified algorithm
     if options['algo'] == Algorithm.GVNS:
-        run_gvns(solution, options)
-        return get_log_data(options['prob'].name.lower(), Algorithm.GVNS.name.lower()), solution.inst
+        run_gvns(solution, options, visualisation)
+
     if options['algo'] == Algorithm.GRASP:
-        run_grasp(solution, options)
-        return get_log_data(options['prob'].name.lower(), Algorithm.GRASP.name.lower()), solution.inst
-   
-    return [], None
-
-
+        run_grasp(solution, options, visualisation)
+        
+    return solution
 ######################### overwrite GVNS to log necessary information 
 
 class MyGVNS(GVNS):
 
-    def __init__(self, logger_step, sol: Solution, meths_ch: List[Method], meths_li: List[Method], meths_sh: List[Method],
-                 own_settings: dict = None, consider_initial_sol=False):
+    def __init__(self, sol: Solution, meths_ch: List[Method], meths_li: List[Method], meths_sh: List[Method],
+                 own_settings: dict = None, consider_initial_sol=False,logger_step=True):
         super().__init__(sol, meths_ch, meths_li, meths_sh, own_settings, consider_initial_sol)
-        self.logger_step = logger_step
+        self.logger_step = False
+        if logger_step:
+            self.logger_step = logging.getLogger("step-by-step")
 
     def perform_method(self, method: Method, sol: Solution, delayed_success=False) -> Result:
         """Perform method on given solution and returns Results object.
@@ -239,9 +274,12 @@ class MyGVNS(GVNS):
         res = Result()
         obj_old = sol.obj()
         t_start = time.process_time()
-        step_info = f'START\nSOL: {"[ "+" ".join([str(i) for i in sol.x[:sol.sel]]) +" ]"}\nOBJ: {obj_old}\nM: {method.name}\nPAR: {method.par}'
-        self.logger_step.info(step_info)
-        self.logger_step.info(f'INC: {"[ "+" ".join([str(i) for i in self.incumbent.x[:self.incumbent.sel]]) +" ]"}\nBEST: {self.incumbent.obj()}')
+        ##### logging for visualisation
+        if self.logger_step:
+            sol_str, inc_str = f'{sol}'.replace('\n',''), f'{self.incumbent}'.replace('\n','') # necessary because of automatic line breaks in str of numpy array
+            step_info = f'START\nSOL: {sol_str}\nOBJ: {obj_old}\nM: {method.name}\nPAR: {method.par}\nINC: {inc_str}\nBEST: {self.incumbent.obj()}'
+            self.logger_step.info(step_info)
+        #################
         method.func(sol, method.par, res)
         t_end = time.process_time()
         if __debug__ and self.own_settings.mh_checkit:
@@ -257,9 +295,12 @@ class MyGVNS(GVNS):
                 ms.obj_gain += obj_new - obj_old
         self.iteration += 1
         new_incumbent = self.update_incumbent(sol, t_end - self.time_start)
-        step_info = f'END\nSOL: {"[ "+" ".join([str(i) for i in sol.x[:sol.sel]]) +" ]"}\nOBJ: {sol.obj()}\nM: {method.name}\nPAR: {method.par}'
-        self.logger_step.info(step_info)
-        self.logger_step.info(f'INC: {"[ "+" ".join([str(i) for i in self.incumbent.x[:self.incumbent.sel]]) +" ]"}\nBEST: {self.incumbent.obj()}\nBETTER: {new_incumbent}')
+        ##### logging for visualisation
+        if self.logger_step:
+            sol_str, inc_str = f'{sol}'.replace('\n',''), f'{self.incumbent}'.replace('\n','') 
+            step_info = f'END\nSOL: {sol_str}\nOBJ: {sol.obj()}\nM: {method.name}\nPAR: {method.par}\nINC: {inc_str}\nBEST: {self.incumbent.obj()}\nBETTER: {new_incumbent}'
+            self.logger_step.info(step_info)
+        #################
         terminate = self.check_termination()
         self.log_iteration(method.name, obj_old, sol, new_incumbent, terminate, res.log_info)
         if terminate:
@@ -271,7 +312,7 @@ class MyGVNS(GVNS):
 ########################################
 
 
-def run_gvns(solution, options: dict):
+def run_gvns(solution, options: dict, visualisation: bool):
 
 
     prob = problems[options['prob']]
@@ -280,7 +321,7 @@ def run_gvns(solution, options: dict):
     sh = [ prob.get_method(Algorithm.GVNS, Option.SH, m[0], m[1]) for m in options[Option.SH] ]
     
     ### for now, the overwritten GVNS is called
-    alg = MyGVNS(logger_step, solution, ch, li, sh)
+    alg = MyGVNS(solution, ch, li, sh, logger_step=visualisation)
 
     alg.run()
     alg.method_statistics()
@@ -288,20 +329,34 @@ def run_gvns(solution, options: dict):
     logging.getLogger("pymhlib_iter").handlers[0].flush()
 
 
-def run_grasp(solution, options: dict):
+def run_grasp(solution, options: dict, visualisation):
     
     prob = problems[options['prob']]
 
     ch = []
     li = [ prob.get_method(Algorithm.GRASP, Option.LI, m[0], m[1]) for m in options[Option.LI] ]
-    RGC = [ prob.get_method(Algorithm.GRASP, Option.RGC, m[0], m[1]) for m in options[Option.RGC] ]
+    rgc = [ prob.get_method(Algorithm.GRASP, Option.RGC, m[0], m[1]) for m in options[Option.RGC] ]
 
     # for now the overwritten gvns is called
-    alg = MyGVNS(logger_step, solution,ch,li,RGC,consider_initial_sol=True)
+    alg = MyGVNS(solution,ch,li,rgc,consider_initial_sol=True, logger_step=visualisation)
     alg.run()
     alg.method_statistics()
     alg.main_results()
     logging.getLogger("pymhlib_iter").handlers[0].flush()
+
+
+def run_comparison(configs: list()):
+    log_df = pd.DataFrame({'iteration':[]})
+    
+    for config in configs:
+        name = config['name']
+        _,_ = run_algorithm(config,visualisation=False)
+        print(name, 'done')
+
+        df = pd.read_csv('logs' + os.path.sep + 'iter.log', sep=r'\s+', usecols=['iteration','obj_new'])
+        df.rename(columns = {'obj_new':name}, inplace=True)
+        log_df = pd.merge(log_df, df, how = 'outer', on = 'iteration')
+    return log_df
 
     
 

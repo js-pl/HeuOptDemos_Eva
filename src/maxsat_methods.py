@@ -8,6 +8,7 @@ import random
 import numpy as np
 import logging
 from copy import deepcopy
+import time
 
 
 logger_step = logging.getLogger("step-by-step")
@@ -83,7 +84,7 @@ def greedy_randomized_construction(sol: Solution, par, _result):
     while not is_complete_solution(greedy_sol):
         
         log = f'SOL: {greedy_sol}\n'
-
+        
         cl = candidate_list(greedy_sol)
         rcl = restricted_candidate_list(greedy_sol, cl, par)
         sel = random.choice(rcl)

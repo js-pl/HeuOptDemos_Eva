@@ -515,6 +515,6 @@ def reset_misp_graph(graph):
 #only used for debugging
 if __name__ == '__main__':
         graph = init_misp_graph(MISPInstance('gnm-30-60'))
-        get_animation(0,['MISP','GVNS'], graph)
+        #get_animation(0,['MISP','GVNS'], graph)
 
 

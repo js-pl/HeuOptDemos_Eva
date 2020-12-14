@@ -16,6 +16,7 @@ from IPython.display import clear_output
 
 
 
+
 def load_visualisation_settings():
 
         interface = InterfaceVisualisation()
@@ -30,7 +31,7 @@ def load_runtime_settings():
 
 class InterfaceVisualisation():
 
-        def __init__(self):
+        def __init__(self,visualisation=True):
 
                 self.problemWidget = widgets.Dropdown(
                                         options = handler.get_problems(),
@@ -41,7 +42,7 @@ class InterfaceVisualisation():
                                 description = 'Algorithm'
                                 )
                 self.instanceWidget = widgets.Dropdown(
-                                options = handler.get_instances(Problem(self.problemWidget.value)),
+                                options = handler.get_instances(Problem(self.problemWidget.value),visualisation),
                                 description = 'Instance'
                                 )
                 self.optionsWidget = widgets.VBox() #container which holds all options
@@ -91,7 +92,7 @@ class InterfaceVisualisation():
 
                 self.algoWidget.options = handler.get_algorithms(Problem(change.new))
                 self.optionsWidget.children = self.get_options(Algorithm(self.algoWidget.value))
-                self.instanceWidget.options = handler.get_instances(Problem(change.new))
+                self.instanceWidget.options = handler.get_instances(Problem(change.new), not isinstance(self, InterfaceRuntimeAnalysis))
                 self.optionsHandles = {}
                 self.on_change_algo(None)
 
@@ -108,7 +109,7 @@ class InterfaceVisualisation():
                 params = self.prepare_parameters()
 
                 # starts call to pymhlib in handler module
-                self.log_data, instance = handler.run_algorithm(params)
+                self.log_data, instance = handler.run_algorithm_visualisation(params)
 
                 # initialize graph from instance
                 self.plot_instance = p.get_visualisation(params['prob'],params['algo'], instance)
@@ -304,10 +305,11 @@ class InterfaceVisualisation():
 class InterfaceRuntimeAnalysis(InterfaceVisualisation):
 
         def __init__(self):
-                super().__init__()
+                super().__init__(visualisation=False)
                 self.add_instance = widgets.Button(description='Add configuration')
-                self.instances = []
-                self.selectedInstances = widgets.Select(options=[])
+                self.configurations = []
+                self.selectedConfigs = widgets.Select(options=[])
+                self.out = widgets.Output()
 
         def display_widgets(self):
 
@@ -316,24 +318,42 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                 self.optionsWidget.children = self.get_options(Algorithm(self.algoWidget.value))
                 self.add_instance.on_click(self.on_add_instance)
                 self.run_button.on_click(self.run_visualisation)
-                display(widgets.VBox([self.problemWidget,self.instanceWidget,self.algoWidget,self.optionsWidget,self.add_instance,self.selectedInstances,self.run_button]))
-                #display(self.controls)
+                display(widgets.VBox([self.problemWidget,self.instanceWidget,self.algoWidget,self.optionsWidget,self.add_instance,self.selectedConfigs,self.run_button]))
+                display(self.out)
 
         def on_add_instance(self, event):
                 params = self.prepare_parameters()
-                params['name'] = f'{params.get("prob").name.lower()}-{params.get("algo").name.lower()}'
-                #TODO add name/identifier for instance
-                self.instances.append(params)
+                name = [f'{params.get("algo").name.lower()}']
+                for k,v in params.items():
+                        if not type(k) == Option or len(v) == 0:
+                                continue
+                        o = k.name.lower()+ '-' + '-'.join([str(p[1]) for p in v])
+                        name += [o] 
+
                 self.problemWidget.disabled = True
                 self.instanceWidget.disabled = True
                 # TODO enable widgets when all instances are deleted
-                options = [o[3:] for o in list(self.selectedInstances.options)]
-                options.append(f'{params.get("prob").name.lower()}-{params.get("algo").name.lower()}')
-                self.selectedInstances.options = [f'{i}. ' + o for i,o in enumerate(options, start=1)]
-                print(params)
+                options = list(self.selectedConfigs.options)
+                count = int(options[-1].split('.')[0]) + 1 if len(options) > 0 else 1
+                options.append(str(count) + '. ' + '_'.join(name))
+                params['name'] = options[-1]
+                self.configurations.append(params)
+                self.selectedConfigs.options = options
 
         def run_visualisation(self, event):
-                pass
+                log_df = handler.run_algorithm_comparison(self.configurations)
+                log_df.sort_values('iteration',inplace=True)
+                idx = log_df[log_df['iteration'] == 0].index
+                log_df.drop(idx, inplace=True)
+               
+                with self.out:
+                        self.out.clear_output()
+                        log_df.plot(kind='line', x='iteration', y=[c['name'] for c in self.configurations]); plt.ylabel('obj')
+                        #widgets.interaction.show_inline_matplotlib_plots()
+                        
+
+
+                
 
 
 
