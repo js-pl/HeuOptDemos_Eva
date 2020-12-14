@@ -19,12 +19,10 @@ logger_step = logging.getLogger("step-by-step")
 def update_solution(sol: MAXSATSolution, sel):
     sol.x[abs(sel)-1] = False if sel < 0 else True
 
-    #remove fulfilled clauses from greedy solution (solution needs to be a deep copy from original sol object!)
-    clauses = []
-    for c in sol.inst.clauses:
-        if sel not in c:
-            clauses.append(c)
+    #replace fulfilled clauses in greedy solution by empty array (solution needs to be a deep copy from original sol object!)
+    clauses = [np.array([]) if sel in c else c for c in sol.inst.clauses]
     sol.inst.clauses = clauses
+
 
 def copy_empty(sol: MAXSATSolution):
     #greedy_sol = MAXSATSolution(sol.inst)
@@ -38,19 +36,16 @@ def is_complete_solution(sol: MAXSATSolution):
 
 def candidate_list(sol: MAXSATSolution):
     candidates = dict()
-    # find unfulfilled clauses
-    #clauses = []
-    #for c in [np.array(c, copy=True) for c in sol.inst.clauses]:
-    #    for v in c:
-    #        if sol.x[abs(v)-1] == (1 if v > 0 else 0):
-    #            break
-    #        else:
-    #            clauses.append(c)
 
-    for v in [i+1 for i,v in enumerate(sol.x) if v == -1]:
-        pos = sum([1 for i in sol.inst.clauses if v in i])
-        neg = sum([1 for i in sol.inst.clauses if -v in i])
-        candidates[v], candidates[-v] = pos, neg
+    for v in [i for i,v in enumerate(sol.x,start=1) if v == -1]:
+        candidates[v] = 0
+        candidates[-v] = 0
+        for c in sol.inst.variable_usage[v-1]:
+            clause = sol.inst.clauses[c]
+            if len(clause) == 0:
+                continue
+            candidates[v] = candidates[v] + (v in clause)
+            candidates[-v] = candidates[-v] + (-v in clause)
 
     return candidates
 
@@ -84,7 +79,6 @@ def greedy_randomized_construction(sol: Solution, par, _result):
     while not is_complete_solution(greedy_sol):
         
         log = f'SOL: {greedy_sol}\n'
-        
         cl = candidate_list(greedy_sol)
         rcl = restricted_candidate_list(greedy_sol, cl, par)
         sel = random.choice(rcl)

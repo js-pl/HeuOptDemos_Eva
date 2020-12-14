@@ -42,7 +42,7 @@ if not settings.__dict__: parse_settings(args='')
 
 
 # TODO: pymhlib settings
-settings.mh_titer = 100
+settings.mh_titer = 1000
 settings.mh_lfreq = 1
 #settings.mh_tciter = 30
 settings.mh_out = "logs" + os.path.sep + "summary.log"

@@ -345,11 +345,15 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                 log_df.sort_values('iteration',inplace=True)
                 idx = log_df[log_df['iteration'] == 0].index
                 log_df.drop(idx, inplace=True)
+                plt.rcParams['axes.spines.left'] = True
+                plt.rcParams['axes.spines.right'] = True
+                plt.rcParams['axes.spines.top'] = True
+                plt.rcParams['axes.spines.bottom'] = True
                
                 with self.out:
                         self.out.clear_output()
                         log_df.plot(kind='line', x='iteration', y=[c['name'] for c in self.configurations]); plt.ylabel('obj')
-                        #widgets.interaction.show_inline_matplotlib_plots()
+
                         
 
 
