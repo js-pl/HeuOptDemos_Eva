@@ -160,7 +160,7 @@ class MISP(ProblemDefinition):
     def get_solution(self, instance_path):
         file_path = instance_path
         if instance_path[-6:] == 'random':
-            file_path = "gnm-50-70"
+            file_path = "gnm-30-60-13"
         instance = MISPInstance(file_path)
         return MISPSolution(instance)
 
@@ -198,6 +198,7 @@ def get_options(prob: Problem, algo: Algorithm):
 
 
 def run_algorithm_visualisation(options: dict):
+    settings.mh_titer = 100
     fh = logging.FileHandler(f"logs/{options['prob'].name.lower()}/{options['algo'].name.lower()}/{options['algo'].name.lower()}.log", mode="w")
     logger_step.handlers = []
     logger_step.addHandler(fh)
@@ -213,6 +214,7 @@ def run_algorithm_visualisation(options: dict):
 
 
 def run_algorithm_comparison(configs: list()):
+    settings.mh_titer = 500
 
     log_df = pd.DataFrame({'iteration':[]})
     

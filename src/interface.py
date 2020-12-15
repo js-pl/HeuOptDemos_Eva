@@ -302,6 +302,8 @@ class InterfaceVisualisation():
                 
                         
 
+
+
 class InterfaceRuntimeAnalysis(InterfaceVisualisation):
 
         def __init__(self):
@@ -341,7 +343,10 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                 self.selectedConfigs.options = options
 
         def run_visualisation(self, event):
+                text = widgets.Label(value='running...')
+                display(text)
                 log_df = handler.run_algorithm_comparison(self.configurations)
+                text.layout.display = 'None'
                 log_df.sort_values('iteration',inplace=True)
                 idx = log_df[log_df['iteration'] == 0].index
                 log_df.drop(idx, inplace=True)

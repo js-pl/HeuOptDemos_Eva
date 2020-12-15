@@ -400,9 +400,11 @@ def draw_misp_graph(graph, pos_change: list() = [], sel_color='gold'):
         lcol = [sel_color for n in nodelist]
         #labels = {n:f'{n}{l}' for n,l in nx.get_node_attributes(graph, 'label').items()}
         labels = nx.get_node_attributes(graph, 'label')
+        edges = list(graph.edges())
+        e_cols = [graph.edges[e]['color'] for e in edges]
         
         nx.draw_networkx(graph, pos, nodelist=nodelist, with_labels=True, labels=labels,font_weight='heavy', font_size=14, ax=ax,  
-                        node_color=color, edgecolors=lcol, edge_color='lightgray', linewidths=linewidth, node_size=500)
+                        node_color=color, edgecolors=lcol, edgelist=edges, edge_color=e_cols, linewidths=linewidth, node_size=500)
 
 
 
@@ -487,6 +489,10 @@ def get_grasp_misp_rcl_animation(i:int, log_data: list(), graph):
         nx.set_node_attributes(graph, {n: 'green' for n in info.get('sol', [])}, name='color')
         if info.get('status') == 'sel':
                 graph.nodes[info.get('sel')]['color'] = 'gold'
+                n_unsel = set(graph.neighbors(info.get('sel'))).intersection(set(info['cl'].keys()))
+                nx.set_node_attributes(graph, {n:'darksalmon' for n in n_unsel},'color')
+                nx.set_edge_attributes(graph, {(info.get('sel'),n):'black' for n in n_unsel}, 'color')
+
 
         j = i
         while not (log_data[j]['status'] == 'start'):
