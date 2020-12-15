@@ -52,7 +52,7 @@ class InterfaceVisualisation():
                 self.log_data = []
 
                 self.plot_instance = None
-
+                self.out = widgets.Output()
                 self.controls = self.init_controls()
 
                 self.controls.layout.visibility = 'hidden'
@@ -61,11 +61,9 @@ class InterfaceVisualisation():
 
         def init_controls(self):
 
-                out = widgets.Output()
+                #out = widgets.Output()
 
-                def animate(event):
-                        with out:
-                                p.get_animation(self.controls.children[1].value, self.log_data, self.plot_instance)
+
         
                 play = widgets.Play(interval=1000, value=0, min=0, max=100,
                         step=1, description="Press play")
@@ -83,10 +81,14 @@ class InterfaceVisualisation():
                 prev_iter.on_click(click_prev)
                 next_iter.on_click(click_next)
                 widgets.jslink((play, 'value'), (slider, 'value'))
-                slider.observe(animate, names = 'value')
+                slider.observe(self.animate, names = 'value')
 
-                return widgets.HBox([play, slider, prev_iter, next_iter,out])
+                return widgets.HBox([play, slider, prev_iter, next_iter])
 
+        def animate(self,event):
+                with self.out:
+                        p.get_animation(self.controls.children[1].value, self.log_data, self.plot_instance)
+                        widgets.interaction.show_inline_matplotlib_plots()
                 
         def on_change_problem(self, change):
 
@@ -105,19 +107,22 @@ class InterfaceVisualisation():
 
 
         def run_visualisation(self, event):
-
+                
                 params = self.prepare_parameters()
 
                 # starts call to pymhlib in handler module
                 self.log_data, instance = handler.run_algorithm_visualisation(params)
 
                 # initialize graph from instance
-                self.plot_instance = p.get_visualisation(params['prob'],params['algo'], instance)
+                with self.out:
+                        self.out.clear_output()
+                        self.plot_instance = p.get_visualisation(params['prob'],params['algo'], instance)
+                        widgets.interaction.show_inline_matplotlib_plots()
 
                 self.controls.children[1].value = 0
                 self.controls.children[0].max = self.controls.children[1].max = len(self.log_data) - 3
                 # start drawing
-                p.get_animation(self.controls.children[1].value, self.log_data, self.plot_instance)
+                self.animate(None)
                 self.controls.layout.visibility = 'visible'
 
         def prepare_parameters(self):
@@ -150,6 +155,7 @@ class InterfaceVisualisation():
                 self.run_button.on_click(self.run_visualisation)
                 display(widgets.VBox([self.problemWidget,self.instanceWidget,self.algoWidget,self.optionsWidget,self.run_button]))
                 display(self.controls)
+                display(self.out)
 
                 
         def get_options(self, algo: Algorithm):
@@ -343,6 +349,7 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                 self.selectedConfigs.options = options
 
         def run_visualisation(self, event):
+                self.out.clear_output()
                 text = widgets.Label(value='running...')
                 display(text)
                 log_df = handler.run_algorithm_comparison(self.configurations)
@@ -356,8 +363,9 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                 plt.rcParams['axes.spines.bottom'] = True
                
                 with self.out:
-                        self.out.clear_output()
+                        
                         log_df.plot(kind='line', x='iteration', y=[c['name'] for c in self.configurations]); plt.ylabel('obj')
+                        widgets.interaction.show_inline_matplotlib_plots()
 
                         
 

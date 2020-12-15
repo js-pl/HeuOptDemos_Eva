@@ -39,16 +39,17 @@ phases = {'ch':'Construction', 'li': 'Local Search', 'sh': 'Shaking', 'rgc': 'Ra
 def get_visualisation(prob: Problem, alg: Algorithm, instance):
         global f
         global ax
-
-        if not f:
-                f = plt.figure(num = f'Solving {prob.value} with {alg.value}')
-                ax = f.add_subplot(111)
-        else:
-                f = plt.gcf()
-                ax = f.gca()
+        if f != None:
+                plt.close()
+        #if not f:
+        f = plt.figure(num = f'Solving {prob.value} with {alg.value}')
+        ax = f.add_subplot(111)
+        #else:
+         #       f = plt.gcf()
+         #       ax = f.gca()
 
         #f.set_size_inches(7,5) # resets the window title..?
-
+        #widgets.interaction.show_inline_matplotlib_plots()
 
         f.canvas.set_window_title(f'Solving {prob.value} with {alg.value}')
 
@@ -258,7 +259,7 @@ def get_grasp_maxsat_rcl_animation(i: int, log_data: list(), graph):
         write_literal_info(pos_literals,graph)
         write_cl_info(cl, rcl, sel, graph)
         add_description(info)
-
+        widgets.interaction.show_inline_matplotlib_plots()
 
 
 def write_literal_info(literal_info: dict(),graph):
@@ -361,7 +362,7 @@ def draw_maxsat_graph(graph, pos_change):
         nx.draw_networkx_edges(graph,pos, edgelist=e_list_gray, style=e_style_gray,ax=ax, edge_color='lightgray')
         nx.draw_networkx_edges(graph,pos, edgelist=e_list_black, style=e_style_black,ax=ax, edge_color='black')
         nx.draw_networkx_labels(graph,pos,labels=var_labels,ax=ax)
-
+        #widgets.interaction.show_inline_matplotlib_plots()
 
 def reset_maxsat_graph(graph):
         
