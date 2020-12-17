@@ -12,6 +12,7 @@ from src.handler import Problem, Algorithm, Option
 from pymhlib.demos.maxsat import MAXSATInstance, MAXSATSolution
 from pymhlib.demos.misp import MISPInstance, MISPSolution
 import src.plotting as p
+from src.logdata import get_filtered_logdata, Log
 from IPython.display import clear_output
 
 
@@ -50,6 +51,7 @@ class InterfaceVisualisation():
                 self.optionsHandles = {} #used to store references to relevant children of optionsWidget Box
 
                 self.log_data = []
+                self.animation_data = []
 
                 self.plot_instance = None
                 self.out = widgets.Output()
@@ -60,10 +62,6 @@ class InterfaceVisualisation():
 
 
         def init_controls(self):
-
-                #out = widgets.Output()
-
-
         
                 play = widgets.Play(interval=1000, value=0, min=0, max=100,
                         step=1, description="Press play")
@@ -80,14 +78,24 @@ class InterfaceVisualisation():
                 next_iter = widgets.Button(description='',icon='step-forward', tooltip='next', layout=widgets.Layout(width='50px'))
                 prev_iter.on_click(click_prev)
                 next_iter.on_click(click_next)
+                log_granularity = widgets.Dropdown(description='Log granularity', options=[l.value for l in Log])
+                log_granularity.observe(self.on_change_log_granularity, names='value')
                 widgets.jslink((play, 'value'), (slider, 'value'))
                 slider.observe(self.animate, names = 'value')
 
-                return widgets.HBox([play, slider, prev_iter, next_iter])
+                return widgets.HBox([play, slider, prev_iter, next_iter, log_granularity])
+
+        def on_change_log_granularity(self, change):
+                self.animation_data = get_filtered_logdata(
+                                                self.controls.children[1].value, 
+                                                self.log_data, 
+                                                Log(self.controls.children[4].value)
+                                                )
+
 
         def animate(self,event):
                 with self.out:
-                        p.get_animation(self.controls.children[1].value, self.log_data, self.plot_instance)
+                        p.get_animation(self.controls.children[1].value, self.animation_data, self.plot_instance)
                         widgets.interaction.show_inline_matplotlib_plots()
                 
         def on_change_problem(self, change):
@@ -112,6 +120,7 @@ class InterfaceVisualisation():
 
                 # starts call to pymhlib in handler module
                 self.log_data, instance = handler.run_algorithm_visualisation(params)
+                self.animation_data = self.log_data
 
                 # initialize graph from instance
                 with self.out:
@@ -120,7 +129,7 @@ class InterfaceVisualisation():
                         widgets.interaction.show_inline_matplotlib_plots()
 
                 self.controls.children[1].value = 0
-                self.controls.children[0].max = self.controls.children[1].max = len(self.log_data) - 3
+                self.controls.children[0].max = self.controls.children[1].max = len(self.animation_data) - 3
                 # start drawing
                 self.animate(None)
                 self.controls.layout.visibility = 'visible'

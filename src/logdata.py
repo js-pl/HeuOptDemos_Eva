@@ -5,6 +5,16 @@ import os
 import sys
 sys.path.append('..\\HeuOptDemos_Eva')
 
+import enum
+
+class Log(enum.Enum):
+        StepInter = 'step-by-step (intermediate steps)' # start-frame and end-frame for each step
+        StepNoInter = 'step-by-step (no intermediate steps)' # start and end combined in one frame
+        Update = 'updated solutions' # result of a phase e.g. li(vnd)-cycle, complete rgc in one frame
+        NewInc = 'new incumbents' # like Update, but only if new incumbent was found
+        FullCycle = 'major cycles' # one full cycle of algorithm, e.g. sh+li, rgc+li, per frame
+
+
 
 def get_log_data(prob: str, alg: str):
 
@@ -111,7 +121,9 @@ def cast_number(data: str):
         return float(data)
 
 
-
+def get_filtered_logdata(i: int, log_data: list, granularity: Log):
+    print(i,granularity)
+    return log_data
 
 # only used for debugging
 if __name__ == '__main__':
