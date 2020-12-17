@@ -10,9 +10,44 @@ import enum
 class Log(enum.Enum):
         StepInter = 'step-by-step (intermediate steps)' # start-frame and end-frame for each step
         StepNoInter = 'step-by-step (no intermediate steps)' # start and end combined in one frame
+        NewInc = 'new incumbents' # like StepNoInter, but only if new incumbent was found
         Update = 'updated solutions' # result of a phase e.g. li(vnd)-cycle, complete rgc in one frame
-        NewInc = 'new incumbents' # like Update, but only if new incumbent was found
-        FullCycle = 'major cycles' # one full cycle of algorithm, e.g. sh+li, rgc+li, per frame
+        #FullCycle = 'major cycles' # one full cycle of algorithm, e.g. sh+li, rgc+li, per frame
+
+
+class LogData():
+
+    def __init__(self, log_data: list):
+        self.full_data = log_data
+        self.levels = self.init_levels()
+        self.current_level = Log.StepInter
+        self.log_data = log_data
+
+    def init_levels(self):
+        levels = dict()
+        levels[Log.StepInter] = list(range(2, len(self.full_data)))
+        levels[Log.StepNoInter] = [i for i in levels[Log.StepInter] if self.full_data[i].get('status') != 'start']
+        levels[Log.NewInc] = [i for i in levels[Log.StepNoInter] if self.full_data[i].get('better',False)]
+        update = list()
+        for i in levels[Log.StepNoInter][:-1]:
+            if self.full_data[i].get('m', False) and (self.full_data[i].get('m') != self.full_data[i+1].get('m')):
+                update.append(i)
+        else:
+            update.append(levels[Log.StepNoInter][-1])
+
+        levels[Log.Update] = update
+        #TODO log level for major cycles
+
+        return levels
+
+
+    def change_granularity(self, i: int, granularity: Log):
+        # sets self.log_data to requested granularity and returns the number of iteration to show next
+        self.log_data = self.full_data[:2] + [self.full_data[i] for i in self.levels[granularity]]
+        current_iter = self.levels[self.current_level][i]
+        next_iter = len(self.levels[granularity]) -1  if current_iter > self.levels[granularity][-1] else next(i for i,val in enumerate(self.levels[granularity]) if val >= current_iter) 
+        self.current_level = granularity
+        return next_iter
 
 
 
@@ -123,7 +158,12 @@ def cast_number(data: str):
 
 def get_filtered_logdata(i: int, log_data: list, granularity: Log):
     print(i,granularity)
-    return log_data
+    animation_data = log_data[:2] # add problem and algo
+
+    return log_data, next_iter
+
+
+
 
 # only used for debugging
 if __name__ == '__main__':

@@ -8,1050 +8,50 @@ PAR: 1
 INC: [False False False False False False False]
 BEST: 37
 END
-SOL: [False False False False False  True False]
-OBJ: 39
-M: li1
-PAR: 1
-INC: [False False False False False  True False]
-BEST: 39
-BETTER: True
-START
-SOL: [False False False False False  True False]
-OBJ: 39
-M: li1
-PAR: 1
-INC: [False False False False False  True False]
-BEST: 39
-END
-SOL: [False False False False  True  True False]
-OBJ: 42
-M: li1
-PAR: 1
-INC: [False False False False  True  True False]
-BEST: 42
-BETTER: True
-START
-SOL: [False False False False  True  True False]
-OBJ: 42
-M: li1
-PAR: 1
-INC: [False False False False  True  True False]
-BEST: 42
-END
-SOL: [ True False False False  True  True False]
-OBJ: 44
-M: li1
-PAR: 1
-INC: [ True False False False  True  True False]
-BEST: 44
-BETTER: True
-START
-SOL: [ True False False False  True  True False]
-OBJ: 44
-M: li1
-PAR: 1
-INC: [ True False False False  True  True False]
-BEST: 44
-END
-SOL: [ True False False False  True  True False]
-OBJ: 44
-M: li1
-PAR: 1
-INC: [ True False False False  True  True False]
-BEST: 44
-BETTER: False
-START
-SOL: [ True False False False  True  True False]
-OBJ: 44
-M: rgc5
-PAR: 5
-INC: [ True False False False  True  True False]
-BEST: 44
-SOL: [-1 -1 -1 -1 -1 -1 -1]
-CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
-PAR: 5
-RCL: [ 5 -1  6  3 -6]
-SEL: -6
-SOL: [-1 -1 -1 -1 -1  0 -1]
-CL: {1: 6, -1: 11, 2: 5, -2: 4, 3: 9, -3: 5, 4: 9, -4: 5, 5: 11, -5: 8, 7: 8, -7: 6}
-PAR: 5
-RCL: [-1  5  3  4 -5]
-SEL: -1
-SOL: [ 0 -1 -1 -1 -1  0 -1]
-CL: {2: 5, -2: 3, 3: 8, -3: 3, 4: 7, -4: 0, 5: 6, -5: 5, 7: 5, -7: 5}
-PAR: 5
-RCL: [ 3  4  5  2 -5]
-SEL: -5
-SOL: [ 0 -1 -1 -1  0  0 -1]
-CL: {2: 3, -2: 2, 3: 7, -3: 3, 4: 7, -4: 0, 7: 5, -7: 4}
-PAR: 5
-RCL: [ 3  4  7 -7  2]
-SEL: 7
-SOL: [ 0 -1 -1 -1  0  0  1]
-CL: {2: 3, -2: 2, 3: 6, -3: 3, 4: 6, -4: 0}
-PAR: 5
-RCL: [ 3  4  2 -3 -2]
-SEL: 3
-SOL: [ 0 -1  1 -1  0  0  1]
-CL: {2: 2, -2: 1, 4: 5, -4: 0}
-PAR: 5
-RCL: [ 4  2 -2 -4]
-SEL: -4
-SOL: [ 0 -1  1  0  0  0  1]
-CL: {2: 2, -2: 1}
-PAR: 5
-RCL: [ 2 -2]
-SEL: 2
-END
-SOL: [False  True  True False False False  True]
-OBJ: 41
-M: rgc5
-PAR: 5
-INC: [ True False False False  True  True False]
-BEST: 44
-BETTER: False
-START
-SOL: [False  True  True False False False  True]
-OBJ: 41
-M: li1
-PAR: 1
-INC: [ True False False False  True  True False]
-BEST: 44
-END
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: True
-START
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-SOL: [-1 -1 -1 -1 -1 -1 -1]
-CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
-PAR: 5
-RCL: [ 5 -1  6  3 -6]
-SEL: -1
-SOL: [ 0 -1 -1 -1 -1 -1 -1]
-CL: {2: 5, -2: 3, 3: 11, -3: 5, 4: 7, -4: 2, 5: 8, -5: 6, 6: 9, -6: 9, 7: 6, -7: 8}
-PAR: 5
-RCL: [ 3  6 -6  5 -7]
-SEL: 6
-SOL: [ 0 -1 -1 -1 -1  1 -1]
-CL: {2: 3, -2: 1, 3: 9, -3: 5, 4: 5, -4: 2, 5: 8, -5: 3, 7: 5, -7: 8}
-PAR: 5
-RCL: [ 3  5 -7 -3  4]
-SEL: -7
-SOL: [ 0 -1 -1 -1 -1  1  0]
-CL: {2: 2, -2: 1, 3: 6, -3: 5, 4: 4, -4: 2, 5: 5, -5: 1}
-PAR: 5
-RCL: [ 3 -3  5  4  2]
-SEL: 5
-SOL: [ 0 -1 -1 -1  1  1  0]
-CL: {2: 1, -2: 1, 3: 4, -3: 4, 4: 3, -4: 2}
-PAR: 5
-RCL: [ 3 -3  4 -4  2]
-SEL: 3
-SOL: [ 0 -1  1 -1  1  1  0]
-CL: {2: 1, -2: 0, 4: 3, -4: 1}
-PAR: 5
-RCL: [ 4  2 -4 -2]
-SEL: -4
-SOL: [ 0 -1  1  0  1  1  0]
-CL: {2: 1, -2: 0}
-PAR: 5
-RCL: [ 2 -2]
-SEL: -2
-END
-SOL: [False False  True False  True  True False]
-OBJ: 41
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False False  True False  True  True False]
-OBJ: 41
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False False  True  True  True  True False]
-OBJ: 43
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False False  True  True  True  True False]
-OBJ: 43
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False False  True  True  True  True  True]
-OBJ: 44
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False False  True  True  True  True  True]
-OBJ: 44
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False False  True  True  True False  True]
-OBJ: 45
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False False  True  True  True False  True]
-OBJ: 45
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-SOL: [-1 -1 -1 -1 -1 -1 -1]
-CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
-PAR: 5
-RCL: [ 5 -1  6  3 -6]
-SEL: 6
-SOL: [-1 -1 -1 -1 -1  1 -1]
-CL: {1: 5, -1: 9, 2: 3, -2: 2, 3: 10, -3: 8, 4: 6, -4: 5, 5: 14, -5: 4, 7: 9, -7: 9}
-PAR: 5
-RCL: [ 5  3 -1  7 -7]
-SEL: -7
-SOL: [-1 -1 -1 -1 -1  1  0]
-CL: {1: 4, -1: 8, 2: 2, -2: 2, 3: 7, -3: 8, 4: 4, -4: 5, 5: 10, -5: 2}
-PAR: 5
-RCL: [ 5 -1 -3  3 -4]
-SEL: -4
-SOL: [-1 -1 -1  0 -1  1  0]
-CL: {1: 3, -1: 5, 2: 2, -2: 2, 3: 5, -3: 6, 5: 9, -5: 1}
-PAR: 5
-RCL: [ 5 -3 -1  3  1]
-SEL: 3
-SOL: [-1 -1  1  0 -1  1  0]
-CL: {1: 3, -1: 5, 2: 2, -2: 1, 5: 7, -5: 1}
-PAR: 5
-RCL: [ 5 -1  1  2 -2]
-SEL: -1
-SOL: [ 0 -1  1  0 -1  1  0]
-CL: {2: 2, -2: 0, 5: 3, -5: 1}
-PAR: 5
-RCL: [ 5  2 -5 -2]
-SEL: 5
-SOL: [ 0 -1  1  0  1  1  0]
-CL: {2: 1, -2: 0}
-PAR: 5
-RCL: [ 2 -2]
-SEL: -2
-END
-SOL: [False False  True False  True  True False]
-OBJ: 41
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False False  True False  True  True False]
-OBJ: 41
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False False False False  True  True False]
-OBJ: 42
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False False False False  True  True False]
-OBJ: 42
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [ True False False False  True  True False]
-OBJ: 44
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [ True False False False  True  True False]
-OBJ: 44
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [ True False False False  True  True False]
-OBJ: 44
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-SOL: [-1 -1 -1 -1 -1 -1 -1]
-CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
-PAR: 5
-RCL: [ 5 -1  6  3 -6]
-SEL: -6
-SOL: [-1 -1 -1 -1 -1  0 -1]
-CL: {1: 6, -1: 11, 2: 5, -2: 4, 3: 9, -3: 5, 4: 9, -4: 5, 5: 11, -5: 8, 7: 8, -7: 6}
-PAR: 5
-RCL: [-1  5  3  4 -5]
-SEL: -1
-SOL: [ 0 -1 -1 -1 -1  0 -1]
-CL: {2: 5, -2: 3, 3: 8, -3: 3, 4: 7, -4: 0, 5: 6, -5: 5, 7: 5, -7: 5}
-PAR: 5
-RCL: [ 3  4  5  2 -5]
-SEL: 2
-SOL: [ 0  1 -1 -1 -1  0 -1]
-CL: {3: 7, -3: 3, 4: 7, -4: 0, 5: 4, -5: 3, 7: 5, -7: 4}
-PAR: 5
-RCL: [ 3  4  7  5 -7]
-SEL: 5
-SOL: [ 0  1 -1 -1  1  0 -1]
-CL: {3: 6, -3: 2, 4: 6, -4: 0, 7: 3, -7: 3}
-PAR: 5
-RCL: [ 3  4  7 -7 -3]
-SEL: 4
-SOL: [ 0  1 -1  1  1  0 -1]
-CL: {3: 5, -3: 0, 7: 3, -7: 2}
-PAR: 5
-RCL: [ 3  7 -7 -3]
-SEL: 7
-SOL: [ 0  1 -1  1  1  0  1]
-CL: {3: 5, -3: 0}
-PAR: 5
-RCL: [ 3 -3]
-SEL: -3
-END
-SOL: [False  True False  True  True False  True]
-OBJ: 41
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True False  True  True False  True]
-OBJ: 41
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-SOL: [-1 -1 -1 -1 -1 -1 -1]
-CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
-PAR: 5
-RCL: [ 5 -1  6  3 -6]
-SEL: 3
-SOL: [-1 -1  1 -1 -1 -1 -1]
-CL: {1: 5, -1: 13, 2: 4, -2: 4, 4: 7, -4: 5, 5: 12, -5: 7, 6: 12, -6: 9, 7: 9, -7: 6}
-PAR: 5
-RCL: [-1  5  6 -6  7]
-SEL: 7
-SOL: [-1 -1  1 -1 -1 -1  1]
-CL: {1: 4, -1: 9, 2: 4, -2: 4, 4: 7, -4: 3, 5: 8, -5: 7, 6: 11, -6: 7}
-PAR: 5
-RCL: [ 6 -1  5  4 -5]
-SEL: -1
-SOL: [ 0 -1  1 -1 -1 -1  1]
-CL: {2: 4, -2: 2, 4: 5, -4: 1, 5: 4, -5: 5, 6: 6, -6: 5}
-PAR: 5
-RCL: [ 6  4 -5 -6  2]
-SEL: -6
-SOL: [ 0 -1  1 -1 -1  0  1]
-CL: {2: 4, -2: 2, 4: 5, -4: 0, 5: 3, -5: 4}
-PAR: 5
-RCL: [ 4  2 -5  5 -2]
-SEL: -5
-SOL: [ 0 -1  1 -1  0  0  1]
-CL: {2: 2, -2: 1, 4: 5, -4: 0}
-PAR: 5
-RCL: [ 4  2 -2 -4]
-SEL: 2
-SOL: [ 0  1  1 -1  0  0  1]
-CL: {4: 5, -4: 0}
-PAR: 5
-RCL: [ 4 -4]
-SEL: 4
-END
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-SOL: [-1 -1 -1 -1 -1 -1 -1]
-CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
-PAR: 5
-RCL: [ 5 -1  6  3 -6]
-SEL: 6
-SOL: [-1 -1 -1 -1 -1  1 -1]
-CL: {1: 5, -1: 9, 2: 3, -2: 2, 3: 10, -3: 8, 4: 6, -4: 5, 5: 14, -5: 4, 7: 9, -7: 9}
-PAR: 5
-RCL: [ 5  3 -1  7 -7]
-SEL: -1
-SOL: [ 0 -1 -1 -1 -1  1 -1]
-CL: {2: 3, -2: 1, 3: 9, -3: 5, 4: 5, -4: 2, 5: 8, -5: 3, 7: 5, -7: 8}
-PAR: 5
-RCL: [ 3  5 -7 -3  4]
-SEL: -7
-SOL: [ 0 -1 -1 -1 -1  1  0]
-CL: {2: 2, -2: 1, 3: 6, -3: 5, 4: 4, -4: 2, 5: 5, -5: 1}
-PAR: 5
-RCL: [ 3 -3  5  4  2]
-SEL: 4
-SOL: [ 0 -1 -1  1 -1  1  0]
-CL: {2: 2, -2: 1, 3: 5, -3: 3, 5: 4, -5: 1}
-PAR: 5
-RCL: [ 3  5 -3  2 -2]
-SEL: 3
-SOL: [ 0 -1  1  1 -1  1  0]
-CL: {2: 2, -2: 0, 5: 3, -5: 1}
-PAR: 5
-RCL: [ 5  2 -5 -2]
-SEL: 2
-SOL: [ 0  1  1  1 -1  1  0]
-CL: {5: 2, -5: 1}
-PAR: 5
-RCL: [ 5 -5]
-SEL: -5
-END
-SOL: [False  True  True  True False  True False]
-OBJ: 43
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True False  True False]
-OBJ: 43
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True  True  True False]
-OBJ: 44
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True  True  True False]
-OBJ: 44
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-SOL: [-1 -1 -1 -1 -1 -1 -1]
-CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
-PAR: 5
-RCL: [ 5 -1  6  3 -6]
-SEL: 6
-SOL: [-1 -1 -1 -1 -1  1 -1]
-CL: {1: 5, -1: 9, 2: 3, -2: 2, 3: 10, -3: 8, 4: 6, -4: 5, 5: 14, -5: 4, 7: 9, -7: 9}
-PAR: 5
-RCL: [ 5  3 -1  7 -7]
-SEL: 7
-SOL: [-1 -1 -1 -1 -1  1  1]
-CL: {1: 4, -1: 5, 2: 3, -2: 2, 3: 9, -3: 5, 4: 5, -4: 3, 5: 9, -5: 4}
-PAR: 5
-RCL: [ 3  5 -1 -3  4]
-SEL: -1
-SOL: [ 0 -1 -1 -1 -1  1  1]
-CL: {2: 3, -2: 1, 3: 8, -3: 4, 4: 4, -4: 2, 5: 6, -5: 3}
-PAR: 5
-RCL: [ 3  5 -3  4  2]
-SEL: 2
-SOL: [ 0  1 -1 -1 -1  1  1]
-CL: {3: 7, -3: 4, 4: 4, -4: 2, 5: 4, -5: 3}
-PAR: 5
-RCL: [ 3 -3  4  5 -5]
-SEL: 3
-SOL: [ 0  1  1 -1 -1  1  1]
-CL: {4: 4, -4: 1, 5: 3, -5: 2}
-PAR: 5
-RCL: [ 4  5 -5 -4]
-SEL: -4
-SOL: [ 0  1  1  0 -1  1  1]
-CL: {5: 3, -5: 2}
-PAR: 5
-RCL: [ 5 -5]
-SEL: 5
-END
-SOL: [False  True  True False  True  True  True]
-OBJ: 42
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True False  True  True  True]
-OBJ: 42
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-SOL: [-1 -1 -1 -1 -1 -1 -1]
-CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
-PAR: 5
-RCL: [ 5 -1  6  3 -6]
-SEL: 6
-SOL: [-1 -1 -1 -1 -1  1 -1]
-CL: {1: 5, -1: 9, 2: 3, -2: 2, 3: 10, -3: 8, 4: 6, -4: 5, 5: 14, -5: 4, 7: 9, -7: 9}
-PAR: 5
-RCL: [ 5  3 -1  7 -7]
-SEL: -1
-SOL: [ 0 -1 -1 -1 -1  1 -1]
-CL: {2: 3, -2: 1, 3: 9, -3: 5, 4: 5, -4: 2, 5: 8, -5: 3, 7: 5, -7: 8}
-PAR: 5
-RCL: [ 3  5 -7 -3  4]
-SEL: -7
-SOL: [ 0 -1 -1 -1 -1  1  0]
-CL: {2: 2, -2: 1, 3: 6, -3: 5, 4: 4, -4: 2, 5: 5, -5: 1}
-PAR: 5
-RCL: [ 3 -3  5  4  2]
-SEL: 2
-SOL: [ 0  1 -1 -1 -1  1  0]
-CL: {3: 6, -3: 5, 4: 4, -4: 2, 5: 4, -5: 1}
-PAR: 5
-RCL: [ 3 -3  4  5 -4]
-SEL: 3
-SOL: [ 0  1  1 -1 -1  1  0]
-CL: {4: 3, -4: 1, 5: 2, -5: 1}
-PAR: 5
-RCL: [ 4  5 -4 -5]
-SEL: 4
-SOL: [ 0  1  1  1 -1  1  0]
-CL: {5: 2, -5: 1}
-PAR: 5
-RCL: [ 5 -5]
-SEL: -5
-END
-SOL: [False  True  True  True False  True False]
-OBJ: 43
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True False  True False]
-OBJ: 43
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True False  True  True]
-OBJ: 44
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True False  True  True]
-OBJ: 44
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-SOL: [-1 -1 -1 -1 -1 -1 -1]
-CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
-PAR: 5
-RCL: [ 5 -1  6  3 -6]
-SEL: 5
-SOL: [-1 -1 -1 -1  1 -1 -1]
-CL: {1: 7, -1: 7, 2: 3, -2: 5, 3: 9, -3: 5, 4: 7, -4: 5, 6: 13, -6: 8, 7: 5, -7: 5}
-PAR: 5
-RCL: [ 6  3 -6  1 -1]
-SEL: 3
-SOL: [-1 -1  1 -1  1 -1 -1]
-CL: {1: 5, -1: 6, 2: 3, -2: 4, 4: 6, -4: 3, 6: 11, -6: 6, 7: 5, -7: 3}
-PAR: 5
-RCL: [ 6 -1  4 -6  1]
-SEL: -6
-SOL: [-1 -1  1 -1  1  0 -1]
-CL: {1: 4, -1: 5, 2: 3, -2: 3, 4: 6, -4: 2, 7: 4, -7: 1}
-PAR: 5
-RCL: [ 4 -1  1  7  2]
-SEL: 2
-SOL: [-1  1  1 -1  1  0 -1]
-CL: {1: 4, -1: 5, 4: 6, -4: 2, 7: 4, -7: 1}
-PAR: 5
-RCL: [ 4 -1  1  7 -4]
-SEL: 4
-SOL: [-1  1  1  1  1  0 -1]
-CL: {1: 1, -1: 4, 7: 4, -7: 0}
-PAR: 5
-RCL: [-1  7  1 -7]
-SEL: 7
-SOL: [-1  1  1  1  1  0  1]
-CL: {1: 0, -1: 3}
-PAR: 5
-RCL: [-1  1]
-SEL: -1
-END
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-SOL: [-1 -1 -1 -1 -1 -1 -1]
-CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
-PAR: 5
-RCL: [ 5 -1  6  3 -6]
-SEL: 6
-SOL: [-1 -1 -1 -1 -1  1 -1]
-CL: {1: 5, -1: 9, 2: 3, -2: 2, 3: 10, -3: 8, 4: 6, -4: 5, 5: 14, -5: 4, 7: 9, -7: 9}
-PAR: 5
-RCL: [ 5  3 -1  7 -7]
-SEL: 3
-SOL: [-1 -1  1 -1 -1  1 -1]
-CL: {1: 4, -1: 8, 2: 2, -2: 1, 4: 5, -4: 3, 5: 11, -5: 2, 7: 8, -7: 6}
-PAR: 5
-RCL: [ 5 -1  7 -7  4]
-SEL: -7
-SOL: [-1 -1  1 -1 -1  1  0]
-CL: {1: 4, -1: 7, 2: 2, -2: 1, 4: 3, -4: 3, 5: 8, -5: 1}
-PAR: 5
-RCL: [ 5 -1  1  4 -4]
-SEL: 4
-SOL: [-1 -1  1  1 -1  1  0]
-CL: {1: 2, -1: 7, 2: 2, -2: 1, 5: 8, -5: 1}
-PAR: 5
-RCL: [ 5 -1  1  2 -2]
-SEL: 2
-SOL: [-1  1  1  1 -1  1  0]
-CL: {1: 2, -1: 7, 5: 7, -5: 1}
-PAR: 5
-RCL: [-1  5  1 -5]
-SEL: 1
-SOL: [ 1  1  1  1 -1  1  0]
-CL: {5: 7, -5: 1}
-PAR: 5
-RCL: [ 5 -5]
-SEL: -5
-END
-SOL: [ True  True  True  True False  True False]
-OBJ: 38
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [ True  True  True  True False  True False]
+SOL: [False False  True False False False False]
 OBJ: 38
 M: li1
 PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True False  True False]
-OBJ: 43
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
+INC: [False False  True False False False False]
+BEST: 38
+BETTER: True
 START
-SOL: [False  True  True  True False  True False]
-OBJ: 43
+SOL: [False False  True False False False False]
+OBJ: 38
 M: li1
 PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
+INC: [False False  True False False False False]
+BEST: 38
 END
-SOL: [False  True  True  True  True  True False]
-OBJ: 44
+SOL: [False False  True  True False False False]
+OBJ: 42
 M: li1
 PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
+INC: [False False  True  True False False False]
+BEST: 42
+BETTER: True
 START
-SOL: [False  True  True  True  True  True False]
-OBJ: 44
+SOL: [False False  True  True False False False]
+OBJ: 42
 M: li1
 PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-SOL: [-1 -1 -1 -1 -1 -1 -1]
-CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
-PAR: 5
-RCL: [ 5 -1  6  3 -6]
-SEL: 3
-SOL: [-1 -1  1 -1 -1 -1 -1]
-CL: {1: 5, -1: 13, 2: 4, -2: 4, 4: 7, -4: 5, 5: 12, -5: 7, 6: 12, -6: 9, 7: 9, -7: 6}
-PAR: 5
-RCL: [-1  5  6 -6  7]
-SEL: -6
-SOL: [-1 -1  1 -1 -1  0 -1]
-CL: {1: 4, -1: 10, 2: 4, -2: 3, 4: 7, -4: 4, 5: 9, -5: 6, 7: 7, -7: 3}
-PAR: 5
-RCL: [-1  5  4  7 -5]
-SEL: -1
-SOL: [ 0 -1  1 -1 -1  0 -1]
-CL: {2: 4, -2: 2, 4: 5, -4: 0, 5: 4, -5: 4, 7: 4, -7: 2}
-PAR: 5
-RCL: [ 4  2  5 -5  7]
-SEL: 2
-SOL: [ 0  1  1 -1 -1  0 -1]
-CL: {4: 5, -4: 0, 5: 3, -5: 2, 7: 4, -7: 2}
-PAR: 5
-RCL: [ 4  7  5 -5 -7]
-SEL: 4
-SOL: [ 0  1  1  1 -1  0 -1]
-CL: {5: 3, -5: 2, 7: 4, -7: 1}
-PAR: 5
-RCL: [ 7  5 -5 -7]
-SEL: -7
-SOL: [ 0  1  1  1 -1  0  0]
-CL: {5: 2, -5: 2}
-PAR: 5
-RCL: [ 5 -5]
-SEL: -5
+INC: [False False  True  True False False False]
+BEST: 42
 END
 SOL: [False  True  True  True False False False]
 OBJ: 43
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
+M: li1
+PAR: 1
+INC: [False  True  True  True False False False]
+BEST: 43
+BETTER: True
 START
 SOL: [False  True  True  True False False False]
 OBJ: 43
 M: li1
 PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
+INC: [False  True  True  True False False False]
+BEST: 43
 END
 SOL: [False  True  True  True False False  True]
 OBJ: 46
@@ -1059,7 +59,7 @@ M: li1
 PAR: 1
 INC: [False  True  True  True False False  True]
 BEST: 46
-BETTER: False
+BETTER: True
 START
 SOL: [False  True  True  True False False  True]
 OBJ: 46
@@ -1078,715 +78,50 @@ BETTER: False
 START
 SOL: [False  True  True  True False False  True]
 OBJ: 46
-M: rgc5
-PAR: 5
+M: rgc0.45
+PAR: 0.45
 INC: [False  True  True  True False False  True]
 BEST: 46
 SOL: [-1 -1 -1 -1 -1 -1 -1]
 CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
-PAR: 5
-RCL: [ 5 -1  6  3 -6]
-SEL: -6
-SOL: [-1 -1 -1 -1 -1  0 -1]
-CL: {1: 6, -1: 11, 2: 5, -2: 4, 3: 9, -3: 5, 4: 9, -4: 5, 5: 11, -5: 8, 7: 8, -7: 6}
-PAR: 5
-RCL: [-1  5  3  4 -5]
-SEL: 5
-SOL: [-1 -1 -1 -1  1  0 -1]
-CL: {1: 6, -1: 6, 2: 3, -2: 4, 3: 7, -3: 3, 4: 7, -4: 3, 7: 4, -7: 3}
-PAR: 5
-RCL: [ 3  4  1 -1 -2]
-SEL: -1
-SOL: [ 0 -1 -1 -1  1  0 -1]
-CL: {2: 3, -2: 3, 3: 6, -3: 2, 4: 6, -4: 0, 7: 3, -7: 3}
-PAR: 5
-RCL: [ 3  4  2 -2  7]
-SEL: 7
-SOL: [ 0 -1 -1 -1  1  0  1]
-CL: {2: 3, -2: 3, 3: 6, -3: 2, 4: 6, -4: 0}
-PAR: 5
-RCL: [ 3  4  2 -2 -3]
-SEL: 2
-SOL: [ 0  1 -1 -1  1  0  1]
-CL: {3: 6, -3: 2, 4: 6, -4: 0}
-PAR: 5
-RCL: [ 3  4 -3 -4]
-SEL: 3
-SOL: [ 0  1  1 -1  1  0  1]
-CL: {4: 5, -4: 0}
-PAR: 5
-RCL: [ 4 -4]
-SEL: -4
-END
-SOL: [False  True  True False  True False  True]
-OBJ: 41
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True False  True False  True]
-OBJ: 41
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-SOL: [-1 -1 -1 -1 -1 -1 -1]
-CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
-PAR: 5
-RCL: [ 5 -1  6  3 -6]
-SEL: 5
-SOL: [-1 -1 -1 -1  1 -1 -1]
-CL: {1: 7, -1: 7, 2: 3, -2: 5, 3: 9, -3: 5, 4: 7, -4: 5, 6: 13, -6: 8, 7: 5, -7: 5}
-PAR: 5
-RCL: [ 6  3 -6  1 -1]
-SEL: 6
-SOL: [-1 -1 -1 -1  1  1 -1]
-CL: {1: 5, -1: 3, 2: 1, -2: 2, 3: 7, -3: 5, 4: 4, -4: 4, 7: 4, -7: 5}
-PAR: 5
-RCL: [ 3  1 -3 -7  4]
-SEL: 3
-SOL: [-1 -1  1 -1  1  1 -1]
-CL: {1: 4, -1: 2, 2: 1, -2: 1, 4: 4, -4: 2, 7: 4, -7: 3}
-PAR: 5
-RCL: [ 1  4  7 -7 -1]
-SEL: -1
-SOL: [ 0 -1  1 -1  1  1 -1]
-CL: {2: 1, -2: 0, 4: 4, -4: 1, 7: 3, -7: 3}
-PAR: 5
-RCL: [ 4  7 -7  2 -4]
-SEL: 4
-SOL: [ 0 -1  1  1  1  1 -1]
-CL: {2: 1, -2: 0, 7: 3, -7: 2}
-PAR: 5
-RCL: [ 7 -7  2 -2]
-SEL: 2
-SOL: [ 0  1  1  1  1  1 -1]
-CL: {7: 3, -7: 2}
-PAR: 5
-RCL: [ 7 -7]
-SEL: -7
-END
-SOL: [False  True  True  True  True  True False]
-OBJ: 44
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True  True  True False]
-OBJ: 44
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-SOL: [-1 -1 -1 -1 -1 -1 -1]
-CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
-PAR: 5
-RCL: [ 5 -1  6  3 -6]
-SEL: 6
-SOL: [-1 -1 -1 -1 -1  1 -1]
-CL: {1: 5, -1: 9, 2: 3, -2: 2, 3: 10, -3: 8, 4: 6, -4: 5, 5: 14, -5: 4, 7: 9, -7: 9}
-PAR: 5
-RCL: [ 5  3 -1  7 -7]
-SEL: 7
-SOL: [-1 -1 -1 -1 -1  1  1]
-CL: {1: 4, -1: 5, 2: 3, -2: 2, 3: 9, -3: 5, 4: 5, -4: 3, 5: 9, -5: 4}
-PAR: 5
-RCL: [ 3  5 -1 -3  4]
-SEL: 3
-SOL: [-1 -1  1 -1 -1  1  1]
-CL: {1: 3, -1: 4, 2: 2, -2: 1, 4: 5, -4: 1, 5: 7, -5: 2}
-PAR: 5
-RCL: [ 5  4 -1  1  2]
-SEL: 1
-SOL: [ 1 -1  1 -1 -1  1  1]
-CL: {2: 2, -2: 1, 4: 3, -4: 0, 5: 7, -5: 2}
-PAR: 5
-RCL: [ 5  4  2 -5 -2]
-SEL: -5
-SOL: [ 1 -1  1 -1  0  1  1]
-CL: {2: 2, -2: 1, 4: 3, -4: 0}
-PAR: 5
-RCL: [ 4  2 -2 -4]
-SEL: -4
-SOL: [ 1 -1  1  0  0  1  1]
-CL: {2: 2, -2: 1}
-PAR: 5
-RCL: [ 2 -2]
-SEL: 2
-END
-SOL: [ True  True  True False False  True  True]
-OBJ: 39
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [ True  True  True False False  True  True]
-OBJ: 39
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [ True  True  True False  True  True  True]
-OBJ: 43
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [ True  True  True False  True  True  True]
-OBJ: 43
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [ True  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [ True  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [ True  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-SOL: [-1 -1 -1 -1 -1 -1 -1]
-CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
-PAR: 5
-RCL: [ 5 -1  6  3 -6]
+PAR: 0.45
+RCL: [ 1 -1  3 -3  4 -4  5 -5  6 -6  7 -7]
 SEL: 3
 SOL: [-1 -1  1 -1 -1 -1 -1]
 CL: {1: 5, -1: 13, 2: 4, -2: 4, 4: 7, -4: 5, 5: 12, -5: 7, 6: 12, -6: 9, 7: 9, -7: 6}
-PAR: 5
-RCL: [-1  5  6 -6  7]
-SEL: 7
-SOL: [-1 -1  1 -1 -1 -1  1]
-CL: {1: 4, -1: 9, 2: 4, -2: 4, 4: 7, -4: 3, 5: 8, -5: 7, 6: 11, -6: 7}
-PAR: 5
-RCL: [ 6 -1  5  4 -5]
-SEL: -1
-SOL: [ 0 -1  1 -1 -1 -1  1]
-CL: {2: 4, -2: 2, 4: 5, -4: 1, 5: 4, -5: 5, 6: 6, -6: 5}
-PAR: 5
-RCL: [ 6  4 -5 -6  2]
+PAR: 0.45
+RCL: [-1  4  5 -5  6 -6  7 -7]
 SEL: 4
+SOL: [-1 -1  1  1 -1 -1 -1]
+CL: {1: 2, -1: 11, 2: 4, -2: 4, 5: 11, -5: 6, 6: 10, -6: 9, 7: 9, -7: 4}
+PAR: 0.45
+RCL: [-1  5 -5  6 -6  7]
+SEL: 7
+SOL: [-1 -1  1  1 -1 -1  1]
+CL: {1: 1, -1: 7, 2: 4, -2: 4, 5: 7, -5: 6, 6: 9, -6: 7}
+PAR: 0.45
+RCL: [-1  5 -5  6 -6]
+SEL: -1
 SOL: [ 0 -1  1  1 -1 -1  1]
 CL: {2: 4, -2: 2, 5: 4, -5: 5, 6: 5, -6: 5}
-PAR: 5
-RCL: [-5  6 -6  2  5]
-SEL: 6
-SOL: [ 0 -1  1  1 -1  1  1]
-CL: {2: 2, -2: 0, 5: 4, -5: 2}
-PAR: 5
-RCL: [ 5  2 -5 -2]
-SEL: 5
-SOL: [ 0 -1  1  1  1  1  1]
-CL: {2: 1, -2: 0}
-PAR: 5
-RCL: [ 2 -2]
-SEL: -2
-END
-SOL: [False False  True  True  True  True  True]
-OBJ: 44
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False False  True  True  True  True  True]
-OBJ: 44
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [ True False  True  True  True  True  True]
-OBJ: 45
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [ True False  True  True  True  True  True]
-OBJ: 45
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [ True False  True  True  True  True  True]
-OBJ: 45
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-SOL: [-1 -1 -1 -1 -1 -1 -1]
-CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
-PAR: 5
-RCL: [ 5 -1  6  3 -6]
-SEL: 3
-SOL: [-1 -1  1 -1 -1 -1 -1]
-CL: {1: 5, -1: 13, 2: 4, -2: 4, 4: 7, -4: 5, 5: 12, -5: 7, 6: 12, -6: 9, 7: 9, -7: 6}
-PAR: 5
-RCL: [-1  5  6 -6  7]
-SEL: -1
-SOL: [ 0 -1  1 -1 -1 -1 -1]
-CL: {2: 4, -2: 2, 4: 5, -4: 1, 5: 5, -5: 5, 6: 7, -6: 6, 7: 5, -7: 5}
-PAR: 5
-RCL: [ 6 -6  4  5 -5]
-SEL: 4
-SOL: [ 0 -1  1  1 -1 -1 -1]
-CL: {2: 4, -2: 2, 5: 5, -5: 5, 6: 6, -6: 6, 7: 5, -7: 4}
-PAR: 5
-RCL: [ 6 -6  5 -5  7]
-SEL: 5
-SOL: [ 0 -1  1  1  1 -1 -1]
-CL: {2: 3, -2: 2, 6: 6, -6: 5, 7: 4, -7: 2}
-PAR: 5
-RCL: [ 6 -6  7  2 -2]
-SEL: 2
-SOL: [ 0  1  1  1  1 -1 -1]
-CL: {6: 4, -6: 5, 7: 4, -7: 2}
-PAR: 5
-RCL: [-6  6  7 -7]
-SEL: 6
-SOL: [ 0  1  1  1  1  1 -1]
-CL: {7: 3, -7: 2}
-PAR: 5
-RCL: [ 7 -7]
-SEL: 7
-END
-SOL: [False  True  True  True  True  True  True]
-OBJ: 45
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-SOL: [-1 -1 -1 -1 -1 -1 -1]
-CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
-PAR: 5
-RCL: [ 5 -1  6  3 -6]
-SEL: -6
-SOL: [-1 -1 -1 -1 -1  0 -1]
-CL: {1: 6, -1: 11, 2: 5, -2: 4, 3: 9, -3: 5, 4: 9, -4: 5, 5: 11, -5: 8, 7: 8, -7: 6}
-PAR: 5
-RCL: [-1  5  3  4 -5]
-SEL: 4
-SOL: [-1 -1 -1  1 -1  0 -1]
-CL: {1: 2, -1: 9, 2: 5, -2: 4, 3: 7, -3: 3, 5: 9, -5: 7, 7: 7, -7: 4}
-PAR: 5
-RCL: [-1  5  3 -5  7]
-SEL: 5
-SOL: [-1 -1 -1  1  1  0 -1]
-CL: {1: 2, -1: 5, 2: 3, -2: 4, 3: 6, -3: 1, 7: 4, -7: 2}
-PAR: 5
-RCL: [ 3 -1 -2  7  2]
-SEL: 2
-SOL: [-1  1 -1  1  1  0 -1]
-CL: {1: 2, -1: 5, 3: 6, -3: 1, 7: 4, -7: 2}
-PAR: 5
-RCL: [ 3 -1  7  1 -7]
-SEL: 7
-SOL: [-1  1 -1  1  1  0  1]
-CL: {1: 1, -1: 4, 3: 6, -3: 0}
-PAR: 5
-RCL: [ 3 -1  1 -3]
-SEL: -1
-SOL: [ 0  1 -1  1  1  0  1]
-CL: {3: 5, -3: 0}
-PAR: 5
-RCL: [ 3 -3]
-SEL: 3
-END
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-SOL: [-1 -1 -1 -1 -1 -1 -1]
-CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
-PAR: 5
-RCL: [ 5 -1  6  3 -6]
-SEL: -1
-SOL: [ 0 -1 -1 -1 -1 -1 -1]
-CL: {2: 5, -2: 3, 3: 11, -3: 5, 4: 7, -4: 2, 5: 8, -5: 6, 6: 9, -6: 9, 7: 6, -7: 8}
-PAR: 5
-RCL: [ 3  6 -6  5 -7]
-SEL: 3
-SOL: [ 0 -1  1 -1 -1 -1 -1]
-CL: {2: 4, -2: 2, 4: 5, -4: 1, 5: 5, -5: 5, 6: 7, -6: 6, 7: 5, -7: 5}
-PAR: 5
-RCL: [ 6 -6  4  5 -5]
+PAR: 0.45
+RCL: [ 2  5 -5  6 -6]
 SEL: -5
-SOL: [ 0 -1  1 -1  0 -1 -1]
-CL: {2: 2, -2: 1, 4: 5, -4: 1, 6: 4, -6: 5, 7: 5, -7: 4}
-PAR: 5
-RCL: [ 4 -6  7  6 -7]
-SEL: -7
-SOL: [ 0 -1  1 -1  0 -1  0]
-CL: {2: 2, -2: 1, 4: 4, -4: 1, 6: 4, -6: 3}
-PAR: 5
-RCL: [ 4  6 -6  2 -2]
+SOL: [ 0 -1  1  1  0 -1  1]
+CL: {2: 2, -2: 1, 6: 2, -6: 4}
+PAR: 0.45
+RCL: [ 2  6 -6]
 SEL: 2
-SOL: [ 0  1  1 -1  0 -1  0]
-CL: {4: 4, -4: 1, 6: 4, -6: 3}
-PAR: 5
-RCL: [ 4  6 -6 -4]
-SEL: 6
-SOL: [ 0  1  1 -1  0  1  0]
-CL: {4: 3, -4: 1}
-PAR: 5
-RCL: [ 4 -4]
-SEL: -4
-END
-SOL: [False  True  True False False  True False]
-OBJ: 41
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True False False  True False]
-OBJ: 41
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True False  True False]
-OBJ: 43
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True False  True False]
-OBJ: 43
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True  True  True False]
-OBJ: 44
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True  True  True False]
-OBJ: 44
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-SOL: [-1 -1 -1 -1 -1 -1 -1]
-CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
-PAR: 5
-RCL: [ 5 -1  6  3 -6]
+SOL: [ 0  1  1  1  0 -1  1]
+CL: {6: 2, -6: 4}
+PAR: 0.45
+RCL: [ 6 -6]
 SEL: -6
-SOL: [-1 -1 -1 -1 -1  0 -1]
-CL: {1: 6, -1: 11, 2: 5, -2: 4, 3: 9, -3: 5, 4: 9, -4: 5, 5: 11, -5: 8, 7: 8, -7: 6}
-PAR: 5
-RCL: [-1  5  3  4 -5]
-SEL: -5
-SOL: [-1 -1 -1 -1  0  0 -1]
-CL: {1: 5, -1: 8, 2: 3, -2: 3, 3: 7, -3: 5, 4: 8, -4: 4, 7: 8, -7: 5}
-PAR: 5
-RCL: [-1  4  7  3  1]
-SEL: 7
-SOL: [-1 -1 -1 -1  0  0  1]
-CL: {1: 4, -1: 5, 2: 3, -2: 3, 3: 6, -3: 3, 4: 7, -4: 2}
-PAR: 5
-RCL: [ 4  3 -1  1  2]
-SEL: 2
-SOL: [-1  1 -1 -1  0  0  1]
-CL: {1: 4, -1: 5, 3: 5, -3: 3, 4: 7, -4: 2}
-PAR: 5
-RCL: [ 4 -1  3  1 -3]
-SEL: -3
-SOL: [-1  1  0 -1  0  0  1]
-CL: {1: 3, -1: 5, 4: 5, -4: 2}
-PAR: 5
-RCL: [-1  4  1 -4]
-SEL: -4
-SOL: [-1  1  0  0  0  0  1]
-CL: {1: 3, -1: 3}
-PAR: 5
-RCL: [ 1 -1]
-SEL: 1
-END
-SOL: [ True  True False False False False  True]
-OBJ: 39
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [ True  True False False False False  True]
-OBJ: 39
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [ True  True  True False False False  True]
-OBJ: 41
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [ True  True  True False False False  True]
-OBJ: 41
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [ True  True  True  True False False  True]
-OBJ: 42
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [ True  True  True  True False False  True]
-OBJ: 42
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
 END
 SOL: [False  True  True  True False False  True]
 OBJ: 46
-M: li1
-PAR: 1
+M: rgc0.45
+PAR: 0.45
 INC: [False  True  True  True False False  True]
 BEST: 46
 BETTER: False
@@ -1808,238 +143,108 @@ BETTER: False
 START
 SOL: [False  True  True  True False False  True]
 OBJ: 46
-M: rgc5
-PAR: 5
+M: rgc0.45
+PAR: 0.45
 INC: [False  True  True  True False False  True]
 BEST: 46
 SOL: [-1 -1 -1 -1 -1 -1 -1]
 CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
-PAR: 5
-RCL: [ 5 -1  6  3 -6]
-SEL: -6
-SOL: [-1 -1 -1 -1 -1  0 -1]
-CL: {1: 6, -1: 11, 2: 5, -2: 4, 3: 9, -3: 5, 4: 9, -4: 5, 5: 11, -5: 8, 7: 8, -7: 6}
-PAR: 5
-RCL: [-1  5  3  4 -5]
-SEL: 3
-SOL: [-1 -1  1 -1 -1  0 -1]
-CL: {1: 4, -1: 10, 2: 4, -2: 3, 4: 7, -4: 4, 5: 9, -5: 6, 7: 7, -7: 3}
-PAR: 5
-RCL: [-1  5  4  7 -5]
-SEL: -5
-SOL: [-1 -1  1 -1  0  0 -1]
-CL: {1: 4, -1: 8, 2: 2, -2: 2, 4: 6, -4: 4, 7: 7, -7: 3}
-PAR: 5
-RCL: [-1  7  4  1 -4]
-SEL: -1
-SOL: [ 0 -1  1 -1  0  0 -1]
-CL: {2: 2, -2: 1, 4: 5, -4: 0, 7: 4, -7: 2}
-PAR: 5
-RCL: [ 4  7  2 -7 -2]
-SEL: 7
-SOL: [ 0 -1  1 -1  0  0  1]
-CL: {2: 2, -2: 1, 4: 5, -4: 0}
-PAR: 5
-RCL: [ 4  2 -2 -4]
-SEL: 2
-SOL: [ 0  1  1 -1  0  0  1]
-CL: {4: 5, -4: 0}
-PAR: 5
-RCL: [ 4 -4]
-SEL: -4
-END
-SOL: [False  True  True False False False  True]
-OBJ: 41
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True False False False  True]
-OBJ: 41
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-SOL: [-1 -1 -1 -1 -1 -1 -1]
-CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
-PAR: 5
-RCL: [ 5 -1  6  3 -6]
-SEL: 3
-SOL: [-1 -1  1 -1 -1 -1 -1]
-CL: {1: 5, -1: 13, 2: 4, -2: 4, 4: 7, -4: 5, 5: 12, -5: 7, 6: 12, -6: 9, 7: 9, -7: 6}
-PAR: 5
-RCL: [-1  5  6 -6  7]
-SEL: -1
-SOL: [ 0 -1  1 -1 -1 -1 -1]
-CL: {2: 4, -2: 2, 4: 5, -4: 1, 5: 5, -5: 5, 6: 7, -6: 6, 7: 5, -7: 5}
-PAR: 5
-RCL: [ 6 -6  4  5 -5]
-SEL: 6
-SOL: [ 0 -1  1 -1 -1  1 -1]
-CL: {2: 2, -2: 0, 4: 4, -4: 1, 5: 5, -5: 2, 7: 4, -7: 5}
-PAR: 5
-RCL: [ 5 -7  4  7  2]
-SEL: 4
-SOL: [ 0 -1  1  1 -1  1 -1]
-CL: {2: 2, -2: 0, 5: 5, -5: 2, 7: 4, -7: 4}
-PAR: 5
-RCL: [ 5  7 -7  2 -5]
-SEL: -7
-SOL: [ 0 -1  1  1 -1  1  0]
-CL: {2: 2, -2: 0, 5: 3, -5: 1}
-PAR: 5
-RCL: [ 5  2 -5 -2]
-SEL: 5
-SOL: [ 0 -1  1  1  1  1  0]
-CL: {2: 1, -2: 0}
-PAR: 5
-RCL: [ 2 -2]
-SEL: 2
-END
-SOL: [False  True  True  True  True  True False]
-OBJ: 44
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True  True  True False]
-OBJ: 44
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True  True  True  True]
-OBJ: 45
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True  True False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-SOL: [-1 -1 -1 -1 -1 -1 -1]
-CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
-PAR: 5
-RCL: [ 5 -1  6  3 -6]
+PAR: 0.45
+RCL: [ 1 -1  3 -3  4 -4  5 -5  6 -6  7 -7]
 SEL: 6
 SOL: [-1 -1 -1 -1 -1  1 -1]
 CL: {1: 5, -1: 9, 2: 3, -2: 2, 3: 10, -3: 8, 4: 6, -4: 5, 5: 14, -5: 4, 7: 9, -7: 9}
-PAR: 5
-RCL: [ 5  3 -1  7 -7]
-SEL: 3
-SOL: [-1 -1  1 -1 -1  1 -1]
-CL: {1: 4, -1: 8, 2: 2, -2: 1, 4: 5, -4: 3, 5: 11, -5: 2, 7: 8, -7: 6}
-PAR: 5
-RCL: [ 5 -1  7 -7  4]
-SEL: -7
-SOL: [-1 -1  1 -1 -1  1  0]
-CL: {1: 4, -1: 7, 2: 2, -2: 1, 4: 3, -4: 3, 5: 8, -5: 1}
-PAR: 5
-RCL: [ 5 -1  1  4 -4]
-SEL: 5
-SOL: [-1 -1  1 -1  1  1  0]
-CL: {1: 4, -1: 2, 2: 1, -2: 1, 4: 3, -4: 2}
-PAR: 5
-RCL: [ 1  4 -1 -4  2]
+PAR: 0.45
+RCL: [-1  3 -3  5  7 -7]
+SEL: -3
+SOL: [-1 -1  0 -1 -1  1 -1]
+CL: {1: 3, -1: 6, 2: 3, -2: 2, 4: 4, -4: 3, 5: 11, -5: 4, 7: 6, -7: 9}
+PAR: 0.45
+RCL: [-1  5  7 -7]
+SEL: 7
+SOL: [-1 -1  0 -1 -1  1  1]
+CL: {1: 2, -1: 4, 2: 3, -2: 2, 4: 3, -4: 2, 5: 7, -5: 4}
+PAR: 0.45
+RCL: [-1  5 -5]
+SEL: -5
+SOL: [-1 -1  0 -1  0  1  1]
+CL: {1: 1, -1: 3, 2: 3, -2: 2, 4: 3, -4: 1}
+PAR: 0.45
+RCL: [-1  2 -2  4]
+SEL: 4
+SOL: [-1 -1  0  1  0  1  1]
+CL: {1: 0, -1: 2, 2: 3, -2: 2}
+PAR: 0.45
+RCL: [-1  2 -2]
 SEL: 2
-SOL: [-1  1  1 -1  1  1  0]
-CL: {1: 4, -1: 2, 4: 3, -4: 2}
-PAR: 5
-RCL: [ 1  4 -1 -4]
-SEL: -4
-SOL: [-1  1  1  0  1  1  0]
-CL: {1: 3, -1: 1}
-PAR: 5
-RCL: [ 1 -1]
-SEL: 1
+SOL: [-1  1  0  1  0  1  1]
+CL: {1: 0, -1: 2}
+PAR: 0.45
+RCL: [-1]
+SEL: -1
 END
-SOL: [ True  True  True False  True  True False]
-OBJ: 44
-M: rgc5
-PAR: 5
+SOL: [False  True False  True False  True  True]
+OBJ: 40
+M: rgc0.45
+PAR: 0.45
 INC: [False  True  True  True False False  True]
 BEST: 46
 BETTER: False
 START
-SOL: [ True  True  True False  True  True False]
+SOL: [False  True False  True False  True  True]
+OBJ: 40
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True False  True  True]
+OBJ: 44
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False  True  True]
 OBJ: 44
 M: li1
 PAR: 1
 INC: [False  True  True  True False False  True]
 BEST: 46
 END
-SOL: [ True  True  True False  True  True False]
-OBJ: 44
+SOL: [False  True  True  True  True  True  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True  True  True  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
 M: li1
 PAR: 1
 INC: [False  True  True  True False False  True]
@@ -2048,210 +253,50 @@ BETTER: False
 START
 SOL: [False  True  True  True False False  True]
 OBJ: 46
-M: rgc5
-PAR: 5
+M: rgc0.45
+PAR: 0.45
 INC: [False  True  True  True False False  True]
 BEST: 46
 SOL: [-1 -1 -1 -1 -1 -1 -1]
 CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
-PAR: 5
-RCL: [ 5 -1  6  3 -6]
+PAR: 0.45
+RCL: [ 1 -1  3 -3  4 -4  5 -5  6 -6  7 -7]
 SEL: 3
 SOL: [-1 -1  1 -1 -1 -1 -1]
 CL: {1: 5, -1: 13, 2: 4, -2: 4, 4: 7, -4: 5, 5: 12, -5: 7, 6: 12, -6: 9, 7: 9, -7: 6}
-PAR: 5
-RCL: [-1  5  6 -6  7]
+PAR: 0.45
+RCL: [-1  4  5 -5  6 -6  7 -7]
 SEL: 5
 SOL: [-1 -1  1 -1  1 -1 -1]
 CL: {1: 5, -1: 6, 2: 3, -2: 4, 4: 6, -4: 3, 6: 11, -6: 6, 7: 5, -7: 3}
-PAR: 5
-RCL: [ 6 -1  4 -6  1]
+PAR: 0.45
+RCL: [ 1 -1  4  6 -6  7]
 SEL: -1
 SOL: [ 0 -1  1 -1  1 -1 -1]
 CL: {2: 3, -2: 2, 4: 5, -4: 1, 6: 7, -6: 5, 7: 4, -7: 3}
-PAR: 5
-RCL: [ 6  4 -6  7  2]
+PAR: 0.45
+RCL: [ 4  6 -6  7]
 SEL: 4
 SOL: [ 0 -1  1  1  1 -1 -1]
 CL: {2: 3, -2: 2, 6: 6, -6: 5, 7: 4, -7: 2}
-PAR: 5
-RCL: [ 6 -6  7  2 -2]
-SEL: 7
-SOL: [ 0 -1  1  1  1 -1  1]
-CL: {2: 3, -2: 2, 6: 5, -6: 4}
-PAR: 5
-RCL: [ 6 -6  2 -2]
-SEL: -2
-SOL: [ 0  0  1  1  1 -1  1]
-CL: {6: 3, -6: 4}
-PAR: 5
-RCL: [-6  6]
+PAR: 0.45
+RCL: [ 2  6 -6  7]
 SEL: 6
-END
-SOL: [False False  True  True  True  True  True]
-OBJ: 44
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False False  True  True  True  True  True]
-OBJ: 44
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [ True False  True  True  True  True  True]
-OBJ: 45
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [ True False  True  True  True  True  True]
-OBJ: 45
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [ True False  True  True  True  True  True]
-OBJ: 45
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-SOL: [-1 -1 -1 -1 -1 -1 -1]
-CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
-PAR: 5
-RCL: [ 5 -1  6  3 -6]
-SEL: -6
-SOL: [-1 -1 -1 -1 -1  0 -1]
-CL: {1: 6, -1: 11, 2: 5, -2: 4, 3: 9, -3: 5, 4: 9, -4: 5, 5: 11, -5: 8, 7: 8, -7: 6}
-PAR: 5
-RCL: [-1  5  3  4 -5]
-SEL: -1
-SOL: [ 0 -1 -1 -1 -1  0 -1]
-CL: {2: 5, -2: 3, 3: 8, -3: 3, 4: 7, -4: 0, 5: 6, -5: 5, 7: 5, -7: 5}
-PAR: 5
-RCL: [ 3  4  5  2 -5]
-SEL: 3
-SOL: [ 0 -1  1 -1 -1  0 -1]
-CL: {2: 4, -2: 2, 4: 5, -4: 0, 5: 4, -5: 4, 7: 4, -7: 2}
-PAR: 5
-RCL: [ 4  2  5 -5  7]
-SEL: 4
-SOL: [ 0 -1  1  1 -1  0 -1]
-CL: {2: 4, -2: 2, 5: 4, -5: 4, 7: 4, -7: 1}
-PAR: 5
-RCL: [ 2  5 -5  7 -2]
-SEL: 2
-SOL: [ 0  1  1  1 -1  0 -1]
-CL: {5: 3, -5: 2, 7: 4, -7: 1}
-PAR: 5
-RCL: [ 7  5 -5 -7]
-SEL: -5
-SOL: [ 0  1  1  1  0  0 -1]
-CL: {7: 4, -7: 1}
-PAR: 5
-RCL: [ 7 -7]
-SEL: -7
-END
-SOL: [False  True  True  True False False False]
-OBJ: 43
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True False False False]
-OBJ: 43
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-END
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: li1
-PAR: 1
-INC: [False  True  True  True False False  True]
-BEST: 46
-BETTER: False
-START
-SOL: [False  True  True  True False False  True]
-OBJ: 46
-M: rgc5
-PAR: 5
-INC: [False  True  True  True False False  True]
-BEST: 46
-SOL: [-1 -1 -1 -1 -1 -1 -1]
-CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
-PAR: 5
-RCL: [ 5 -1  6  3 -6]
-SEL: 5
-SOL: [-1 -1 -1 -1  1 -1 -1]
-CL: {1: 7, -1: 7, 2: 3, -2: 5, 3: 9, -3: 5, 4: 7, -4: 5, 6: 13, -6: 8, 7: 5, -7: 5}
-PAR: 5
-RCL: [ 6  3 -6  1 -1]
-SEL: 3
-SOL: [-1 -1  1 -1  1 -1 -1]
-CL: {1: 5, -1: 6, 2: 3, -2: 4, 4: 6, -4: 3, 6: 11, -6: 6, 7: 5, -7: 3}
-PAR: 5
-RCL: [ 6 -1  4 -6  1]
-SEL: 6
-SOL: [-1 -1  1 -1  1  1 -1]
-CL: {1: 4, -1: 2, 2: 1, -2: 1, 4: 4, -4: 2, 7: 4, -7: 3}
-PAR: 5
-RCL: [ 1  4  7 -7 -1]
-SEL: -1
-SOL: [ 0 -1  1 -1  1  1 -1]
-CL: {2: 1, -2: 0, 4: 4, -4: 1, 7: 3, -7: 3}
-PAR: 5
-RCL: [ 4  7 -7  2 -4]
-SEL: 4
 SOL: [ 0 -1  1  1  1  1 -1]
 CL: {2: 1, -2: 0, 7: 3, -7: 2}
-PAR: 5
-RCL: [ 7 -7  2 -2]
+PAR: 0.45
+RCL: [ 7 -7]
 SEL: -7
 SOL: [ 0 -1  1  1  1  1  0]
 CL: {2: 1, -2: 0}
-PAR: 5
-RCL: [ 2 -2]
+PAR: 0.45
+RCL: [2]
 SEL: 2
 END
 SOL: [False  True  True  True  True  True False]
 OBJ: 44
-M: rgc5
-PAR: 5
+M: rgc0.45
+PAR: 0.45
 INC: [False  True  True  True False False  True]
 BEST: 46
 BETTER: False
@@ -2303,65 +348,255 @@ BETTER: False
 START
 SOL: [False  True  True  True False False  True]
 OBJ: 46
-M: rgc5
-PAR: 5
+M: rgc0.45
+PAR: 0.45
 INC: [False  True  True  True False False  True]
 BEST: 46
 SOL: [-1 -1 -1 -1 -1 -1 -1]
 CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
-PAR: 5
-RCL: [ 5 -1  6  3 -6]
-SEL: -1
-SOL: [ 0 -1 -1 -1 -1 -1 -1]
-CL: {2: 5, -2: 3, 3: 11, -3: 5, 4: 7, -4: 2, 5: 8, -5: 6, 6: 9, -6: 9, 7: 6, -7: 8}
-PAR: 5
-RCL: [ 3  6 -6  5 -7]
-SEL: -7
-SOL: [ 0 -1 -1 -1 -1 -1  0]
-CL: {2: 4, -2: 3, 3: 8, -3: 5, 4: 6, -4: 2, 5: 5, -5: 4, 6: 9, -6: 6}
-PAR: 5
-RCL: [ 6  3  4 -6 -3]
-SEL: 4
-SOL: [ 0 -1 -1  1 -1 -1  0]
-CL: {2: 4, -2: 3, 3: 6, -3: 3, 5: 4, -5: 4, 6: 7, -6: 6}
-PAR: 5
-RCL: [ 6  3 -6  2  5]
-SEL: 2
-SOL: [ 0  1 -1  1 -1 -1  0]
-CL: {3: 6, -3: 3, 5: 3, -5: 2, 6: 5, -6: 6}
-PAR: 5
-RCL: [ 3 -6  6 -3  5]
-SEL: -3
-SOL: [ 0  1  0  1 -1 -1  0]
-CL: {5: 2, -5: 2, 6: 5, -6: 4}
-PAR: 5
-RCL: [ 6 -6  5 -5]
-SEL: -5
-SOL: [ 0  1  0  1  0 -1  0]
-CL: {6: 4, -6: 4}
-PAR: 5
-RCL: [ 6 -6]
+PAR: 0.45
+RCL: [ 1 -1  3 -3  4 -4  5 -5  6 -6  7 -7]
 SEL: 6
+SOL: [-1 -1 -1 -1 -1  1 -1]
+CL: {1: 5, -1: 9, 2: 3, -2: 2, 3: 10, -3: 8, 4: 6, -4: 5, 5: 14, -5: 4, 7: 9, -7: 9}
+PAR: 0.45
+RCL: [-1  3 -3  5  7 -7]
+SEL: -7
+SOL: [-1 -1 -1 -1 -1  1  0]
+CL: {1: 4, -1: 8, 2: 2, -2: 2, 3: 7, -3: 8, 4: 4, -4: 5, 5: 10, -5: 2}
+PAR: 0.45
+RCL: [-1  3 -3 -4  5]
+SEL: -1
+SOL: [ 0 -1 -1 -1 -1  1  0]
+CL: {2: 2, -2: 1, 3: 6, -3: 5, 4: 4, -4: 2, 5: 5, -5: 1}
+PAR: 0.45
+RCL: [ 3 -3  4  5]
+SEL: 5
+SOL: [ 0 -1 -1 -1  1  1  0]
+CL: {2: 1, -2: 1, 3: 4, -3: 4, 4: 3, -4: 2}
+PAR: 0.45
+RCL: [ 3 -3  4 -4]
+SEL: 3
+SOL: [ 0 -1  1 -1  1  1  0]
+CL: {2: 1, -2: 0, 4: 3, -4: 1}
+PAR: 0.45
+RCL: [4]
+SEL: 4
+SOL: [ 0 -1  1  1  1  1  0]
+CL: {2: 1, -2: 0}
+PAR: 0.45
+RCL: [2]
+SEL: 2
 END
-SOL: [False  True False  True False  True False]
-OBJ: 41
-M: rgc5
-PAR: 5
+SOL: [False  True  True  True  True  True False]
+OBJ: 44
+M: rgc0.45
+PAR: 0.45
 INC: [False  True  True  True False False  True]
 BEST: 46
 BETTER: False
 START
-SOL: [False  True False  True False  True False]
-OBJ: 41
+SOL: [False  True  True  True  True  True False]
+OBJ: 44
 M: li1
 PAR: 1
 INC: [False  True  True  True False False  True]
 BEST: 46
 END
-SOL: [False  True False  True  True  True False]
+SOL: [False  True  True  True  True  True  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True  True  True  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+SOL: [-1 -1 -1 -1 -1 -1 -1]
+CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
+PAR: 0.45
+RCL: [ 1 -1  3 -3  4 -4  5 -5  6 -6  7 -7]
+SEL: 6
+SOL: [-1 -1 -1 -1 -1  1 -1]
+CL: {1: 5, -1: 9, 2: 3, -2: 2, 3: 10, -3: 8, 4: 6, -4: 5, 5: 14, -5: 4, 7: 9, -7: 9}
+PAR: 0.45
+RCL: [-1  3 -3  5  7 -7]
+SEL: -7
+SOL: [-1 -1 -1 -1 -1  1  0]
+CL: {1: 4, -1: 8, 2: 2, -2: 2, 3: 7, -3: 8, 4: 4, -4: 5, 5: 10, -5: 2}
+PAR: 0.45
+RCL: [-1  3 -3 -4  5]
+SEL: -3
+SOL: [-1 -1  0 -1 -1  1  0]
+CL: {1: 2, -1: 5, 2: 2, -2: 2, 4: 2, -4: 3, 5: 7, -5: 2}
+PAR: 0.45
+RCL: [-1  5]
+SEL: -1
+SOL: [ 0 -1  0 -1 -1  1  0]
+CL: {2: 2, -2: 1, 4: 2, -4: 1, 5: 4, -5: 1}
+PAR: 0.45
+RCL: [2 4 5]
+SEL: 5
+SOL: [ 0 -1  0 -1  1  1  0]
+CL: {2: 1, -2: 1, 4: 1, -4: 1}
+PAR: 0.45
+RCL: [ 2 -2  4 -4]
+SEL: 4
+SOL: [ 0 -1  0  1  1  1  0]
+CL: {2: 1, -2: 1}
+PAR: 0.45
+RCL: [ 2 -2]
+SEL: -2
+END
+SOL: [False False False  True  True  True False]
+OBJ: 42
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False False False  True  True  True False]
 OBJ: 42
 M: li1
 PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False False  True  True  True  True False]
+OBJ: 43
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False False  True  True  True  True False]
+OBJ: 43
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [ True False  True  True  True  True False]
+OBJ: 44
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [ True False  True  True  True  True False]
+OBJ: 44
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [ True False  True  True  True  True  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [ True False  True  True  True  True  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [ True False  True  True  True  True  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+SOL: [-1 -1 -1 -1 -1 -1 -1]
+CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
+PAR: 0.45
+RCL: [ 1 -1  3 -3  4 -4  5 -5  6 -6  7 -7]
+SEL: 5
+SOL: [-1 -1 -1 -1  1 -1 -1]
+CL: {1: 7, -1: 7, 2: 3, -2: 5, 3: 9, -3: 5, 4: 7, -4: 5, 6: 13, -6: 8, 7: 5, -7: 5}
+PAR: 0.45
+RCL: [ 1 -1  3  4  6 -6]
+SEL: -1
+SOL: [ 0 -1 -1 -1  1 -1 -1]
+CL: {2: 3, -2: 3, 3: 8, -3: 4, 4: 6, -4: 2, 6: 9, -6: 7, 7: 4, -7: 5}
+PAR: 0.45
+RCL: [ 3  4  6 -6 -7]
+SEL: 4
+SOL: [ 0 -1 -1  1  1 -1 -1]
+CL: {2: 3, -2: 3, 3: 7, -3: 2, 6: 7, -6: 7, 7: 4, -7: 4}
+PAR: 0.45
+RCL: [ 3  6 -6  7 -7]
+SEL: 6
+SOL: [ 0 -1 -1  1  1  1 -1]
+CL: {2: 1, -2: 1, 3: 6, -3: 2, 7: 3, -7: 4}
+PAR: 0.45
+RCL: [ 3  7 -7]
+SEL: -7
+SOL: [ 0 -1 -1  1  1  1  0]
+CL: {2: 1, -2: 1, 3: 4, -3: 2}
+PAR: 0.45
+RCL: [ 3 -3]
+SEL: -3
+SOL: [ 0 -1  0  1  1  1  0]
+CL: {2: 1, -2: 1}
+PAR: 0.45
+RCL: [ 2 -2]
+SEL: 2
+END
+SOL: [False  True False  True  True  True False]
+OBJ: 42
+M: rgc0.45
+PAR: 0.45
 INC: [False  True  True  True False False  True]
 BEST: 46
 BETTER: False
@@ -2377,6 +612,1771 @@ SOL: [False  True  True  True  True  True False]
 OBJ: 44
 M: li1
 PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True  True  True False]
+OBJ: 44
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True  True  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True  True  True  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+SOL: [-1 -1 -1 -1 -1 -1 -1]
+CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
+PAR: 0.45
+RCL: [ 1 -1  3 -3  4 -4  5 -5  6 -6  7 -7]
+SEL: 4
+SOL: [-1 -1 -1  1 -1 -1 -1]
+CL: {1: 3, -1: 12, 2: 5, -2: 5, 3: 10, -3: 6, 5: 13, -5: 8, 6: 11, -6: 12, 7: 9, -7: 7}
+PAR: 0.45
+RCL: [-1  3 -3  5 -5  6 -6  7 -7]
+SEL: -7
+SOL: [-1 -1 -1  1 -1 -1  0]
+CL: {1: 2, -1: 12, 2: 4, -2: 5, 3: 7, -3: 6, 5: 10, -5: 6, 6: 11, -6: 9}
+PAR: 0.45
+RCL: [-1  3 -3  5 -5  6 -6]
+SEL: -1
+SOL: [ 0 -1 -1  1 -1 -1  0]
+CL: {2: 4, -2: 3, 3: 6, -3: 3, 5: 4, -5: 4, 6: 7, -6: 6}
+PAR: 0.45
+RCL: [ 2  3  5 -5  6 -6]
+SEL: 2
+SOL: [ 0  1 -1  1 -1 -1  0]
+CL: {3: 6, -3: 3, 5: 3, -5: 2, 6: 5, -6: 6}
+PAR: 0.45
+RCL: [ 3 -3  5  6 -6]
+SEL: 3
+SOL: [ 0  1  1  1 -1 -1  0]
+CL: {5: 2, -5: 2, 6: 4, -6: 3}
+PAR: 0.45
+RCL: [ 5 -5  6 -6]
+SEL: 6
+SOL: [ 0  1  1  1 -1  1  0]
+CL: {5: 2, -5: 1}
+PAR: 0.45
+RCL: [ 5 -5]
+SEL: -5
+END
+SOL: [False  True  True  True False  True False]
+OBJ: 43
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False  True False]
+OBJ: 43
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True  True False]
+OBJ: 44
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True  True  True False]
+OBJ: 44
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True  True  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True  True  True  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+SOL: [-1 -1 -1 -1 -1 -1 -1]
+CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
+PAR: 0.45
+RCL: [ 1 -1  3 -3  4 -4  5 -5  6 -6  7 -7]
+SEL: 1
+SOL: [ 1 -1 -1 -1 -1 -1 -1]
+CL: {2: 5, -2: 5, 3: 10, -3: 6, 4: 5, -4: 6, 5: 15, -5: 8, 6: 12, -6: 11, 7: 9, -7: 8}
+PAR: 0.45
+RCL: [ 3  5 -5  6 -6  7 -7]
+SEL: -6
+SOL: [ 1 -1 -1 -1 -1  0 -1]
+CL: {2: 5, -2: 4, 3: 7, -3: 4, 4: 5, -4: 5, 5: 11, -5: 7, 7: 7, -7: 5}
+PAR: 0.45
+RCL: [ 2  3  4 -4  5 -5  7 -7]
+SEL: -7
+SOL: [ 1 -1 -1 -1 -1  0  0]
+CL: {2: 4, -2: 4, 3: 5, -3: 4, 4: 3, -4: 5, 5: 8, -5: 7}
+PAR: 0.45
+RCL: [ 2 -2  3 -3 -4  5 -5]
+SEL: -2
+SOL: [ 1  0 -1 -1 -1  0  0]
+CL: {3: 4, -3: 4, 4: 3, -4: 5, 5: 8, -5: 6}
+PAR: 0.45
+RCL: [ 3 -3 -4  5 -5]
+SEL: -3
+SOL: [ 1  0  0 -1 -1  0  0]
+CL: {4: 2, -4: 4, 5: 6, -5: 6}
+PAR: 0.45
+RCL: [-4  5 -5]
+SEL: -5
+SOL: [ 1  0  0 -1  0  0  0]
+CL: {4: 1, -4: 3}
+PAR: 0.45
+RCL: [-4]
+SEL: -4
+END
+SOL: [ True False False False False False False]
+OBJ: 40
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [ True False False False False False False]
+OBJ: 40
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [ True False False False False False False]
+OBJ: 40
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+SOL: [-1 -1 -1 -1 -1 -1 -1]
+CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
+PAR: 0.45
+RCL: [ 1 -1  3 -3  4 -4  5 -5  6 -6  7 -7]
+SEL: 3
+SOL: [-1 -1  1 -1 -1 -1 -1]
+CL: {1: 5, -1: 13, 2: 4, -2: 4, 4: 7, -4: 5, 5: 12, -5: 7, 6: 12, -6: 9, 7: 9, -7: 6}
+PAR: 0.45
+RCL: [-1  4  5 -5  6 -6  7 -7]
+SEL: 4
+SOL: [-1 -1  1  1 -1 -1 -1]
+CL: {1: 2, -1: 11, 2: 4, -2: 4, 5: 11, -5: 6, 6: 10, -6: 9, 7: 9, -7: 4}
+PAR: 0.45
+RCL: [-1  5 -5  6 -6  7]
+SEL: 6
+SOL: [-1 -1  1  1 -1  1 -1]
+CL: {1: 2, -1: 7, 2: 2, -2: 1, 5: 10, -5: 2, 7: 8, -7: 4}
+PAR: 0.45
+RCL: [-1  5  7]
+SEL: -1
+SOL: [ 0 -1  1  1 -1  1 -1]
+CL: {2: 2, -2: 0, 5: 5, -5: 2, 7: 4, -7: 4}
+PAR: 0.45
+RCL: [ 5  7 -7]
+SEL: -7
+SOL: [ 0 -1  1  1 -1  1  0]
+CL: {2: 2, -2: 0, 5: 3, -5: 1}
+PAR: 0.45
+RCL: [2 5]
+SEL: 2
+SOL: [ 0  1  1  1 -1  1  0]
+CL: {5: 2, -5: 1}
+PAR: 0.45
+RCL: [ 5 -5]
+SEL: -5
+END
+SOL: [False  True  True  True False  True False]
+OBJ: 43
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False  True False]
+OBJ: 43
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True  True False]
+OBJ: 44
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True  True  True False]
+OBJ: 44
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True  True  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True  True  True  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+SOL: [-1 -1 -1 -1 -1 -1 -1]
+CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
+PAR: 0.45
+RCL: [ 1 -1  3 -3  4 -4  5 -5  6 -6  7 -7]
+SEL: -1
+SOL: [ 0 -1 -1 -1 -1 -1 -1]
+CL: {2: 5, -2: 3, 3: 11, -3: 5, 4: 7, -4: 2, 5: 8, -5: 6, 6: 9, -6: 9, 7: 6, -7: 8}
+PAR: 0.45
+RCL: [ 2  3 -3  4  5 -5  6 -6  7 -7]
+SEL: 6
+SOL: [ 0 -1 -1 -1 -1  1 -1]
+CL: {2: 3, -2: 1, 3: 9, -3: 5, 4: 5, -4: 2, 5: 8, -5: 3, 7: 5, -7: 8}
+PAR: 0.45
+RCL: [ 3 -3  4  5  7 -7]
+SEL: -7
+SOL: [ 0 -1 -1 -1 -1  1  0]
+CL: {2: 2, -2: 1, 3: 6, -3: 5, 4: 4, -4: 2, 5: 5, -5: 1}
+PAR: 0.45
+RCL: [ 3 -3  4  5]
+SEL: 4
+SOL: [ 0 -1 -1  1 -1  1  0]
+CL: {2: 2, -2: 1, 3: 5, -3: 3, 5: 4, -5: 1}
+PAR: 0.45
+RCL: [ 3 -3  5]
+SEL: 3
+SOL: [ 0 -1  1  1 -1  1  0]
+CL: {2: 2, -2: 0, 5: 3, -5: 1}
+PAR: 0.45
+RCL: [2 5]
+SEL: 5
+SOL: [ 0 -1  1  1  1  1  0]
+CL: {2: 1, -2: 0}
+PAR: 0.45
+RCL: [2]
+SEL: 2
+END
+SOL: [False  True  True  True  True  True False]
+OBJ: 44
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True  True  True False]
+OBJ: 44
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True  True  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True  True  True  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+SOL: [-1 -1 -1 -1 -1 -1 -1]
+CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
+PAR: 0.45
+RCL: [ 1 -1  3 -3  4 -4  5 -5  6 -6  7 -7]
+SEL: -4
+SOL: [-1 -1 -1  0 -1 -1 -1]
+CL: {1: 6, -1: 9, 2: 5, -2: 5, 3: 10, -3: 6, 5: 13, -5: 8, 6: 12, -6: 10, 7: 8, -7: 9}
+PAR: 0.45
+RCL: [ 1 -1  3 -3  5 -5  6 -6  7 -7]
+SEL: 1
+SOL: [ 1 -1 -1  0 -1 -1 -1]
+CL: {2: 5, -2: 5, 3: 8, -3: 5, 5: 13, -5: 7, 6: 10, -6: 10, 7: 7, -7: 8}
+PAR: 0.45
+RCL: [ 3  5 -5  6 -6  7 -7]
+SEL: 5
+SOL: [ 1 -1 -1  0  1 -1 -1]
+CL: {2: 3, -2: 5, 3: 5, -3: 2, 6: 10, -6: 6, 7: 3, -7: 4}
+PAR: 0.45
+RCL: [-2  3  6 -6]
+SEL: -2
+SOL: [ 1  0 -1  0  1 -1 -1]
+CL: {3: 4, -3: 2, 6: 7, -6: 5, 7: 3, -7: 4}
+PAR: 0.45
+RCL: [ 3  6 -6 -7]
+SEL: -6
+SOL: [ 1  0 -1  0  1  0 -1]
+CL: {3: 3, -3: 1, 7: 2, -7: 2}
+PAR: 0.45
+RCL: [ 3  7 -7]
+SEL: 3
+SOL: [ 1  0  1  0  1  0 -1]
+CL: {7: 2, -7: 1}
+PAR: 0.45
+RCL: [ 7 -7]
+SEL: 7
+END
+SOL: [ True False  True False  True False  True]
+OBJ: 41
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [ True False  True False  True False  True]
+OBJ: 41
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [ True False  True  True  True False  True]
+OBJ: 43
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [ True False  True  True  True False  True]
+OBJ: 43
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False False  True  True  True False  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False False  True  True  True False  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+SOL: [-1 -1 -1 -1 -1 -1 -1]
+CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
+PAR: 0.45
+RCL: [ 1 -1  3 -3  4 -4  5 -5  6 -6  7 -7]
+SEL: 7
+SOL: [-1 -1 -1 -1 -1 -1  1]
+CL: {1: 6, -1: 10, 2: 5, -2: 5, 3: 11, -3: 5, 4: 8, -4: 5, 5: 10, -5: 9, 6: 13, -6: 10}
+PAR: 0.45
+RCL: [ 1 -1  3  4  5 -5  6 -6]
+SEL: 5
+SOL: [-1 -1 -1 -1  1 -1  1]
+CL: {1: 6, -1: 6, 2: 3, -2: 5, 3: 9, -3: 3, 4: 7, -4: 4, 6: 12, -6: 7}
+PAR: 0.45
+RCL: [ 1 -1  3  4  6 -6]
+SEL: -6
+SOL: [-1 -1 -1 -1  1  0  1]
+CL: {1: 5, -1: 5, 2: 3, -2: 4, 3: 7, -3: 2, 4: 7, -4: 2}
+PAR: 0.45
+RCL: [ 1 -1 -2  3  4]
+SEL: 1
+SOL: [ 1 -1 -1 -1  1  0  1]
+CL: {2: 3, -2: 4, 3: 5, -3: 1, 4: 3, -4: 2}
+PAR: 0.45
+RCL: [ 2 -2  3  4]
+SEL: 2
+SOL: [ 1  1 -1 -1  1  0  1]
+CL: {3: 5, -3: 1, 4: 3, -4: 2}
+PAR: 0.45
+RCL: [3 4]
+SEL: 3
+SOL: [ 1  1  1 -1  1  0  1]
+CL: {4: 3, -4: 1}
+PAR: 0.45
+RCL: [4]
+SEL: 4
+END
+SOL: [ True  True  True  True  True False  True]
+OBJ: 43
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [ True  True  True  True  True False  True]
+OBJ: 43
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [ True  True  True  True  True  True  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [ True  True  True  True  True  True  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [ True  True  True  True  True  True  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+SOL: [-1 -1 -1 -1 -1 -1 -1]
+CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
+PAR: 0.45
+RCL: [ 1 -1  3 -3  4 -4  5 -5  6 -6  7 -7]
+SEL: 4
+SOL: [-1 -1 -1  1 -1 -1 -1]
+CL: {1: 3, -1: 12, 2: 5, -2: 5, 3: 10, -3: 6, 5: 13, -5: 8, 6: 11, -6: 12, 7: 9, -7: 7}
+PAR: 0.45
+RCL: [-1  3 -3  5 -5  6 -6  7 -7]
+SEL: -7
+SOL: [-1 -1 -1  1 -1 -1  0]
+CL: {1: 2, -1: 12, 2: 4, -2: 5, 3: 7, -3: 6, 5: 10, -5: 6, 6: 11, -6: 9}
+PAR: 0.45
+RCL: [-1  3 -3  5 -5  6 -6]
+SEL: -5
+SOL: [-1 -1 -1  1  0 -1  0]
+CL: {1: 2, -1: 10, 2: 2, -2: 4, 3: 6, -3: 6, 6: 7, -6: 9}
+PAR: 0.45
+RCL: [-1  3 -3  6 -6]
+SEL: 6
+SOL: [-1 -1 -1  1  0  1  0]
+CL: {1: 2, -1: 7, 2: 2, -2: 2, 3: 5, -3: 6}
+PAR: 0.45
+RCL: [-1  3 -3]
+SEL: 3
+SOL: [-1 -1  1  1  0  1  0]
+CL: {1: 2, -1: 7, 2: 2, -2: 1}
+PAR: 0.45
+RCL: [-1]
+SEL: -1
+SOL: [ 0 -1  1  1  0  1  0]
+CL: {2: 2, -2: 0}
+PAR: 0.45
+RCL: [2]
+SEL: 2
+END
+SOL: [False  True  True  True False  True False]
+OBJ: 43
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False  True False]
+OBJ: 43
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True  True False]
+OBJ: 44
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True  True  True False]
+OBJ: 44
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True  True  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True  True  True  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+SOL: [-1 -1 -1 -1 -1 -1 -1]
+CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
+PAR: 0.45
+RCL: [ 1 -1  3 -3  4 -4  5 -5  6 -6  7 -7]
+SEL: 7
+SOL: [-1 -1 -1 -1 -1 -1  1]
+CL: {1: 6, -1: 10, 2: 5, -2: 5, 3: 11, -3: 5, 4: 8, -4: 5, 5: 10, -5: 9, 6: 13, -6: 10}
+PAR: 0.45
+RCL: [ 1 -1  3  4  5 -5  6 -6]
+SEL: -5
+SOL: [-1 -1 -1 -1  0 -1  1]
+CL: {1: 5, -1: 7, 2: 3, -2: 4, 3: 9, -3: 5, 4: 7, -4: 4, 6: 8, -6: 9}
+PAR: 0.45
+RCL: [ 1 -1  3 -3  4  6 -6]
+SEL: 4
+SOL: [-1 -1 -1  1  0 -1  1]
+CL: {1: 1, -1: 6, 2: 3, -2: 4, 3: 8, -3: 3, 6: 6, -6: 9}
+PAR: 0.45
+RCL: [-1  3  6 -6]
+SEL: -1
+SOL: [ 0 -1 -1  1  0 -1  1]
+CL: {2: 3, -2: 2, 3: 8, -3: 2, 6: 3, -6: 7}
+PAR: 0.45
+RCL: [ 3 -6]
+SEL: -6
+SOL: [ 0 -1 -1  1  0  0  1]
+CL: {2: 3, -2: 2, 3: 5, -3: 1}
+PAR: 0.45
+RCL: [2 3]
+SEL: 2
+SOL: [ 0  1 -1  1  0  0  1]
+CL: {3: 4, -3: 1}
+PAR: 0.45
+RCL: [3]
+SEL: 3
+END
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+SOL: [-1 -1 -1 -1 -1 -1 -1]
+CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
+PAR: 0.45
+RCL: [ 1 -1  3 -3  4 -4  5 -5  6 -6  7 -7]
+SEL: -6
+SOL: [-1 -1 -1 -1 -1  0 -1]
+CL: {1: 6, -1: 11, 2: 5, -2: 4, 3: 9, -3: 5, 4: 9, -4: 5, 5: 11, -5: 8, 7: 8, -7: 6}
+PAR: 0.45
+RCL: [ 1 -1  2  3 -3  4 -4  5 -5  7 -7]
+SEL: -7
+SOL: [-1 -1 -1 -1 -1  0  0]
+CL: {1: 5, -1: 10, 2: 4, -2: 4, 3: 6, -3: 5, 4: 7, -4: 5, 5: 8, -5: 7}
+PAR: 0.45
+RCL: [ 1 -1  3 -3  4 -4  5 -5]
+SEL: -5
+SOL: [-1 -1 -1 -1  0  0  0]
+CL: {1: 5, -1: 7, 2: 2, -2: 3, 3: 5, -3: 5, 4: 6, -4: 4}
+PAR: 0.45
+RCL: [ 1 -1  3 -3  4 -4]
+SEL: -4
+SOL: [-1 -1 -1  0  0  0  0]
+CL: {1: 5, -1: 3, 2: 2, -2: 3, 3: 5, -3: 4}
+PAR: 0.45
+RCL: [ 1 -1 -2  3 -3]
+SEL: 1
+SOL: [ 1 -1 -1  0  0  0  0]
+CL: {2: 2, -2: 3, 3: 4, -3: 3}
+PAR: 0.45
+RCL: [ 2 -2  3 -3]
+SEL: -2
+SOL: [ 1  0 -1  0  0  0  0]
+CL: {3: 3, -3: 3}
+PAR: 0.45
+RCL: [ 3 -3]
+SEL: -3
+END
+SOL: [ True False False False False False False]
+OBJ: 40
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [ True False False False False False False]
+OBJ: 40
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [ True False False False False False False]
+OBJ: 40
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+SOL: [-1 -1 -1 -1 -1 -1 -1]
+CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
+PAR: 0.45
+RCL: [ 1 -1  3 -3  4 -4  5 -5  6 -6  7 -7]
+SEL: -5
+SOL: [-1 -1 -1 -1  0 -1 -1]
+CL: {1: 6, -1: 11, 2: 3, -2: 4, 3: 10, -3: 8, 4: 8, -4: 6, 6: 9, -6: 11, 7: 10, -7: 7}
+PAR: 0.45
+RCL: [ 1 -1  3 -3  4 -4  6 -6  7 -7]
+SEL: -7
+SOL: [-1 -1 -1 -1  0 -1  0]
+CL: {1: 6, -1: 10, 2: 2, -2: 4, 3: 8, -3: 8, 4: 6, -4: 6, 6: 9, -6: 9}
+PAR: 0.45
+RCL: [ 1 -1  3 -3  4 -4  6 -6]
+SEL: -1
+SOL: [ 0 -1 -1 -1  0 -1  0]
+CL: {2: 2, -2: 2, 3: 8, -3: 5, 4: 6, -4: 2, 6: 6, -6: 6}
+PAR: 0.45
+RCL: [ 3 -3  4  6 -6]
+SEL: 3
+SOL: [ 0 -1  1 -1  0 -1  0]
+CL: {2: 2, -2: 1, 4: 4, -4: 1, 6: 4, -6: 3}
+PAR: 0.45
+RCL: [ 2  4  6 -6]
+SEL: 2
+SOL: [ 0  1  1 -1  0 -1  0]
+CL: {4: 4, -4: 1, 6: 4, -6: 3}
+PAR: 0.45
+RCL: [ 4  6 -6]
+SEL: -6
+SOL: [ 0  1  1 -1  0  0  0]
+CL: {4: 4, -4: 0}
+PAR: 0.45
+RCL: [4]
+SEL: 4
+END
+SOL: [False  True  True  True False False False]
+OBJ: 43
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False False]
+OBJ: 43
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+SOL: [-1 -1 -1 -1 -1 -1 -1]
+CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
+PAR: 0.45
+RCL: [ 1 -1  3 -3  4 -4  5 -5  6 -6  7 -7]
+SEL: -4
+SOL: [-1 -1 -1  0 -1 -1 -1]
+CL: {1: 6, -1: 9, 2: 5, -2: 5, 3: 10, -3: 6, 5: 13, -5: 8, 6: 12, -6: 10, 7: 8, -7: 9}
+PAR: 0.45
+RCL: [ 1 -1  3 -3  5 -5  6 -6  7 -7]
+SEL: -3
+SOL: [-1 -1  0  0 -1 -1 -1]
+CL: {1: 5, -1: 7, 2: 5, -2: 5, 5: 10, -5: 8, 6: 12, -6: 8, 7: 6, -7: 9}
+PAR: 0.45
+RCL: [-1  5 -5  6 -6  7 -7]
+SEL: 7
+SOL: [-1 -1  0  0 -1 -1  1]
+CL: {1: 4, -1: 6, 2: 5, -2: 5, 5: 7, -5: 8, 6: 11, -6: 7}
+PAR: 0.45
+RCL: [-1  2 -2  5 -5  6 -6]
+SEL: -1
+SOL: [ 0 -1  0  0 -1 -1  1]
+CL: {2: 5, -2: 3, 5: 5, -5: 6, 6: 8, -6: 6}
+PAR: 0.45
+RCL: [ 2  5 -5  6 -6]
+SEL: 2
+SOL: [ 0  1  0  0 -1 -1  1]
+CL: {5: 3, -5: 4, 6: 6, -6: 6}
+PAR: 0.45
+RCL: [ 5 -5  6 -6]
+SEL: 6
+SOL: [ 0  1  0  0 -1  1  1]
+CL: {5: 3, -5: 3}
+PAR: 0.45
+RCL: [ 5 -5]
+SEL: -5
+END
+SOL: [False  True False False False  True  True]
+OBJ: 39
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True False False False  True  True]
+OBJ: 39
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True False  True False  True  True]
+OBJ: 40
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True False  True False  True  True]
+OBJ: 40
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True False  True  True]
+OBJ: 44
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False  True  True]
+OBJ: 44
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+SOL: [-1 -1 -1 -1 -1 -1 -1]
+CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
+PAR: 0.45
+RCL: [ 1 -1  3 -3  4 -4  5 -5  6 -6  7 -7]
+SEL: -6
+SOL: [-1 -1 -1 -1 -1  0 -1]
+CL: {1: 6, -1: 11, 2: 5, -2: 4, 3: 9, -3: 5, 4: 9, -4: 5, 5: 11, -5: 8, 7: 8, -7: 6}
+PAR: 0.45
+RCL: [ 1 -1  2  3 -3  4 -4  5 -5  7 -7]
+SEL: 5
+SOL: [-1 -1 -1 -1  1  0 -1]
+CL: {1: 6, -1: 6, 2: 3, -2: 4, 3: 7, -3: 3, 4: 7, -4: 3, 7: 4, -7: 3}
+PAR: 0.45
+RCL: [ 1 -1 -2  3  4  7]
+SEL: 1
+SOL: [ 1 -1 -1 -1  1  0 -1]
+CL: {2: 3, -2: 4, 3: 5, -3: 2, 4: 3, -4: 3, 7: 3, -7: 2}
+PAR: 0.45
+RCL: [ 2 -2  3  4 -4  7]
+SEL: 2
+SOL: [ 1  1 -1 -1  1  0 -1]
+CL: {3: 5, -3: 2, 4: 3, -4: 3, 7: 3, -7: 2}
+PAR: 0.45
+RCL: [ 3  4 -4  7]
+SEL: 4
+SOL: [ 1  1 -1  1  1  0 -1]
+CL: {3: 5, -3: 1, 7: 3, -7: 1}
+PAR: 0.45
+RCL: [3 7]
+SEL: 3
+SOL: [ 1  1  1  1  1  0 -1]
+CL: {7: 3, -7: 0}
+PAR: 0.45
+RCL: [7]
+SEL: 7
+END
+SOL: [ True  True  True  True  True False  True]
+OBJ: 43
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [ True  True  True  True  True False  True]
+OBJ: 43
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [ True  True  True  True  True  True  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [ True  True  True  True  True  True  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [ True  True  True  True  True  True  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+SOL: [-1 -1 -1 -1 -1 -1 -1]
+CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
+PAR: 0.45
+RCL: [ 1 -1  3 -3  4 -4  5 -5  6 -6  7 -7]
+SEL: 4
+SOL: [-1 -1 -1  1 -1 -1 -1]
+CL: {1: 3, -1: 12, 2: 5, -2: 5, 3: 10, -3: 6, 5: 13, -5: 8, 6: 11, -6: 12, 7: 9, -7: 7}
+PAR: 0.45
+RCL: [-1  3 -3  5 -5  6 -6  7 -7]
+SEL: -1
+SOL: [ 0 -1 -1  1 -1 -1 -1]
+CL: {2: 5, -2: 3, 3: 9, -3: 3, 5: 7, -5: 6, 6: 7, -6: 9, 7: 5, -7: 7}
+PAR: 0.45
+RCL: [ 2  3  5 -5  6 -6  7 -7]
+SEL: 7
+SOL: [ 0 -1 -1  1 -1 -1  1]
+CL: {2: 5, -2: 3, 3: 9, -3: 2, 5: 6, -5: 6, 6: 6, -6: 8}
+PAR: 0.45
+RCL: [ 2  3  5 -5  6 -6]
+SEL: -6
+SOL: [ 0 -1 -1  1 -1  0  1]
+CL: {2: 5, -2: 3, 3: 6, -3: 1, 5: 4, -5: 5}
+PAR: 0.45
+RCL: [ 2 -2  3  5 -5]
+SEL: 5
+SOL: [ 0 -1 -1  1  1  0  1]
+CL: {2: 3, -2: 3, 3: 5, -3: 0}
+PAR: 0.45
+RCL: [ 2 -2  3]
+SEL: 3
+SOL: [ 0 -1  1  1  1  0  1]
+CL: {2: 3, -2: 2}
+PAR: 0.45
+RCL: [ 2 -2]
+SEL: -2
+END
+SOL: [False False  True  True  True False  True]
+OBJ: 45
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False False  True  True  True False  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+SOL: [-1 -1 -1 -1 -1 -1 -1]
+CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
+PAR: 0.45
+RCL: [ 1 -1  3 -3  4 -4  5 -5  6 -6  7 -7]
+SEL: -7
+SOL: [-1 -1 -1 -1 -1 -1  0]
+CL: {1: 6, -1: 13, 2: 4, -2: 5, 3: 9, -3: 8, 4: 7, -4: 7, 5: 11, -5: 7, 6: 14, -6: 9}
+PAR: 0.45
+RCL: [-1  3 -3  4 -4  5 -5  6 -6]
+SEL: 5
+SOL: [-1 -1 -1 -1  1 -1  0]
+CL: {1: 6, -1: 7, 2: 3, -2: 5, 3: 7, -3: 5, 4: 6, -4: 5, 6: 13, -6: 6}
+PAR: 0.45
+RCL: [ 1 -1  3  4  6 -6]
+SEL: -1
+SOL: [ 0 -1 -1 -1  1 -1  0]
+CL: {2: 3, -2: 3, 3: 6, -3: 4, 4: 5, -4: 2, 6: 9, -6: 5}
+PAR: 0.45
+RCL: [ 3  4  6 -6]
+SEL: -6
+SOL: [ 0 -1 -1 -1  1  0  0]
+CL: {2: 3, -2: 3, 3: 4, -3: 2, 4: 5, -4: 0}
+PAR: 0.45
+RCL: [ 2 -2  3  4]
+SEL: 2
+SOL: [ 0  1 -1 -1  1  0  0]
+CL: {3: 4, -3: 2, 4: 5, -4: 0}
+PAR: 0.45
+RCL: [3 4]
+SEL: 4
+SOL: [ 0  1 -1  1  1  0  0]
+CL: {3: 3, -3: 0}
+PAR: 0.45
+RCL: [3]
+SEL: 3
+END
+SOL: [False  True  True  True  True False False]
+OBJ: 43
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True  True False False]
+OBJ: 43
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+SOL: [-1 -1 -1 -1 -1 -1 -1]
+CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
+PAR: 0.45
+RCL: [ 1 -1  3 -3  4 -4  5 -5  6 -6  7 -7]
+SEL: -6
+SOL: [-1 -1 -1 -1 -1  0 -1]
+CL: {1: 6, -1: 11, 2: 5, -2: 4, 3: 9, -3: 5, 4: 9, -4: 5, 5: 11, -5: 8, 7: 8, -7: 6}
+PAR: 0.45
+RCL: [ 1 -1  2  3 -3  4 -4  5 -5  7 -7]
+SEL: -1
+SOL: [ 0 -1 -1 -1 -1  0 -1]
+CL: {2: 5, -2: 3, 3: 8, -3: 3, 4: 7, -4: 0, 5: 6, -5: 5, 7: 5, -7: 5}
+PAR: 0.45
+RCL: [ 2  3  4  5 -5  7 -7]
+SEL: 2
+SOL: [ 0  1 -1 -1 -1  0 -1]
+CL: {3: 7, -3: 3, 4: 7, -4: 0, 5: 4, -5: 3, 7: 5, -7: 4}
+PAR: 0.45
+RCL: [ 3  4  5  7 -7]
+SEL: -7
+SOL: [ 0  1 -1 -1 -1  0  0]
+CL: {3: 5, -3: 3, 4: 6, -4: 0, 5: 3, -5: 2}
+PAR: 0.45
+RCL: [ 3 -3  4  5]
+SEL: 4
+SOL: [ 0  1 -1  1 -1  0  0]
+CL: {3: 3, -3: 1, 5: 2, -5: 2}
+PAR: 0.45
+RCL: [ 3  5 -5]
+SEL: -5
+SOL: [ 0  1 -1  1  0  0  0]
+CL: {3: 3, -3: 1}
+PAR: 0.45
+RCL: [3]
+SEL: 3
+END
+SOL: [False  True  True  True False False False]
+OBJ: 43
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False False]
+OBJ: 43
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+SOL: [-1 -1 -1 -1 -1 -1 -1]
+CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
+PAR: 0.45
+RCL: [ 1 -1  3 -3  4 -4  5 -5  6 -6  7 -7]
+SEL: 3
+SOL: [-1 -1  1 -1 -1 -1 -1]
+CL: {1: 5, -1: 13, 2: 4, -2: 4, 4: 7, -4: 5, 5: 12, -5: 7, 6: 12, -6: 9, 7: 9, -7: 6}
+PAR: 0.45
+RCL: [-1  4  5 -5  6 -6  7 -7]
+SEL: 4
+SOL: [-1 -1  1  1 -1 -1 -1]
+CL: {1: 2, -1: 11, 2: 4, -2: 4, 5: 11, -5: 6, 6: 10, -6: 9, 7: 9, -7: 4}
+PAR: 0.45
+RCL: [-1  5 -5  6 -6  7]
+SEL: 5
+SOL: [-1 -1  1  1  1 -1 -1]
+CL: {1: 2, -1: 5, 2: 3, -2: 4, 6: 9, -6: 6, 7: 5, -7: 2}
+PAR: 0.45
+RCL: [-1  6 -6  7]
+SEL: -1
+SOL: [ 0 -1  1  1  1 -1 -1]
+CL: {2: 3, -2: 2, 6: 6, -6: 5, 7: 4, -7: 2}
+PAR: 0.45
+RCL: [ 2  6 -6  7]
+SEL: 2
+SOL: [ 0  1  1  1  1 -1 -1]
+CL: {6: 4, -6: 5, 7: 4, -7: 2}
+PAR: 0.45
+RCL: [ 6 -6  7]
+SEL: 6
+SOL: [ 0  1  1  1  1  1 -1]
+CL: {7: 3, -7: 2}
+PAR: 0.45
+RCL: [ 7 -7]
+SEL: -7
+END
+SOL: [False  True  True  True  True  True False]
+OBJ: 44
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True  True  True False]
+OBJ: 44
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True  True  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True  True  True  True]
+OBJ: 45
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+SOL: [-1 -1 -1 -1 -1 -1 -1]
+CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
+PAR: 0.45
+RCL: [ 1 -1  3 -3  4 -4  5 -5  6 -6  7 -7]
+SEL: -3
+SOL: [-1 -1  0 -1 -1 -1 -1]
+CL: {1: 5, -1: 11, 2: 5, -2: 5, 4: 7, -4: 5, 5: 12, -5: 9, 6: 14, -6: 9, 7: 7, -7: 9}
+PAR: 0.45
+RCL: [-1  4  5 -5  6 -6  7 -7]
+SEL: 7
+SOL: [-1 -1  0 -1 -1 -1  1]
+CL: {1: 4, -1: 9, 2: 5, -2: 5, 4: 6, -4: 4, 5: 8, -5: 9, 6: 13, -6: 8}
+PAR: 0.45
+RCL: [-1  4  5 -5  6 -6]
+SEL: -5
+SOL: [-1 -1  0 -1  0 -1  1]
+CL: {1: 3, -1: 6, 2: 3, -2: 4, 4: 5, -4: 3, 6: 8, -6: 7}
+PAR: 0.45
+RCL: [-1 -2  4  6 -6]
+SEL: 4
+SOL: [-1 -1  0  1  0 -1  1]
+CL: {1: 0, -1: 5, 2: 3, -2: 4, 6: 6, -6: 7}
+PAR: 0.45
+RCL: [-1 -2  6 -6]
+SEL: -6
+SOL: [-1 -1  0  1  0  0  1]
+CL: {1: 0, -1: 4, 2: 3, -2: 3}
+PAR: 0.45
+RCL: [-1  2 -2]
+SEL: -1
+SOL: [ 0 -1  0  1  0  0  1]
+CL: {2: 3, -2: 2}
+PAR: 0.45
+RCL: [ 2 -2]
+SEL: 2
+END
+SOL: [False  True False  True False False  True]
+OBJ: 43
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True False  True False False  True]
+OBJ: 43
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+SOL: [-1 -1 -1 -1 -1 -1 -1]
+CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
+PAR: 0.45
+RCL: [ 1 -1  3 -3  4 -4  5 -5  6 -6  7 -7]
+SEL: -3
+SOL: [-1 -1  0 -1 -1 -1 -1]
+CL: {1: 5, -1: 11, 2: 5, -2: 5, 4: 7, -4: 5, 5: 12, -5: 9, 6: 14, -6: 9, 7: 7, -7: 9}
+PAR: 0.45
+RCL: [-1  4  5 -5  6 -6  7 -7]
+SEL: 4
+SOL: [-1 -1  0  1 -1 -1 -1]
+CL: {1: 2, -1: 9, 2: 5, -2: 5, 5: 10, -5: 8, 6: 11, -6: 9, 7: 6, -7: 7}
+PAR: 0.45
+RCL: [-1  2 -2  5 -5  6 -6  7 -7]
+SEL: 7
+SOL: [-1 -1  0  1 -1 -1  1]
+CL: {1: 1, -1: 7, 2: 5, -2: 5, 5: 7, -5: 8, 6: 10, -6: 8}
+PAR: 0.45
+RCL: [-1  2 -2  5 -5  6 -6]
+SEL: -1
+SOL: [ 0 -1  0  1 -1 -1  1]
+CL: {2: 5, -2: 3, 5: 5, -5: 6, 6: 6, -6: 7}
+PAR: 0.45
+RCL: [ 2  5 -5  6 -6]
+SEL: -6
+SOL: [ 0 -1  0  1 -1  0  1]
+CL: {2: 5, -2: 3, 5: 3, -5: 5}
+PAR: 0.45
+RCL: [ 2 -2  5 -5]
+SEL: 5
+SOL: [ 0 -1  0  1  1  0  1]
+CL: {2: 3, -2: 3}
+PAR: 0.45
+RCL: [ 2 -2]
+SEL: 2
+END
+SOL: [False  True False  True  True False  True]
+OBJ: 41
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True False  True  True False  True]
+OBJ: 41
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True  True False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+SOL: [-1 -1 -1 -1 -1 -1 -1]
+CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
+PAR: 0.45
+RCL: [ 1 -1  3 -3  4 -4  5 -5  6 -6  7 -7]
+SEL: -6
+SOL: [-1 -1 -1 -1 -1  0 -1]
+CL: {1: 6, -1: 11, 2: 5, -2: 4, 3: 9, -3: 5, 4: 9, -4: 5, 5: 11, -5: 8, 7: 8, -7: 6}
+PAR: 0.45
+RCL: [ 1 -1  2  3 -3  4 -4  5 -5  7 -7]
+SEL: -1
+SOL: [ 0 -1 -1 -1 -1  0 -1]
+CL: {2: 5, -2: 3, 3: 8, -3: 3, 4: 7, -4: 0, 5: 6, -5: 5, 7: 5, -7: 5}
+PAR: 0.45
+RCL: [ 2  3  4  5 -5  7 -7]
+SEL: 4
+SOL: [ 0 -1 -1  1 -1  0 -1]
+CL: {2: 5, -2: 3, 3: 6, -3: 1, 5: 5, -5: 5, 7: 4, -7: 4}
+PAR: 0.45
+RCL: [ 2 -2  3  5 -5  7 -7]
+SEL: -7
+SOL: [ 0 -1 -1  1 -1  0  0]
+CL: {2: 4, -2: 3, 3: 3, -3: 1, 5: 3, -5: 4}
+PAR: 0.45
+RCL: [ 2 -2  3  5 -5]
+SEL: -2
+SOL: [ 0  0 -1  1 -1  0  0]
+CL: {3: 2, -3: 1, 5: 3, -5: 3}
+PAR: 0.45
+RCL: [ 3  5 -5]
+SEL: -5
+SOL: [ 0  0 -1  1  0  0  0]
+CL: {3: 2, -3: 1}
+PAR: 0.45
+RCL: [ 3 -3]
+SEL: 3
+END
+SOL: [False False  True  True False False False]
+OBJ: 42
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False False  True  True False False False]
+OBJ: 42
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True False False False]
+OBJ: 43
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False False]
+OBJ: 43
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+END
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: li1
+PAR: 1
+INC: [False  True  True  True False False  True]
+BEST: 46
+BETTER: False
+START
+SOL: [False  True  True  True False False  True]
+OBJ: 46
+M: rgc0.45
+PAR: 0.45
+INC: [False  True  True  True False False  True]
+BEST: 46
+SOL: [-1 -1 -1 -1 -1 -1 -1]
+CL: {1: 7, -1: 14, 2: 5, -2: 5, 3: 12, -3: 8, 4: 9, -4: 7, 5: 15, -5: 9, 6: 14, -6: 12, 7: 10, -7: 9}
+PAR: 0.45
+RCL: [ 1 -1  3 -3  4 -4  5 -5  6 -6  7 -7]
+SEL: 4
+SOL: [-1 -1 -1  1 -1 -1 -1]
+CL: {1: 3, -1: 12, 2: 5, -2: 5, 3: 10, -3: 6, 5: 13, -5: 8, 6: 11, -6: 12, 7: 9, -7: 7}
+PAR: 0.45
+RCL: [-1  3 -3  5 -5  6 -6  7 -7]
+SEL: 6
+SOL: [-1 -1 -1  1 -1  1 -1]
+CL: {1: 3, -1: 8, 2: 3, -2: 2, 3: 9, -3: 6, 5: 12, -5: 4, 7: 8, -7: 7}
+PAR: 0.45
+RCL: [-1  3 -3  5  7 -7]
+SEL: -7
+SOL: [-1 -1 -1  1 -1  1  0]
+CL: {1: 2, -1: 8, 2: 2, -2: 2, 3: 6, -3: 6, 5: 9, -5: 2}
+PAR: 0.45
+RCL: [-1  3 -3  5]
+SEL: 3
+SOL: [-1 -1  1  1 -1  1  0]
+CL: {1: 2, -1: 7, 2: 2, -2: 1, 5: 8, -5: 1}
+PAR: 0.45
+RCL: [-1  5]
+SEL: -1
+SOL: [ 0 -1  1  1 -1  1  0]
+CL: {2: 2, -2: 0, 5: 3, -5: 1}
+PAR: 0.45
+RCL: [2 5]
+SEL: 5
+SOL: [ 0 -1  1  1  1  1  0]
+CL: {2: 1, -2: 0}
+PAR: 0.45
+RCL: [2]
+SEL: 2
+END
+SOL: [False  True  True  True  True  True False]
+OBJ: 44
+M: rgc0.45
+PAR: 0.45
 INC: [False  True  True  True False False  True]
 BEST: 46
 BETTER: False

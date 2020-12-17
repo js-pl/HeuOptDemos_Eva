@@ -12,7 +12,7 @@ from src.handler import Problem, Algorithm, Option
 from pymhlib.demos.maxsat import MAXSATInstance, MAXSATSolution
 from pymhlib.demos.misp import MISPInstance, MISPSolution
 import src.plotting as p
-from src.logdata import get_filtered_logdata, Log
+from src.logdata import get_filtered_logdata, Log, LogData
 from IPython.display import clear_output
 
 
@@ -42,16 +42,18 @@ class InterfaceVisualisation():
                                 options = handler.get_algorithms(Problem(self.problemWidget.value)),
                                 description = 'Algorithm'
                                 )
+                
                 self.instanceWidget = widgets.Dropdown(
                                 options = handler.get_instances(Problem(self.problemWidget.value),visualisation),
                                 description = 'Instance'
                                 )
+                self.instanceBox = widgets.HBox([self.instanceWidget])
+
                 self.optionsWidget = widgets.VBox() #container which holds all options
 
-                self.optionsHandles = {} #used to store references to relevant children of optionsWidget Box
+                self.optionsHandles = {} #used to store references to relevant option widgets since they are wrapped in boxes
 
-                self.log_data = []
-                self.animation_data = []
+                self.log_data = None
 
                 self.plot_instance = None
                 self.out = widgets.Output()
@@ -86,16 +88,17 @@ class InterfaceVisualisation():
                 return widgets.HBox([play, slider, prev_iter, next_iter, log_granularity])
 
         def on_change_log_granularity(self, change):
-                self.animation_data = get_filtered_logdata(
-                                                self.controls.children[1].value, 
-                                                self.log_data, 
-                                                Log(self.controls.children[4].value)
-                                                )
+                next_iter = self.log_data.change_granularity(self.controls.children[1].value, Log(self.controls.children[4].value))
+                #set max,min,value of slider and controls to appropriate iteration number
+                self.controls.children[0].max = self.controls.children[1].max = len(self.log_data.log_data) - 3
+                self.controls.children[1].value = next_iter
+                self.animate(None)
+
 
 
         def animate(self,event):
                 with self.out:
-                        p.get_animation(self.controls.children[1].value, self.animation_data, self.plot_instance)
+                        p.get_animation(self.controls.children[1].value, self.log_data.log_data, self.plot_instance)
                         widgets.interaction.show_inline_matplotlib_plots()
                 
         def on_change_problem(self, change):
@@ -119,8 +122,9 @@ class InterfaceVisualisation():
                 params = self.prepare_parameters()
 
                 # starts call to pymhlib in handler module
-                self.log_data, instance = handler.run_algorithm_visualisation(params)
-                self.animation_data = self.log_data
+                log_data, instance = handler.run_algorithm_visualisation(params)
+                self.log_data = LogData(log_data)
+                #self.animation_data = self.log_data.log_data
 
                 # initialize graph from instance
                 with self.out:
@@ -129,19 +133,18 @@ class InterfaceVisualisation():
                         widgets.interaction.show_inline_matplotlib_plots()
 
                 self.controls.children[1].value = 0
-                self.controls.children[0].max = self.controls.children[1].max = len(self.animation_data) - 3
+                self.controls.children[0].max = self.controls.children[1].max = len(self.log_data.log_data) - 3
                 # start drawing
                 self.animate(None)
                 self.controls.layout.visibility = 'visible'
 
         def prepare_parameters(self):
                 # prepare current widget parameters for call to run algorithm
-                # store each option as list of tuples (<name>,<parameter>)
                 params = {'prob':Problem(self.problemWidget.value),
                                 'algo':Algorithm(self.algoWidget.value),
-                                'inst':self.instanceWidget.value}
-                
+                                'inst':'-'.join([str(c.value) for c in self.instanceBox.children])}
 
+                # store each option as list of tuples (<name>,<parameter>)
                 # extend if further options are needed
                 if Option.CH in self.optionsHandles:
                         params[Option.CH] = [(self.optionsHandles.get(Option.CH).value, 0)]
@@ -159,12 +162,21 @@ class InterfaceVisualisation():
         def display_widgets(self):
 
                 self.problemWidget.observe(self.on_change_problem, names='value')
+                self.instanceWidget.observe(self.on_change_instance, names='value')
                 self.algoWidget.observe(self.on_change_algo, names='value')
                 self.optionsWidget.children = self.get_options(Algorithm(self.algoWidget.value))
                 self.run_button.on_click(self.run_visualisation)
-                display(widgets.VBox([self.problemWidget,self.instanceWidget,self.algoWidget,self.optionsWidget,self.run_button]))
+                display(widgets.VBox([self.problemWidget,self.instanceBox,self.algoWidget,self.optionsWidget,self.run_button]))
                 display(self.controls)
                 display(self.out)
+
+        def on_change_instance(self,change):
+                if change.new == 'random':
+                        n = widgets.IntText(value=30, description='n:',layout=widgets.Layout(width='150px'))
+                        m = widgets.IntText(value=50, description='m:',layout=widgets.Layout(width='150px'))
+                        self.instanceBox.children = (self.instanceWidget,n,m)
+                else:
+                        self.instanceBox.children = (self.instanceWidget,)
 
                 
         def get_options(self, algo: Algorithm):

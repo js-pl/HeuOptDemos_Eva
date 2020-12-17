@@ -159,8 +159,8 @@ class MISP(ProblemDefinition):
 
     def get_solution(self, instance_path):
         file_path = instance_path
-        if instance_path[-6:] == 'random':
-            file_path = "gnm-30-60-13"
+        if instance_path.startswith('random'):
+            file_path = "gnm" + instance_path[6:] + "-27" #add seed TODO may allow user to set seed
         instance = MISPInstance(file_path)
         return MISPSolution(instance)
 
@@ -205,7 +205,8 @@ def run_algorithm_visualisation(options: dict):
     logger_step.info(f"{options['prob'].name}\n{options['algo'].name}")
 
     file_path = instance_path + problems[options['prob']].name + os.path.sep + options['inst']
-
+    if options['inst'].startswith('random'):
+        file_path = options['inst']
     # initialize solution for problem
     #solution = problems[options['prob']].get_solution(file_path)
     solution = run_algorithm(options, file_path)
@@ -323,7 +324,7 @@ def run_gvns(solution, options: dict, visualisation: bool):
     sh = [ prob.get_method(Algorithm.GVNS, Option.SH, m[0], m[1]) for m in options[Option.SH] ]
     
     ### for now, the overwritten GVNS is called
-    alg = MyGVNS(solution, ch, li, sh, logger_step=visualisation)
+    alg = MyGVNS(solution, ch, li, sh, consider_initial_sol=True, logger_step=visualisation)
 
     alg.run()
     alg.method_statistics()

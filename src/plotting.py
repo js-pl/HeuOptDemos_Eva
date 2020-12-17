@@ -240,8 +240,9 @@ def get_grasp_maxsat_rcl_animation(i: int, log_data: list(), graph):
         added,_,pos_literals = color_and_get_changed_clauses(i,log_data,graph,start=not (info['status'] == 'sel'))
 
         j = i
-        while log_data[j]['status'] != 'start':
+        while not log_data[j]['status'] in ['start','end']:
                 j = j-1
+
 
         mx = max(info['cl'].values())
         par = info.get('par', 0)
@@ -496,7 +497,7 @@ def get_grasp_misp_rcl_animation(i:int, log_data: list(), graph):
 
 
         j = i
-        while not (log_data[j]['status'] == 'start'):
+        while not (log_data[j]['status'] in ['start','end']):
                 j -= 1
 
         par = info.get('par',0.)
