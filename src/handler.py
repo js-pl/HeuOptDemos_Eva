@@ -31,6 +31,7 @@ from typing import List
 import time
 
 from src.maxsat_methods import greedy_randomized_construction as maxsat_greedy_randomized_construction
+from src.problems import Problem, Algorithm, Option
 from src.misp_methods import greedy_randomized_construction as misp_greedy_randomized_construction
 from src.logdata import get_log_data
 
@@ -53,20 +54,6 @@ logger_step.setLevel(logging.INFO)
 instance_path = "instances" + os.path.sep
 demo_data_path = os.path.dirname(demos.__file__) + os.path.sep + 'data'
 
-# extend enums as needed, they hold the string values which are used for representation in widgets
-class Problem(enum.Enum):
-    MAXSAT = 'MAX-SAT'
-    MISP = 'MAX-Independent Set'
-
-class Algorithm(enum.Enum):
-    GVNS = 'GVNS'
-    GRASP = 'GRASP'
-
-class Option(enum.Enum):
-    CH = 'Initial Solution'
-    LI = 'Local Improvement'
-    SH = 'Shaking'
-    RGC = 'Randomized Greedy Construction'
 
 
 

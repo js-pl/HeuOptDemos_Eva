@@ -6,6 +6,10 @@ import sys
 sys.path.append('..\\HeuOptDemos_Eva')
 
 import enum
+import time
+from src.problems import Problem, Algorithm, Option
+from pymhlib.demos.misp import MISPInstance
+from pymhlib.demos.maxsat import MAXSATInstance
 
 class Log(enum.Enum):
         StepInter = 'step-by-step (intermediate steps)' # start-frame and end-frame for each step
@@ -156,13 +160,62 @@ def cast_number(data: str):
         return float(data)
 
 
-def get_filtered_logdata(i: int, log_data: list, granularity: Log):
-    print(i,granularity)
-    animation_data = log_data[:2] # add problem and algo
+def save_visualisation(params: dict, graph=None):
+    # if instance==random, create instance file from graph, save in instance folder and keep filename
+    inst_filename = params['inst']
+    if inst_filename.startswith('random'):
+        # for now only available for misp
+        if params['prob'].name == 'MISP':
+            inst_filename = save_misp_instance(graph)
 
-    return log_data, next_iter
+    # get current log file according to problem and algo and copy content
+    logfile = os.path.sep.join( ['logs', params['prob'].name.lower(), params['algo'].name.lower(), params['algo'].name.lower() + '.log'] )
+    with open(logfile, 'r') as source:
+        timestamp = time.strftime('_%Y%m%d_%H%M%S')
+        with open(os.path.sep.join(['logs','saved',params['prob'].name.lower()+timestamp + '.log']), 'w') as destination:
+            data = source.read()
+            # prepend description block to log file (instance filename, options)
+            destination.write('I: ' + inst_filename + '\n')
+            for k,v in params.items():
+                if type(k) == Option:
+                    destination.writelines( [f'O: {k.name} {o}\n' for o in v] )
+            destination.write(data)
+            source.close()
+            destination.close()
 
 
+def save_misp_instance(graph):
+    filename = '_'.join(['gnm', str(graph.order()), str(graph.size()), time.strftime('%Y%m%d%H%M%S')]) + '.mis'
+    pathname = 'instances' + os.path.sep + 'misp' + os.path.sep + filename
+    with open(pathname, 'w') as inst_file:
+        inst_file.writelines(['c "source: networkx.gnm_random_graph()"\n', f'p edge {graph.order()} {graph.size()}\n'])
+        for u,v in graph.edges():
+            inst_file.write(f'e {u+1} {v+1}\n')
+        inst_file.close()
+    return filename
+
+
+def read_from_logfile(filename: str):
+    data = list()
+    instance_file = ''
+    with open('logs' + os.path.sep + 'saved' + os.path.sep + filename, 'r') as logfile:
+        for line in logfile:
+            if line.startswith('I:'):
+                instance_file = line.split(' ')[1].strip()
+                continue
+            if line.startswith('O:'):
+                continue
+            data.append(cast_line(line.strip()))
+        logfile.close()
+    
+    instance_path = 'instances' + os.path.sep + data[0].lower() + os.path.sep + instance_file
+    inst = None
+    if data[0] == 'misp':
+        inst = MISPInstance(instance_path)
+    if data[0] == 'maxsat':
+        inst = MAXSATInstance(instance_path)
+
+    return create_log_data(data), inst
 
 
 # only used for debugging

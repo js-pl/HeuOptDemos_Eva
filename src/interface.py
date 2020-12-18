@@ -12,8 +12,9 @@ from src.handler import Problem, Algorithm, Option
 from pymhlib.demos.maxsat import MAXSATInstance, MAXSATSolution
 from pymhlib.demos.misp import MISPInstance, MISPSolution
 import src.plotting as p
-from src.logdata import get_filtered_logdata, Log, LogData
+from src.logdata import Log, LogData, save_visualisation, read_from_logfile
 from IPython.display import clear_output
+import os
 
 
 
@@ -21,7 +22,7 @@ from IPython.display import clear_output
 def load_visualisation_settings():
 
         interface = InterfaceVisualisation()
-        interface.display_widgets()
+        interface.display_main_selection()
 
 def load_runtime_settings():
 
@@ -61,6 +62,9 @@ class InterfaceVisualisation():
 
                 self.controls.layout.visibility = 'hidden'
                 self.run_button =  widgets.Button(description = 'Run')
+                self.save_button = None
+                self.mainSelection = widgets.RadioButtons(options=['load from log file', 'generate new run'])
+                self.logfileWidget = widgets.Dropdown(layout=widgets.Layout(display='None'))
 
 
         def init_controls(self):
@@ -118,13 +122,18 @@ class InterfaceVisualisation():
 
 
         def run_visualisation(self, event):
-                
-                params = self.prepare_parameters()
+                params = dict()
+                log_data = list()
+                if self.mainSelection.value == 'load from log file':
+                        log_data, instance = read_from_logfile(self.logfileWidget.value)
+                        params.update({'prob':Problem[log_data[0].upper()], 'algo':Algorithm[log_data[1].upper()]})
+                        
+                else:
+                        params = self.prepare_parameters()
+                        # starts call to pymhlib in handler module
+                        log_data, instance = handler.run_algorithm_visualisation(params)
 
-                # starts call to pymhlib in handler module
-                log_data, instance = handler.run_algorithm_visualisation(params)
                 self.log_data = LogData(log_data)
-                #self.animation_data = self.log_data.log_data
 
                 # initialize graph from instance
                 with self.out:
@@ -137,6 +146,7 @@ class InterfaceVisualisation():
                 # start drawing
                 self.animate(None)
                 self.controls.layout.visibility = 'visible'
+                self.save_button.disabled = self.mainSelection.value == 'load from log file' 
 
         def prepare_parameters(self):
                 # prepare current widget parameters for call to run algorithm
@@ -159,16 +169,47 @@ class InterfaceVisualisation():
                 return params
 
 
+        def display_main_selection(self):
+
+                options_box = self.display_widgets()
+                options_box.layout.display = 'None'
+                def on_change_main(change):
+                        if change['new'] == 'load from log file':
+                                self.logfileWidget.options = os.listdir('logs' + os.path.sep + 'saved')
+                                self.logfileWidget.layout.display = 'flex'
+                                options_box.layout.display = 'None'
+                                # TODO register change of logfilewidget and load description
+
+                        else: 
+                                self.logfileWidget.layout.display = 'None'
+                                options_box.layout.display = 'flex'
+
+                self.mainSelection.observe(on_change_main, names='value')
+                self.run_button.on_click(self.run_visualisation)
+                display(self.mainSelection)
+                on_change_main({'new': 'load from log file'})
+                display(self.logfileWidget)
+                display(options_box)
+                display(widgets.VBox([self.run_button, self.controls, self.out]))
+
+
         def display_widgets(self):
 
                 self.problemWidget.observe(self.on_change_problem, names='value')
                 self.instanceWidget.observe(self.on_change_instance, names='value')
                 self.algoWidget.observe(self.on_change_algo, names='value')
                 self.optionsWidget.children = self.get_options(Algorithm(self.algoWidget.value))
-                self.run_button.on_click(self.run_visualisation)
-                display(widgets.VBox([self.problemWidget,self.instanceBox,self.algoWidget,self.optionsWidget,self.run_button]))
-                display(self.controls)
-                display(self.out)
+
+                self.save_button = widgets.Button(description='Save Visualisation', disabled=True)
+                self.save_button.on_click(self.on_click_save)
+                optionsBox = widgets.VBox([self.problemWidget,self.instanceBox,self.algoWidget,self.optionsWidget])
+                return widgets.VBox([optionsBox, self.save_button])
+
+        def on_click_save(self,event):
+                #TODO make sure params were not changed!!!!
+                save_visualisation(self.prepare_parameters(), self.plot_instance)
+                self.save_button.disabled = True
+
 
         def on_change_instance(self,change):
                 if change.new == 'random':
@@ -265,7 +306,6 @@ class InterfaceVisualisation():
 
                 
         def on_add_neighborhood(self,event):
-
                 phase = event.tooltip.split(' ')[1]
                 descr = dict(Option.__members__.items()).get(phase).value
                 n_block = [c for c in self.optionsWidget.children if c.children[0].description == descr][0]
@@ -277,11 +317,7 @@ class InterfaceVisualisation():
 
 
         def on_remove_neighborhood(self,event):
-
-                phase = event.tooltip.split(' ')[1]
-                descr = dict(Option.__members__.items()).get(phase).value
-                n_block = [c for c in self.optionsWidget.children if c.children[0].description == descr][0]
-                selected = n_block.children[2]
+                selected = self.get_selected_nh(event)
                 
                 if len(selected.options) == 0:
                         return
@@ -292,11 +328,7 @@ class InterfaceVisualisation():
                 selected.options = tuple(options)
 
         def on_up_neighborhood(self,event):
-
-                phase = event.tooltip.split(' ')[1]
-                descr = dict(Option.__members__.items()).get(phase).value
-                n_block = [c for c in self.optionsWidget.children if c.children[0].description == descr][0]
-                selected = n_block.children[2]
+                selected = self.get_selected_nh(event)
 
                 if len(selected.options) == 0:
                         return
@@ -310,11 +342,7 @@ class InterfaceVisualisation():
                 selected.index = to_up -1
 
         def on_down_neighborhood(self,event):
-
-                phase = event.tooltip.split(' ')[1]
-                descr = dict(Option.__members__.items()).get(phase).value
-                n_block = [c for c in self.optionsWidget.children if c.children[0].description == descr][0]
-                selected = n_block.children[2]
+                selected = self.get_selected_nh(event)
 
                 if len(selected.options) == 0:
                         return
@@ -326,6 +354,12 @@ class InterfaceVisualisation():
                 options[to_down +1], options[to_down] = options[to_down], options[to_down+1]
                 selected.options = tuple(options)
                 selected.index = to_down +1
+
+        def get_selected_nh(self, event):
+                phase = event.tooltip.split(' ')[1]
+                descr = dict(Option.__members__.items()).get(phase).value
+                n_block = [c for c in self.optionsWidget.children if c.children[0].description == descr][0]
+                return n_block.children[2]
                 
                         
 

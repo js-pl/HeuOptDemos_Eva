@@ -1,3 +1,6 @@
+I: my_maxsat.cnf
+O: LI ('k-flip neighborhood search', 1)
+O: RGC ('alpha', 0.5)
 MAXSAT
 GRASP
 START
