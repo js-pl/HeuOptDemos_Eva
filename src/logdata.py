@@ -172,7 +172,7 @@ def save_visualisation(params: dict, graph=None):
     logfile = os.path.sep.join( ['logs', params['prob'].name.lower(), params['algo'].name.lower(), params['algo'].name.lower() + '.log'] )
     with open(logfile, 'r') as source:
         timestamp = time.strftime('_%Y%m%d_%H%M%S')
-        with open(os.path.sep.join(['logs','saved',params['prob'].name.lower()+timestamp + '.log']), 'w') as destination:
+        with open(os.path.sep.join(['logs','saved',params['prob'].name.lower()+ '_' + params['algo'].name.lower() + timestamp + '.log']), 'w') as destination:
             data = source.read()
             # prepend description block to log file (instance filename, options)
             destination.write('I: ' + inst_filename + '\n')
@@ -216,6 +216,22 @@ def read_from_logfile(filename: str):
         inst = MAXSATInstance(instance_path)
 
     return create_log_data(data), inst
+
+def get_log_description(filename: str):
+    if not filename:
+        return ''
+    description = []
+    with open('logs' + os.path.sep + 'saved' + os.path.sep + filename, 'r') as logfile:
+        for line in logfile:
+            if line.startswith('I:'):
+                description.append('Instance: ' + line[2:].strip())
+            elif line.startswith('O:'):
+                description.append(line[2:].strip())
+            else:
+                break
+    
+    return '\n'.join(description)
+
 
 
 # only used for debugging

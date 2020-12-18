@@ -12,7 +12,7 @@ from src.handler import Problem, Algorithm, Option
 from pymhlib.demos.maxsat import MAXSATInstance, MAXSATSolution
 from pymhlib.demos.misp import MISPInstance, MISPSolution
 import src.plotting as p
-from src.logdata import Log, LogData, save_visualisation, read_from_logfile
+from src.logdata import Log, LogData, save_visualisation, read_from_logfile, get_log_description
 from IPython.display import clear_output
 import os
 
@@ -143,6 +143,7 @@ class InterfaceVisualisation():
 
                 self.controls.children[1].value = 0
                 self.controls.children[0].max = self.controls.children[1].max = len(self.log_data.log_data) - 3
+                self.controls.children[4].value = Log.StepInter.value
                 # start drawing
                 self.animate(None)
                 self.controls.layout.visibility = 'visible'
@@ -173,22 +174,35 @@ class InterfaceVisualisation():
 
                 options_box = self.display_widgets()
                 options_box.layout.display = 'None'
+                log_description = widgets.Output()
+
+                def on_change_logfile(change):
+                        with log_description:
+                                log_description.clear_output()
+                                print(get_log_description(change['new']))
+
+                self.logfileWidget.observe(on_change_logfile, names='value')
+
                 def on_change_main(change):
                         if change['new'] == 'load from log file':
                                 self.logfileWidget.options = os.listdir('logs' + os.path.sep + 'saved')
+                                self.run_button.disabled = not len(self.logfileWidget.options) > 0
                                 self.logfileWidget.layout.display = 'flex'
+                                log_description.layout.display = 'flex'
                                 options_box.layout.display = 'None'
-                                # TODO register change of logfilewidget and load description
 
                         else: 
+                                self.run_button.disabled = False
                                 self.logfileWidget.layout.display = 'None'
+                                log_description.layout.display = 'None'
                                 options_box.layout.display = 'flex'
+
 
                 self.mainSelection.observe(on_change_main, names='value')
                 self.run_button.on_click(self.run_visualisation)
                 display(self.mainSelection)
                 on_change_main({'new': 'load from log file'})
-                display(self.logfileWidget)
+                display(widgets.VBox([self.logfileWidget,log_description]))
                 display(options_box)
                 display(widgets.VBox([self.run_button, self.controls, self.out]))
 
