@@ -134,6 +134,7 @@ class InterfaceVisualisation():
                         log_data, instance = handler.run_algorithm_visualisation(params)
 
                 self.log_data = LogData(log_data)
+                #print('\n'.join([str(l) for l in self.log_data.log_data]))
 
                 # initialize graph from instance
                 with self.out:

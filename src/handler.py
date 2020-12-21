@@ -299,6 +299,36 @@ class MyGVNS(GVNS):
         return res
 
 
+    def gvns(self, sol: Solution):
+        """Perform general variable neighborhood search (GVNS) to given solution."""
+        sol2 = sol.copy()
+        if self.vnd(sol2) or not self.meths_sh:
+            return
+        use_vnd = bool(self.meths_li)
+        while True:
+            for m in self.next_method(self.meths_sh, repeat=True):
+                t_start = time.process_time()
+                res = self.perform_method(m, sol2, delayed_success=use_vnd)
+                terminate = res.terminate
+                if not terminate and use_vnd:
+                    terminate = self.vnd(sol2)
+                self.delayed_success_update(m, sol.obj(), t_start, sol2)
+                ### log an entire cycle e.g. sh+li, rgc+li
+                logger_step.info('END_ITER')
+                ###
+                if sol2.is_better(sol):
+                    sol.copy_from(sol2)
+                    if terminate or res.terminate:
+                        return
+                    break
+                else:
+                    if terminate or res.terminate:
+                        return
+                    sol2.copy_from(sol)
+            else:
+                break
+
+
 ########################################
 
 
@@ -352,7 +382,8 @@ def run_comparison(configs: list()):
 
 # only used for debugging
 if __name__ == '__main__':
-        log_data, _ = run_algorithm({'prob':Problem.MISP, Option.CH:[('random',0)], 'inst':'random','algo':Algorithm.GRASP,
+        filepath = instance_path + 'maxsat' + os.path.sep + 'cnf_7_50.cnf'
+        _ = run_algorithm_visualisation({'prob':Problem.MAXSAT, Option.CH:[('random',0)], 'inst':'cnf_7_50.cnf','algo':Algorithm.GRASP,
            Option.LI:[('two-exchange random fill neighborhood search',2)],
           Option.RGC:[('k-best',5)]})
 

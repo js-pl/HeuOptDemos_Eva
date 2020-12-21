@@ -16,7 +16,11 @@ class Log(enum.Enum):
         StepNoInter = 'step-by-step (no intermediate steps)' # start and end combined in one frame
         NewInc = 'new incumbents' # like StepNoInter, but only if new incumbent was found
         Update = 'updated solutions' # result of a phase e.g. li(vnd)-cycle, complete rgc in one frame
-        #FullCycle = 'major cycles' # one full cycle of algorithm, e.g. sh+li, rgc+li, per frame
+        Cycle = 'major cycles' # one entire cycle of algorithm, e.g. sh+li, rgc+li, per frame
+
+# global variables
+len_start = 7
+len_end = 8
 
 
 class LogData():
@@ -25,7 +29,7 @@ class LogData():
         self.full_data = log_data
         self.levels = self.init_levels()
         self.current_level = Log.StepInter
-        self.log_data = log_data
+        self.log_data = log_data # holds logdata for currently active log level
 
     def init_levels(self):
         levels = dict()
@@ -40,7 +44,7 @@ class LogData():
             update.append(levels[Log.StepNoInter][-1])
 
         levels[Log.Update] = update
-        #TODO log level for major cycles
+        levels[Log.Cycle] = [ i for i in levels[Log.StepNoInter] if self.full_data[i].get('end', False)]
 
         return levels
 
@@ -73,6 +77,11 @@ def create_log_data(data: list()):
     i = 2
     while i < len(data):
         # find slice from start to end
+        if data[i] == 'end_iter':
+            vis_data[-1]['end'] = True
+            i += 1
+            if i >= len(data):
+                break
         start = i
         while not data[start] == 'start':
             start += 1
@@ -85,11 +94,11 @@ def create_log_data(data: list()):
         # create data from start-end-slices according to method
         if method in ['ch','li', 'sh']:
             vis_data.append(create_gvns_data(data[start:end]))
-            vis_data.append(create_gvns_data(data[end:end+8]))
+            vis_data.append(create_gvns_data(data[end:end+len_end]))
         if method in ['rgc']:
-            vis_data += create_grasp_data(data[start:end+8])
+            vis_data += create_grasp_data(data[start:end+len_end])
 
-        i = end + 8
+        i = end + len_end
 
     return vis_data
 
@@ -97,15 +106,15 @@ def create_log_data(data: list()):
 def create_gvns_data(data: list()):
 
     entries = {list(d.keys())[0]: list(d.values())[0] for d in data[1:]}
-    entries['status'] = data[0]
+    entries['status'] = data[0] 
     return entries
 
 
 def create_grasp_data(data: list()):
 
-    entries = [create_gvns_data(data[:7])]
+    entries = [create_gvns_data(data[:len_start])]
 
-    greedy_data = data[7:-8]
+    greedy_data = data[len_start:-len_end]
 
     for i in range(0, len(greedy_data),5):
         rcl_data = {list(d.keys())[0]:list(d.values())[0] for d in greedy_data[i:i+5]}
@@ -115,7 +124,7 @@ def create_grasp_data(data: list()):
         sol =  data[-7]['sol']  if i == len(greedy_data) -5 else greedy_data[i+5]['sol']
         entries.append({'status':'sel', 'cl':rcl_data['cl'], 'rcl':rcl_data['rcl'], 'sol':sol, 'sel':rcl_data['sel']})
 
-    entries.append(create_gvns_data(data[-8:]))
+    entries.append(create_gvns_data(data[-len_end:]))
     return entries
 
         

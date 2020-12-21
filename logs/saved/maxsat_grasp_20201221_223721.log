@@ -1,3 +1,6 @@
+I: cnf_7_50.cnf
+O: LI ('k-flip neighborhood search', 1)
+O: RGC ('k-best', 7)
 MAXSAT
 GRASP
 START
