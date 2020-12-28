@@ -58,6 +58,11 @@ class InterfaceVisualisation():
 
                 self.plot_instance = None
                 self.out = widgets.Output()
+                self.settingsWidget = widgets.Accordion(selected_index=None)
+                iterations = widgets.IntText(description='iterations', value=100)
+                seed = widgets.IntText(description='seed', value=0)
+                self.settingsWidget.children = (widgets.VBox([iterations,seed]),)
+                self.settingsWidget.set_title(0, 'General settings')
                 self.controls = self.init_controls()
 
                 self.controls.layout.visibility = 'hidden'
@@ -145,6 +150,7 @@ class InterfaceVisualisation():
                 self.controls.children[1].value = 0
                 self.controls.children[0].max = self.controls.children[1].max = len(self.log_data.log_data) - 3
                 self.controls.children[4].value = Log.StepInter.value
+
                 # start drawing
                 self.animate(None)
                 self.controls.layout.visibility = 'visible'
@@ -168,6 +174,9 @@ class InterfaceVisualisation():
                 if Option.RGC in self.optionsHandles:
                         params[Option.RGC] = [(self.optionsHandles[Option.RGC].children[0].value,self.optionsHandles[Option.RGC].children[1].value)]
 
+                # add settings params
+                settings = {c.description:c.value for c in self.settingsWidget.children[0].children}
+                params['settings'] = settings
                 return params
 
 
@@ -210,6 +219,8 @@ class InterfaceVisualisation():
 
         def display_widgets(self):
 
+
+
                 self.problemWidget.observe(self.on_change_problem, names='value')
                 self.instanceWidget.observe(self.on_change_instance, names='value')
                 self.algoWidget.observe(self.on_change_algo, names='value')
@@ -217,7 +228,7 @@ class InterfaceVisualisation():
 
                 self.save_button = widgets.Button(description='Save Visualisation', disabled=True)
                 self.save_button.on_click(self.on_click_save)
-                optionsBox = widgets.VBox([self.problemWidget,self.instanceBox,self.algoWidget,self.optionsWidget])
+                optionsBox = widgets.VBox([self.settingsWidget, self.problemWidget,self.instanceBox,self.algoWidget,self.optionsWidget])
                 return widgets.VBox([optionsBox, self.save_button])
 
         def on_click_save(self,event):

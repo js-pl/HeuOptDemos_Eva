@@ -185,7 +185,7 @@ def get_options(prob: Problem, algo: Algorithm):
 
 
 def run_algorithm_visualisation(options: dict):
-    settings.mh_titer = 100
+    #settings.mh_titer = 100
     fh = logging.FileHandler(f"logs/{options['prob'].name.lower()}/{options['algo'].name.lower()}/{options['algo'].name.lower()}.log", mode="w")
     logger_step.handlers = []
     logger_step.addHandler(fh)
@@ -202,7 +202,7 @@ def run_algorithm_visualisation(options: dict):
 
 
 def run_algorithm_comparison(configs: list()):
-    settings.mh_titer = 500
+    #settings.mh_titer = 500
 
     log_df = pd.DataFrame({'iteration':[]})
     
@@ -226,6 +226,9 @@ def run_algorithm_comparison(configs: list()):
 
 
 def run_algorithm(options: dict, file_path: str, visualisation=True):
+    if options.get('settings', False):
+        settings.mh_titer = options['settings'].get('iterations',100)
+        settings.seed = options['settings'].get('seed',0)
 
     # initialize solution for problem
     solution = problems[options['prob']].get_solution(file_path)
