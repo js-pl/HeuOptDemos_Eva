@@ -31,6 +31,7 @@ from typing import List
 import time
 
 from src.maxsat_methods import greedy_randomized_construction as maxsat_greedy_randomized_construction
+from src.problems import Problem, Algorithm, Option
 from src.misp_methods import greedy_randomized_construction as misp_greedy_randomized_construction
 from src.logdata import get_log_data
 
@@ -53,20 +54,6 @@ logger_step.setLevel(logging.INFO)
 instance_path = "instances" + os.path.sep
 demo_data_path = os.path.dirname(demos.__file__) + os.path.sep + 'data'
 
-# extend enums as needed, they hold the string values which are used for representation in widgets
-class Problem(enum.Enum):
-    MAXSAT = 'MAX-SAT'
-    MISP = 'MAX-Independent Set'
-
-class Algorithm(enum.Enum):
-    GVNS = 'GVNS'
-    GRASP = 'GRASP'
-
-class Option(enum.Enum):
-    CH = 'Initial Solution'
-    LI = 'Local Improvement'
-    SH = 'Shaking'
-    RGC = 'Randomized Greedy Construction'
 
 
 
@@ -159,8 +146,8 @@ class MISP(ProblemDefinition):
 
     def get_solution(self, instance_path):
         file_path = instance_path
-        if instance_path[-6:] == 'random':
-            file_path = "gnm-30-60-13"
+        if instance_path.startswith('random'):
+            file_path = "gnm" + instance_path[6:] + "-27" #add seed TODO may allow user to set seed
         instance = MISPInstance(file_path)
         return MISPSolution(instance)
 
@@ -198,14 +185,15 @@ def get_options(prob: Problem, algo: Algorithm):
 
 
 def run_algorithm_visualisation(options: dict):
-    settings.mh_titer = 100
+    #settings.mh_titer = 100
     fh = logging.FileHandler(f"logs/{options['prob'].name.lower()}/{options['algo'].name.lower()}/{options['algo'].name.lower()}.log", mode="w")
     logger_step.handlers = []
     logger_step.addHandler(fh)
     logger_step.info(f"{options['prob'].name}\n{options['algo'].name}")
 
     file_path = instance_path + problems[options['prob']].name + os.path.sep + options['inst']
-
+    if options['inst'].startswith('random'):
+        file_path = options['inst']
     # initialize solution for problem
     #solution = problems[options['prob']].get_solution(file_path)
     solution = run_algorithm(options, file_path)
@@ -214,7 +202,7 @@ def run_algorithm_visualisation(options: dict):
 
 
 def run_algorithm_comparison(configs: list()):
-    settings.mh_titer = 500
+    #settings.mh_titer = 500
 
     log_df = pd.DataFrame({'iteration':[]})
     
@@ -238,6 +226,9 @@ def run_algorithm_comparison(configs: list()):
 
 
 def run_algorithm(options: dict, file_path: str, visualisation=True):
+    if options.get('settings', False):
+        settings.mh_titer = options['settings'].get('iterations',100)
+        settings.seed = options['settings'].get('seed',0)
 
     # initialize solution for problem
     solution = problems[options['prob']].get_solution(file_path)
@@ -311,6 +302,36 @@ class MyGVNS(GVNS):
         return res
 
 
+    def gvns(self, sol: Solution):
+        """Perform general variable neighborhood search (GVNS) to given solution."""
+        sol2 = sol.copy()
+        if self.vnd(sol2) or not self.meths_sh:
+            return
+        use_vnd = bool(self.meths_li)
+        while True:
+            for m in self.next_method(self.meths_sh, repeat=True):
+                t_start = time.process_time()
+                res = self.perform_method(m, sol2, delayed_success=use_vnd)
+                terminate = res.terminate
+                if not terminate and use_vnd:
+                    terminate = self.vnd(sol2)
+                self.delayed_success_update(m, sol.obj(), t_start, sol2)
+                ### log an entire cycle e.g. sh+li, rgc+li
+                logger_step.info('END_ITER')
+                ###
+                if sol2.is_better(sol):
+                    sol.copy_from(sol2)
+                    if terminate or res.terminate:
+                        return
+                    break
+                else:
+                    if terminate or res.terminate:
+                        return
+                    sol2.copy_from(sol)
+            else:
+                break
+
+
 ########################################
 
 
@@ -323,7 +344,7 @@ def run_gvns(solution, options: dict, visualisation: bool):
     sh = [ prob.get_method(Algorithm.GVNS, Option.SH, m[0], m[1]) for m in options[Option.SH] ]
     
     ### for now, the overwritten GVNS is called
-    alg = MyGVNS(solution, ch, li, sh, logger_step=visualisation)
+    alg = MyGVNS(solution, ch, li, sh, consider_initial_sol=True, logger_step=visualisation)
 
     alg.run()
     alg.method_statistics()
@@ -364,7 +385,8 @@ def run_comparison(configs: list()):
 
 # only used for debugging
 if __name__ == '__main__':
-        log_data, _ = run_algorithm({'prob':Problem.MISP, Option.CH:[('random',0)], 'inst':'random','algo':Algorithm.GRASP,
+        filepath = instance_path + 'maxsat' + os.path.sep + 'cnf_7_50.cnf'
+        _ = run_algorithm_visualisation({'prob':Problem.MAXSAT, Option.CH:[('random',0)], 'inst':'cnf_7_50.cnf','algo':Algorithm.GRASP,
            Option.LI:[('two-exchange random fill neighborhood search',2)],
           Option.RGC:[('k-best',5)]})
 

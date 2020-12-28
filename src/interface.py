@@ -12,8 +12,9 @@ from src.handler import Problem, Algorithm, Option
 from pymhlib.demos.maxsat import MAXSATInstance, MAXSATSolution
 from pymhlib.demos.misp import MISPInstance, MISPSolution
 import src.plotting as p
-from src.logdata import get_filtered_logdata, Log
+from src.logdata import Log, LogData, save_visualisation, read_from_logfile, get_log_description
 from IPython.display import clear_output
+import os
 
 
 
@@ -21,7 +22,7 @@ from IPython.display import clear_output
 def load_visualisation_settings():
 
         interface = InterfaceVisualisation()
-        interface.display_widgets()
+        interface.display_main_selection()
 
 def load_runtime_settings():
 
@@ -42,23 +43,33 @@ class InterfaceVisualisation():
                                 options = handler.get_algorithms(Problem(self.problemWidget.value)),
                                 description = 'Algorithm'
                                 )
+                
                 self.instanceWidget = widgets.Dropdown(
                                 options = handler.get_instances(Problem(self.problemWidget.value),visualisation),
                                 description = 'Instance'
                                 )
+                self.instanceBox = widgets.HBox([self.instanceWidget])
+
                 self.optionsWidget = widgets.VBox() #container which holds all options
 
-                self.optionsHandles = {} #used to store references to relevant children of optionsWidget Box
+                self.optionsHandles = {} #used to store references to relevant option widgets since they are wrapped in boxes
 
-                self.log_data = []
-                self.animation_data = []
+                self.log_data = None
 
                 self.plot_instance = None
                 self.out = widgets.Output()
+                self.settingsWidget = widgets.Accordion(selected_index=None)
+                iterations = widgets.IntText(description='iterations', value=100)
+                seed = widgets.IntText(description='seed', value=0)
+                self.settingsWidget.children = (widgets.VBox([iterations,seed]),)
+                self.settingsWidget.set_title(0, 'General settings')
                 self.controls = self.init_controls()
 
                 self.controls.layout.visibility = 'hidden'
                 self.run_button =  widgets.Button(description = 'Run')
+                self.save_button = None
+                self.mainSelection = widgets.RadioButtons(options=['load from log file', 'generate new run'])
+                self.logfileWidget = widgets.Dropdown(layout=widgets.Layout(display='None'))
 
 
         def init_controls(self):
@@ -86,16 +97,17 @@ class InterfaceVisualisation():
                 return widgets.HBox([play, slider, prev_iter, next_iter, log_granularity])
 
         def on_change_log_granularity(self, change):
-                self.animation_data = get_filtered_logdata(
-                                                self.controls.children[1].value, 
-                                                self.log_data, 
-                                                Log(self.controls.children[4].value)
-                                                )
+                next_iter = self.log_data.change_granularity(self.controls.children[1].value, Log(self.controls.children[4].value))
+                #set max,min,value of slider and controls to appropriate iteration number
+                self.controls.children[0].max = self.controls.children[1].max = len(self.log_data.log_data) - 3
+                self.controls.children[1].value = next_iter
+                self.animate(None)
+
 
 
         def animate(self,event):
                 with self.out:
-                        p.get_animation(self.controls.children[1].value, self.animation_data, self.plot_instance)
+                        p.get_animation(self.controls.children[1].value, self.log_data.log_data, self.plot_instance)
                         widgets.interaction.show_inline_matplotlib_plots()
                 
         def on_change_problem(self, change):
@@ -115,12 +127,19 @@ class InterfaceVisualisation():
 
 
         def run_visualisation(self, event):
-                
-                params = self.prepare_parameters()
+                params = dict()
+                log_data = list()
+                if self.mainSelection.value == 'load from log file':
+                        log_data, instance = read_from_logfile(self.logfileWidget.value)
+                        params.update({'prob':Problem[log_data[0].upper()], 'algo':Algorithm[log_data[1].upper()]})
+                        
+                else:
+                        params = self.prepare_parameters()
+                        # starts call to pymhlib in handler module
+                        log_data, instance = handler.run_algorithm_visualisation(params)
 
-                # starts call to pymhlib in handler module
-                self.log_data, instance = handler.run_algorithm_visualisation(params)
-                self.animation_data = self.log_data
+                self.log_data = LogData(log_data)
+                #print('\n'.join([str(l) for l in self.log_data.log_data]))
 
                 # initialize graph from instance
                 with self.out:
@@ -129,19 +148,21 @@ class InterfaceVisualisation():
                         widgets.interaction.show_inline_matplotlib_plots()
 
                 self.controls.children[1].value = 0
-                self.controls.children[0].max = self.controls.children[1].max = len(self.animation_data) - 3
+                self.controls.children[0].max = self.controls.children[1].max = len(self.log_data.log_data) - 3
+                self.controls.children[4].value = Log.StepInter.value
+
                 # start drawing
                 self.animate(None)
                 self.controls.layout.visibility = 'visible'
+                self.save_button.disabled = self.mainSelection.value == 'load from log file' 
 
         def prepare_parameters(self):
                 # prepare current widget parameters for call to run algorithm
-                # store each option as list of tuples (<name>,<parameter>)
                 params = {'prob':Problem(self.problemWidget.value),
                                 'algo':Algorithm(self.algoWidget.value),
-                                'inst':self.instanceWidget.value}
-                
+                                'inst':'-'.join([str(c.value) for c in self.instanceBox.children])}
 
+                # store each option as list of tuples (<name>,<parameter>)
                 # extend if further options are needed
                 if Option.CH in self.optionsHandles:
                         params[Option.CH] = [(self.optionsHandles.get(Option.CH).value, 0)]
@@ -153,18 +174,76 @@ class InterfaceVisualisation():
                 if Option.RGC in self.optionsHandles:
                         params[Option.RGC] = [(self.optionsHandles[Option.RGC].children[0].value,self.optionsHandles[Option.RGC].children[1].value)]
 
+                # add settings params
+                settings = {c.description:c.value for c in self.settingsWidget.children[0].children}
+                params['settings'] = settings
                 return params
+
+
+        def display_main_selection(self):
+
+                options_box = self.display_widgets()
+                options_box.layout.display = 'None'
+                log_description = widgets.Output()
+
+                def on_change_logfile(change):
+                        with log_description:
+                                log_description.clear_output()
+                                print(get_log_description(change['new']))
+
+                self.logfileWidget.observe(on_change_logfile, names='value')
+
+                def on_change_main(change):
+                        if change['new'] == 'load from log file':
+                                self.logfileWidget.options = os.listdir('logs' + os.path.sep + 'saved')
+                                self.run_button.disabled = not len(self.logfileWidget.options) > 0
+                                self.logfileWidget.layout.display = 'flex'
+                                log_description.layout.display = 'flex'
+                                options_box.layout.display = 'None'
+
+                        else: 
+                                self.run_button.disabled = False
+                                self.logfileWidget.layout.display = 'None'
+                                log_description.layout.display = 'None'
+                                options_box.layout.display = 'flex'
+
+
+                self.mainSelection.observe(on_change_main, names='value')
+                self.run_button.on_click(self.run_visualisation)
+                display(self.mainSelection)
+                on_change_main({'new': 'load from log file'})
+                display(widgets.VBox([self.logfileWidget,log_description]))
+                display(options_box)
+                display(widgets.VBox([self.run_button, self.controls, self.out]))
 
 
         def display_widgets(self):
 
+
+
                 self.problemWidget.observe(self.on_change_problem, names='value')
+                self.instanceWidget.observe(self.on_change_instance, names='value')
                 self.algoWidget.observe(self.on_change_algo, names='value')
                 self.optionsWidget.children = self.get_options(Algorithm(self.algoWidget.value))
-                self.run_button.on_click(self.run_visualisation)
-                display(widgets.VBox([self.problemWidget,self.instanceWidget,self.algoWidget,self.optionsWidget,self.run_button]))
-                display(self.controls)
-                display(self.out)
+
+                self.save_button = widgets.Button(description='Save Visualisation', disabled=True)
+                self.save_button.on_click(self.on_click_save)
+                optionsBox = widgets.VBox([self.settingsWidget, self.problemWidget,self.instanceBox,self.algoWidget,self.optionsWidget])
+                return widgets.VBox([optionsBox, self.save_button])
+
+        def on_click_save(self,event):
+                #TODO make sure params were not changed!!!!
+                save_visualisation(self.prepare_parameters(), self.plot_instance)
+                self.save_button.disabled = True
+
+
+        def on_change_instance(self,change):
+                if change.new == 'random':
+                        n = widgets.IntText(value=30, description='n:',layout=widgets.Layout(width='150px'))
+                        m = widgets.IntText(value=50, description='m:',layout=widgets.Layout(width='150px'))
+                        self.instanceBox.children = (self.instanceWidget,n,m)
+                else:
+                        self.instanceBox.children = (self.instanceWidget,)
 
                 
         def get_options(self, algo: Algorithm):
@@ -253,7 +332,6 @@ class InterfaceVisualisation():
 
                 
         def on_add_neighborhood(self,event):
-
                 phase = event.tooltip.split(' ')[1]
                 descr = dict(Option.__members__.items()).get(phase).value
                 n_block = [c for c in self.optionsWidget.children if c.children[0].description == descr][0]
@@ -265,11 +343,7 @@ class InterfaceVisualisation():
 
 
         def on_remove_neighborhood(self,event):
-
-                phase = event.tooltip.split(' ')[1]
-                descr = dict(Option.__members__.items()).get(phase).value
-                n_block = [c for c in self.optionsWidget.children if c.children[0].description == descr][0]
-                selected = n_block.children[2]
+                selected = self.get_selected_nh(event)
                 
                 if len(selected.options) == 0:
                         return
@@ -280,11 +354,7 @@ class InterfaceVisualisation():
                 selected.options = tuple(options)
 
         def on_up_neighborhood(self,event):
-
-                phase = event.tooltip.split(' ')[1]
-                descr = dict(Option.__members__.items()).get(phase).value
-                n_block = [c for c in self.optionsWidget.children if c.children[0].description == descr][0]
-                selected = n_block.children[2]
+                selected = self.get_selected_nh(event)
 
                 if len(selected.options) == 0:
                         return
@@ -298,11 +368,7 @@ class InterfaceVisualisation():
                 selected.index = to_up -1
 
         def on_down_neighborhood(self,event):
-
-                phase = event.tooltip.split(' ')[1]
-                descr = dict(Option.__members__.items()).get(phase).value
-                n_block = [c for c in self.optionsWidget.children if c.children[0].description == descr][0]
-                selected = n_block.children[2]
+                selected = self.get_selected_nh(event)
 
                 if len(selected.options) == 0:
                         return
@@ -314,6 +380,12 @@ class InterfaceVisualisation():
                 options[to_down +1], options[to_down] = options[to_down], options[to_down+1]
                 selected.options = tuple(options)
                 selected.index = to_down +1
+
+        def get_selected_nh(self, event):
+                phase = event.tooltip.split(' ')[1]
+                descr = dict(Option.__members__.items()).get(phase).value
+                n_block = [c for c in self.optionsWidget.children if c.children[0].description == descr][0]
+                return n_block.children[2]
                 
                         
 
