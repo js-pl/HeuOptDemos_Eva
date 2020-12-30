@@ -1,3 +1,8 @@
+I: cnf_7_50.cnf
+O: CH ('random', 0)
+O: LI ('k-flip neighborhood search', 1)
+O: SH ('k random flip', 3)
+O: SH ('k random flip', 6)
 MAXSAT
 GVNS
 START

@@ -1,3 +1,6 @@
+I: gnm_45_87_20201228131656.mis
+O: LI ('two-exchange random fill neighborhood search', 1)
+O: RGC ('alpha', 0.45)
 MISP
 GRASP
 START

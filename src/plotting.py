@@ -39,11 +39,14 @@ phases = {'ch':'Construction', 'li': 'Local Search', 'sh': 'Shaking', 'rgc': 'Ra
 def get_visualisation(prob: Problem, alg: Algorithm, instance):
         global f
         global ax
-        if f != None:
-                plt.close()
+        #if f != None:
+        plt.close()
         #if not f:
         f = plt.figure(num = f'Solving {prob.value} with {alg.value}')
         ax = f.add_subplot(111)
+        ax.axis('off')
+        #ax.set_ylim(bottom=-1,top=1.2)
+        #ax.set_xlim(left=-1,right=1)
         #else:
          #       f = plt.gcf()
          #       ax = f.gca()
@@ -329,12 +332,12 @@ def init_maxsat_graph(instance: MAXSATInstance):
 def draw_maxsat_graph(graph, pos_change):
 
         ax.clear()
-        plt.axis('off')
+        #plt.axis('off')
         ax.set_ylim(bottom=-1,top=1.2)
         ax.set_xlim(left=-1,right=1)
 
-        for i in ['right','top','bottom','left']:
-            plt.gca().spines[i].set_visible(False)
+        #for i in ['right','top','bottom','left']:
+        #    plt.gca().spines[i].set_visible(False)
 
         var_inc_nodes = [n for n,t in nx.get_node_attributes(graph, 'type').items() if  t in ['variable', 'incumbent']]
         var_inc_color = [graph.nodes[n]['color'] for n in var_inc_nodes]
@@ -369,6 +372,11 @@ def reset_maxsat_graph(graph):
         
         nx.set_node_attributes(graph, {n: 'lightgray' if graph.nodes[n]['type'] != 'incumbent' else 'white' for n in graph.nodes()}, name='color')
         nx.set_edge_attributes(graph, 'lightgray', name='color')
+
+
+
+
+
 
 
 

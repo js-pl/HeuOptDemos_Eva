@@ -11,7 +11,8 @@ import src.handler as handler
 from src.handler import Problem, Algorithm, Option
 from pymhlib.demos.maxsat import MAXSATInstance, MAXSATSolution
 from pymhlib.demos.misp import MISPInstance, MISPSolution
-import src.plotting as p
+#import src.plotting as p
+import src.plotting_refactor as p
 from src.logdata import Log, LogData, save_visualisation, read_from_logfile, get_log_description
 from IPython.display import clear_output
 import os
@@ -107,7 +108,8 @@ class InterfaceVisualisation():
 
         def animate(self,event):
                 with self.out:
-                        p.get_animation(self.controls.children[1].value, self.log_data.log_data, self.plot_instance)
+                        #p.get_animation(self.controls.children[1].value, self.log_data.log_data, self.plot_instance)
+                        self.plot_instance.get_animation(self.controls.children[1].value, self.log_data.log_data)
                         widgets.interaction.show_inline_matplotlib_plots()
                 
         def on_change_problem(self, change):
@@ -219,8 +221,6 @@ class InterfaceVisualisation():
 
         def display_widgets(self):
 
-
-
                 self.problemWidget.observe(self.on_change_problem, names='value')
                 self.instanceWidget.observe(self.on_change_instance, names='value')
                 self.algoWidget.observe(self.on_change_algo, names='value')
@@ -233,7 +233,7 @@ class InterfaceVisualisation():
 
         def on_click_save(self,event):
                 #TODO make sure params were not changed!!!!
-                save_visualisation(self.prepare_parameters(), self.plot_instance)
+                save_visualisation(self.prepare_parameters(), self.plot_instance.graph)
                 self.save_button.disabled = True
 
 
