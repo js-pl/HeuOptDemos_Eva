@@ -11,8 +11,7 @@ import src.handler as handler
 from src.handler import Problem, Algorithm, Option
 from pymhlib.demos.maxsat import MAXSATInstance, MAXSATSolution
 from pymhlib.demos.misp import MISPInstance, MISPSolution
-#import src.plotting as p
-import src.plotting_refactor as p
+import src.plotting as p
 from src.logdata import Log, LogData, save_visualisation, read_from_logfile, get_log_description
 from IPython.display import clear_output
 import os
