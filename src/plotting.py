@@ -1,6 +1,7 @@
 import sys
 sys.path.append('..\\HeuOptDemos_Eva')
-
+import matplotlib.image as mpimg
+import os
 import networkx as nx
 import numpy as np
 import matplotlib.pyplot as plt
@@ -21,70 +22,72 @@ plt.rcParams['axes.spines.right'] = False
 plt.rcParams['axes.spines.top'] = False
 plt.rcParams['axes.spines.bottom'] = False
 
+pc_dir = 'pseudocode'
 
 class Draw(ABC):
 
-    phases = {'ch':'Construction', 'li': 'Local Search', 'sh': 'Shaking', 'rgc': 'Randomized Greedy Construction', 
-                'cl':'Candidate List', 'rcl': 'Restricted Candidate List', 'sel':'Selection from RCL'}
+        phases = {'ch':'Construction', 'li': 'Local Search', 'sh': 'Shaking', 'rgc': 'Randomized Greedy Construction', 
+                        'cl':'Candidate List', 'rcl': 'Restricted Candidate List', 'sel':'Selection from RCL'}
 
-    plot_description = {'phase': '',
-                        'comment': [],
-                        'best': 0,
-                        'obj': 0,
-                        }
+        plot_description = {'phase': '',
+                                'comment': [],
+                                'best': 0,
+                                'obj': 0,
+                                }
 
-    def __init__(self, prob: Problem, alg: Algorithm, instance):
-        self.problem = prob
-        self.algorithm = alg
-        self.graph = self.init_graph(instance)
+        def __init__(self, prob: Problem, alg: Algorithm, instance):
+                self.problem = prob
+                self.algorithm = alg
+                self.graph = self.init_graph(instance)
 
-        # create figure
-        plt.close() # close any previously drawn figures
-        self.fig, (self.ax, self.img_ax) = plt.subplots(1, 2, gridspec_kw={'width_ratios': [2, 1]}, 
-                    num = f'Solving {prob.value} with {alg.value}')
-        self.img_ax.axis('off')
-        self.ax.axis('off')
+                # create figure
+                plt.close() # close any previously drawn figures
+                self.fig, (self.ax, self.img_ax) = plt.subplots(1, 2, gridspec_kw={'width_ratios': [2, 1]}, 
+                        num = f'Solving {prob.value} with {alg.value}')
+                self.img_ax.axis('off')
+                self.ax.axis('off')
 
-    @abstractmethod
-    def init_graph(self, instance):
-        return None
+        @abstractmethod
+        def init_graph(self, instance):
+                return None
 
-    def get_animation(self, i: int, log_data: list):
-        if log_data[i+2].get('m','').startswith('rgc') or log_data[i+2].get('status','') in ['cl', 'rcl', 'sel']:
-            self.get_grasp_animation(i,log_data[2:])
-        else:
-            self.get_gvns_animation(i,log_data[2:])
+        def get_animation(self, i: int, log_data: list):
+                if log_data[i+2].get('m','').startswith('rgc') or log_data[i+2].get('status','') in ['cl', 'rcl', 'sel']:
+                        self.get_grasp_animation(i,log_data[2:])
+                else:
+                        self.get_gvns_animation(i,log_data[2:])
 
-    @abstractmethod
-    def get_grasp_animation(self, i: int, log_data: list):
-        pass
+        @abstractmethod
+        def get_grasp_animation(self, i: int, log_data: list):
+                pass
 
-    @abstractmethod
-    def get_gvns_animation(self, i:int, log_data:list):
-        pass
+        @abstractmethod
+        def get_gvns_animation(self, i:int, log_data:list):
+                pass
 
-    def add_description(self, log_info: dict()):
+        def add_description(self, log_info: dict):
 
-            if log_info.get('status') == 'start' and log_info.get('m').startswith('ch'):
-                    log_info['best'] = 0
-                    log_info['obj'] = 0
-            else:
-                    self.plot_description['phase'] = self.phases.get(log_info['status'],'') + self.phases.get(log_info.get('m','   '),'')
+                if log_info.get('status') == 'start' and log_info.get('m').startswith('ch'):
+                        log_info['best'] = 0
+                        log_info['obj'] = 0
+                else:
+                        self.plot_description['phase'] = self.phases.get(log_info['status'],'') + self.phases.get(log_info.get('m','   '),'')
 
 
-            self.ax.text(0,1, '\n'.join((
-            '%s: %s' % (self.plot_description['phase'], ', '.join(self.plot_description['comment']) ),
-            'Best Objective: %d' % (log_info.get('best',self.plot_description['best']), ),
-            'Current Objective: %d' % (log_info.get('obj',self.plot_description['obj']),))), horizontalalignment='left', verticalalignment='top', transform=self.ax.transAxes)
+                self.ax.text(0,1, '\n'.join((
+                '%s: %s' % (self.plot_description['phase'], ', '.join(self.plot_description['comment']) ),
+                'Best Objective: %d' % (log_info.get('best',self.plot_description['best']), ),
+                'Current Objective: %d' % (log_info.get('obj',self.plot_description['obj']),))), horizontalalignment='left', verticalalignment='top', transform=self.ax.transAxes)
 
-#######################
-         #   print('\n'.join((
-         #   '%s: %s' % (self.plot_description['phase'], ', '.join(self.plot_description['comment']) ),
-          #  'Best Objective: %d' % (log_info.get('best',self.plot_description['best']), ),
-          #  'Current Objective: %d' % (log_info.get('obj',self.plot_description['obj']),))))
-########################         
-            #reset description
-            self.plot_description.update({'phase': '', 'comment': [], 'best':0, 'obj':0})
+                self.load_pc_img(log_info)
+                self.plot_description.update({'phase': '', 'comment': [], 'best':0, 'obj':0})
+
+        def load_pc_img(self, log_info: dict):
+                # TODO: load correct image according to current step
+                img_path = (os.path.sep).join( [pc_dir, self.algorithm.name.lower(), self.algorithm.name.lower() + '.PNG'] )
+                img = mpimg.imread(img_path)
+                self.img_ax.set_aspect('equal', anchor='E')
+                self.img_ax.imshow(img)
 
 
 
