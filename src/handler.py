@@ -201,11 +201,11 @@ def run_algorithm_visualisation(options: dict):
 
 
 
-def run_algorithm_comparison(configs: list()):
-    #settings.mh_titer = 500
+def run_algorithm_comparison(configs: list, settings: dict):
 
-    log_df = pd.DataFrame({'iteration':[]})
-    
+    #log_df = pd.DataFrame({'iteration':[]})
+    data = []
+    log_df = pd.DataFrame()
     for config in configs:
 
         iter_fh = logging.FileHandler(f"logs/iter.log", mode="w")
@@ -214,18 +214,48 @@ def run_algorithm_comparison(configs: list()):
         iter_logger.addHandler(iter_fh)
 
         file_path = demo_data_path + os.path.sep + config['inst']
-
         name = config['name']
-        _ = run_algorithm(config,file_path, visualisation=False)
+        for i in range(1,settings.get('runs',1)+1):
+            _ = run_algorithm(config,file_path, visualisation=False)
+        log_df = read_iter_log()
+        log_df.columns = pd.MultiIndex.from_tuples(zip([name]*settings.get('runs',1), log_df.columns))
+        data.append(log_df)
+            #df = pd.read_csv('logs' + os.path.sep + 'iter.log', sep=r'\s+', usecols=['iteration','obj_new'])
+            #df.rename(columns = {'obj_new':name}, inplace=True)
+            #data[name].append(list(df[name]))
+            #log_df = pd.merge(log_df, df, how = 'outer', on = 'iteration')
+        #log_df = pd.concat({k: pd.DataFrame(v).T for k, v in data.items()}, axis=1)
+        #log_df = pd.read_csv('logs' + os.path.sep + 'iter.log', sep=r'\s+', usecols=['obj_new'])
+        #log_df.rename(columns = {'obj_new':i}, inplace=True)
+    df = pd.concat(data, axis=1)
+    df.index += 1
 
-        df = pd.read_csv('logs' + os.path.sep + 'iter.log', sep=r'\s+', usecols=['iteration','obj_new'])
-        df.rename(columns = {'obj_new':name}, inplace=True)
-        log_df = pd.merge(log_df, df, how = 'outer', on = 'iteration')
+    return df
 
-    return log_df
+
+def read_iter_log():
+        df = pd.read_csv('logs' + os.path.sep + 'iter.log', sep=r'\s+', usecols=['obj_new'])
+        indices = [0] + list(df[df.obj_new == 'obj_new'].index)
+        log_df = pd.DataFrame()
+        for i, idx in enumerate(indices, start=1):
+            j = 1 if i == 1 else 2
+            if i >= len(indices):
+                log_df[i] = list(df.obj_new[idx+j:])
+                break
+            else:
+
+                log_df[i] = list(df.obj_new[idx+j:indices[i]])
+
+        log_df.dropna(inplace=True)
+        log_df = log_df.astype(float)
+        return log_df
+        
+
+        
 
 
 def run_algorithm(options: dict, file_path: str, visualisation=True):
+
     if options.get('settings', False):
         settings.mh_titer = options['settings'].get('iterations',100)
         settings.seed = options['settings'].get('seed',0)
