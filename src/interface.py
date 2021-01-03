@@ -16,6 +16,7 @@ from src.logdata import Log, LogData, save_visualisation, read_from_logfile, get
 from IPython.display import clear_output
 import os
 from matplotlib.lines import Line2D
+import pandas as pd
 
 
 
@@ -399,6 +400,9 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                 self.configurations = []
                 self.selectedConfigs = widgets.Select(options=[])
                 self.out = widgets.Output()
+                self.data_available = {}
+                self.iteration_df = pd.DataFrame()
+                self.summaries = {}
 
         def display_widgets(self):
 
@@ -423,6 +427,9 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                         self.settingsWidget.children[0].children[2].disabled = False
                         self.on_change_algo(None)
                         self.out.clear_output()
+                        self.data_available = {}
+                        self.iteration_df = pd.DataFrame()
+                        self.summaries = {}
 
                 reset.on_click(on_reset)
 
@@ -449,45 +456,53 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                 params['name'] = options[-1]
                 self.configurations.append(params)
                 self.selectedConfigs.options = options
+                self.data_available[params['name']] = False
 
         def run_visualisation(self, event):
                 if len(self.configurations) == 0:
                         return
-                self.out.clear_output()
+
                 text = widgets.Label(value='running...')
                 display(text)
+                # only calculate data for configs that have not been calculated before
+                to_run = [c for c in self.configurations if not self.data_available[c['name']]]
                 settings = {s.description:s.value for s in self.settingsWidget.children[0].children}
-                log_df = handler.run_algorithm_comparison(self.configurations, settings)
+                if len(to_run) > 0:
+                        
+                        log_df,summaries = handler.run_algorithm_comparison(to_run, settings)
+                        # set data available to true
+                        self.data_available.update({c['name']:True for c in to_run})
+                        for c in log_df.columns.levels[0]:
+                                log_df[c,'max'] = log_df[c].max(axis=1)
+                                log_df[c,'min'] = log_df[c].min(axis=1)
+                        self.iteration_df = pd.concat([self.iteration_df,log_df], axis=1)
+                        self.summaries.update(summaries)
+
                 text.layout.display = 'None'
-                #log_df.sort_values('iteration',inplace=True)
-                #idx = log_df[log_df['iteration'] == 0].index
-                #log_df.drop(idx, inplace=True)
                 plt.rcParams['axes.spines.left'] = True
                 plt.rcParams['axes.spines.right'] = True
                 plt.rcParams['axes.spines.top'] = True
                 plt.rcParams['axes.spines.bottom'] = True
 
-                for c in log_df.columns.levels[0]:
-                        log_df[c,'max'] = log_df[c].max(axis=1)
-                        log_df[c,'min'] = log_df[c].min(axis=1)
-
 
                 with self.out:
-                        plt.close()
-                        fig,ax = plt.subplots(1,1,num=f'{self.configurations[0]["prob"].value}, runs={settings["runs"]}')
+
+                        fig = plt.figure(num=f'{self.configurations[0]["prob"].value}, runs={settings["runs"]}',clear=True)
+                        ax = fig.add_subplot()
                         legend_handles=[]
-                        for i,c in enumerate(log_df.columns.levels[0]):
-                                log_df[c][['min','max']].plot(color=f'C{i % 10}', ax=ax)
-                                ax.fill_between(log_df.index, log_df[c]['max'], log_df[c]['min'], where=log_df[c]['max'] > log_df[c]['min'] , facecolor=f'C{i % 10}', alpha=0.2)
+                        for i,c in enumerate(self.iteration_df.columns.levels[0]):
+                                self.iteration_df[c][['min','max']].plot(color=f'C{i % 10}', ax=ax)
+                                ax.fill_between(self.iteration_df.index, self.iteration_df[c]['max'], self.iteration_df[c]['min'], where=self.iteration_df[c]['max'] > self.iteration_df[c]['min'] , facecolor=f'C{i % 10}', alpha=0.2)
                                 legend_handles += [Line2D([0],[0],color=f'C{i % 10}',label=c)]
                         loc = ''
+                        best = None
                         if self.configurations[0]['prob'] in [Problem.MAXSAT,Problem.MISP]:
-                                log_df['all','best'] = log_df.cummax(axis=0).cummax(axis=1).iloc[:,-1:]
+                                best = self.iteration_df.cummax(axis=0).cummax(axis=1).iloc[:,-1:]
                                 loc = 'lower right'
                         else:
-                                log_df['all','best'] = log_df.cummin(axis=0).cummin(axis=1).iloc[:,-1:]
+                                best = self.iteration_df.cummin(axis=0).cummin(axis=1).iloc[:,-1:]
                                 loc = 'upper right'
-                        log_df['all'].plot(color='black',ax=ax)
+                        best.plot(color='black',ax=ax)
                         legend_handles += [Line2D([0],[0],color='black',label='best')]
                         ax.legend(handles=legend_handles,loc=loc)
                         widgets.interaction.show_inline_matplotlib_plots()

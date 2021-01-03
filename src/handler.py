@@ -206,12 +206,18 @@ def run_algorithm_comparison(configs: list, settings: dict):
     #log_df = pd.DataFrame({'iteration':[]})
     data = []
     log_df = pd.DataFrame()
+    summaries = {}
     for config in configs:
 
         iter_fh = logging.FileHandler(f"logs/iter.log", mode="w")
         iter_logger = logging.getLogger("pymhlib_iter")
         iter_logger.handlers = []
         iter_logger.addHandler(iter_fh)
+
+        sum_fh = logging.FileHandler(f"logs/summary.log", mode="w")
+        sum_logger = logging.getLogger("pymhlib")
+        sum_logger.handlers = []
+        sum_logger.addHandler(sum_fh)
 
         file_path = demo_data_path + os.path.sep + config['inst']
         name = config['name']
@@ -220,16 +226,30 @@ def run_algorithm_comparison(configs: list, settings: dict):
         log_df = read_iter_log()
         log_df.columns = pd.MultiIndex.from_tuples(zip([name]*settings.get('runs',1), log_df.columns))
         data.append(log_df)
-            #df = pd.read_csv('logs' + os.path.sep + 'iter.log', sep=r'\s+', usecols=['iteration','obj_new'])
-            #df.rename(columns = {'obj_new':name}, inplace=True)
-            #data[name].append(list(df[name]))
-            #log_df = pd.merge(log_df, df, how = 'outer', on = 'iteration')
-        #log_df = pd.concat({k: pd.DataFrame(v).T for k, v in data.items()}, axis=1)
-        #log_df = pd.read_csv('logs' + os.path.sep + 'iter.log', sep=r'\s+', usecols=['obj_new'])
-        #log_df.rename(columns = {'obj_new':i}, inplace=True)
+        summaries[name] = read_sum_log()
+
     df = pd.concat(data, axis=1)
     df.index += 1
 
+    return df, summaries
+
+def read_sum_log():
+    idx = []
+    with open('logs' + os.path.sep + 'summary.log') as f: 
+        for i, line in enumerate(f):
+            if not line.startswith('S '):
+                idx.append(i)
+        f.close()
+        
+    df = pd.read_csv('logs' + os.path.sep + 'summary.log',sep=r'\s+',skiprows=idx)
+    df.drop(labels=['S'], axis=1,inplace=True)
+    idx = df[ df['method'] == 'method' ].index
+    df.drop(idx , inplace=True)
+
+    n = len(df[df['method'] == 'SUM/AVG'])
+    m = int(len(df) / n)
+    df['run'] = (np.array([i for i in range(1,n+1)]).repeat(m))
+    df.set_index(['run','method'], inplace=True)
     return df
 
 
@@ -396,20 +416,6 @@ def run_grasp(solution, options: dict, visualisation):
     alg.method_statistics()
     alg.main_results()
     logging.getLogger("pymhlib_iter").handlers[0].flush()
-
-
-def run_comparison(configs: list()):
-    log_df = pd.DataFrame({'iteration':[]})
-    
-    for config in configs:
-        name = config['name']
-        _,_ = run_algorithm(config,visualisation=False)
-        print(name, 'done')
-
-        df = pd.read_csv('logs' + os.path.sep + 'iter.log', sep=r'\s+', usecols=['iteration','obj_new'])
-        df.rename(columns = {'obj_new':name}, inplace=True)
-        log_df = pd.merge(log_df, df, how = 'outer', on = 'iteration')
-    return log_df
 
     
 
