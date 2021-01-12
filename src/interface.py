@@ -419,6 +419,7 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                 self.run_button.description = 'Run configuration'
                 self.iter_slider = widgets.IntSlider(description='iteration', value=1)
                 self.iter_slider.layout.display = 'None'
+                self.plot_options = widgets.HBox()
                 plt.rcParams['axes.spines.left'] = True
                 plt.rcParams['axes.spines.right'] = True
                 plt.rcParams['axes.spines.top'] = True
@@ -455,21 +456,36 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                         self.summaries = {}
                         self.line_checkboxes.children = []
                         self.iter_slider.layout.display= 'None'
+                        self.plot_options.layout.display = 'None'
 
                 def on_change_iter(change):
                         i = change.new if change.new > 0 else 1
                         self.plot_comparison(i)
                 self.iter_slider.observe(on_change_iter,names='value')
-        
+                solutions = widgets.RadioButtons(options=['current soluntions','best solutions'])
+                checkboxes = widgets.GridspecLayout(3,2)
+                for i in range(3):
+                        for j in range(2):
+                                checkboxes[i,j] = self.init_checkbox(['max','min','polygon','median','mean','best'][j*3+i])
+
+                def on_change_plotoptions(change):
+                        self.plot_comparison(self.iter_slider.value)
+
+                solutions.observe(on_change_plotoptions,names='value')
+                self.plot_options.children = (solutions,checkboxes)
+                self.plot_options.layout.display = 'None'
 
                 reset.on_click(on_reset)
                 save_selected.on_click(self.save_runs)
 
+
                 display(widgets.VBox([self.settingsWidget,self.problemWidget,self.instanceWidget,self.algoWidget,self.optionsWidget,
                         #self.add_instance,self.selectedConfigs, 
-                        self.run_button, self.line_checkboxes, widgets.HBox([save_selected,reset]),self.iter_slider]))
+                        self.run_button, self.line_checkboxes, widgets.HBox([save_selected,reset]),self.plot_options,self.iter_slider]))
 
                 display(self.out)
+
+
 
         def save_runs(self,event):
 
@@ -624,6 +640,7 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                 # add name to checkbox list
                 self.line_checkboxes.children +=(self.init_checkbox(params['name']),)
                 self.iter_slider.layout.display = 'flex'
+                self.plot_options.layout.display = 'flex'
 
                 # plot checked data
                 self.iter_slider.value = self.get_best_idx()
@@ -730,34 +747,55 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                         checked = [c.description for c in self.line_checkboxes.children if c.value]
                         if checked == []:
                                 return
-                        for i,c in enumerate(checked):
+                        sol = 'best' if self.plot_options.children[0].value.startswith('best') else 'current'
+                        lines = [o.description for o in self.plot_options.children[1].children if o.value]
+                        if 'polygon' in lines and not ('max' in lines and 'min' in lines):
+                                lines.remove('polygon')
+                        selected_data = self.iteration_df[checked]
+
+                        if sol == 'best':
+                                selected_data = selected_data.cummax(axis=0) if Problem(self.problemWidget.value) in [Problem.MAXSAT,Problem.MISP] \
+                                                else selected_data.cummin(axis=0)
                                 
+                        for i,c in enumerate(checked):
                                 col = f'C{int(c.split(".")[0]) % 10}'
-                                maxi = self.iteration_df[c].max(axis=1)
-                                mini = self.iteration_df[c].min(axis=1)
-                                maxi.plot(color=col, ax=ax)
-                                mini.plot(color=col, ax=ax)
-                                ax.fill_between(self.iteration_df.index, maxi, mini, where=maxi > mini , facecolor=col, alpha=0.2, interpolate=True)
+                                df = selected_data[c]
+
+                                maxi = df.max(axis=1)
+                                mini = df.min(axis=1)
+                                if 'max' in lines:
+                                        maxi.plot(color=col, ax=ax)
+                                if 'min' in lines:
+                                        mini.plot(color=col, ax=ax)
+                                if 'polygon' in lines:
+                                        ax.fill_between(df.index, maxi, mini, where=maxi > mini , facecolor=col, alpha=0.2, interpolate=True)
+                                if 'mean' in lines:
+                                        m = df.mean(axis=1)
+                                        m.plot(color=col, ax=ax, linestyle='dotted')
+                                if 'median' in lines:
+                                        m = df.median(axis=1)
+                                        m.plot(color=col, ax=ax,linestyle='dashed')
                                 legend_handles += [Line2D([0],[0],color=col,label=c + f' (n={len(self.iteration_df[c].columns)})')]
                         loc = ''
                         best = None
-                        selected_data = self.iteration_df[checked]
+
                         if Problem(self.problemWidget.value) in [Problem.MAXSAT,Problem.MISP]:
                                 best = selected_data.cummax(axis=0).cummax(axis=1).iloc[:,-1:]
                                 loc = 'lower right'
                         else:
                                 best = selected_data.cummin(axis=0).cummin(axis=1).iloc[:,-1:]
                                 loc = 'upper right'
-                        best.plot(color='black',ax=ax)
-                        legend_handles += [Line2D([0],[0],color='black',label='best')]
+                        if 'best' in lines:
+                                best.plot(color='black',ax=ax)
+                                legend_handles += [Line2D([0],[0],color='black',label='best')]
                         ax.legend(handles=legend_handles,loc=loc)
 
                         ax.axvline(x=self.iter_slider.value)
 
                         #create boxplot
-                        col = selected_data.columns
-                        col = [c for c in col if not c[1] in ['max','min']]
-                        bb_data = selected_data[[c for c in col if not c[1] in ['max','min']]]
+                        #col = selected_data.columns
+                        #col = [c for c in col if not c[1] in ['max','min']]
+                        bb_data = selected_data#[[c for c in col if not c[1] in ['max','min']]]
                         bb_data = bb_data.loc[self.iter_slider.value].reset_index(level=1, drop=True).reset_index()
                         bb_data = bb_data.rename(columns={self.iter_slider.value:f'iteration={self.iter_slider.value}'})
                         bb_data.boxplot(by='index',rot=25,ax=ax_bb)
