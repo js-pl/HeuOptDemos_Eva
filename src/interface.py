@@ -17,6 +17,8 @@ from IPython.display import clear_output
 import os
 from matplotlib.lines import Line2D
 import pandas as pd
+from matplotlib import gridspec as gs
+import time
 
 
 
@@ -308,11 +310,21 @@ class InterfaceVisualisation():
                                 description = phase.value
                 )
 
+
                 size = widgets.IntText(value=1,description='k: ',layout=widgets.Layout(width='150px'))
                 add = widgets.Button(description='',icon='chevron-right',layout=widgets.Layout(width='60px'), tooltip='add ' + phase.name)
                 remove = widgets.Button(description='',icon='chevron-left',layout=widgets.Layout(width='60px'), tooltip='remove ' + phase.name)
                 up = widgets.Button(description='',icon='chevron-up',layout=widgets.Layout(width='30px'), tooltip='up ' + phase.name)
                 down = widgets.Button(description='',icon='chevron-down',layout=widgets.Layout(width='30px'), tooltip='down ' + phase.name)
+                
+                def on_change_available(event):
+                        opt = handler.get_options(Problem(self.problemWidget.value),Algorithm(self.algoWidget.value))
+                        opt = [o for o in opt.get(phase) if o[0]==available.value][0]
+                        size.value = 1 if opt[1] == None or type(opt[1]) == type else opt[1]
+                        size.disabled = type(opt[1]) != type or opt[1] == None
+                on_change_available(None)
+
+                available.observe(on_change_available, names='value')
 
                 selected = widgets.Select(
                                 options = [],
@@ -396,123 +408,363 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
 
         def __init__(self):
                 super().__init__(visualisation=False)
-                self.add_instance = widgets.Button(description='Add configuration')
-                self.configurations = []
-                self.selectedConfigs = widgets.Select(options=[])
+                #self.add_instance = widgets.Button(description='Add configuration')
+                self.configurations = {}
+                #self.selectedConfigs = widgets.Select(options=[])
                 self.out = widgets.Output()
-                self.data_available = {}
+                #self.data_available = {}
                 self.iteration_df = pd.DataFrame()
                 self.summaries = {}
-
-        def display_widgets(self):
-
-                self.problemWidget.observe(self.on_change_problem, names='value')
-                self.algoWidget.observe(self.on_change_algo, names='value')
-                self.optionsWidget.children = self.get_options(Algorithm(self.algoWidget.value))
-                self.add_instance.on_click(self.on_add_instance)
-                self.run_button.on_click(self.run_visualisation)
-                self.settingsWidget.children[0].children += (widgets.IntText(value=1, description='runs'),)
-                self.settingsWidget.children[0].children[0].value = 500
-                reset = widgets.Button(description='Reset', icon='close',layout=widgets.Layout(width='100px',justify_self='end'))
-
-                def on_reset(event):
-                        self.settingsWidget.children[0].children[0].value = 500
-                        self.settingsWidget.children[0].children[1].value = 0
-                        self.settingsWidget.children[0].children[2].value = 1
-                        self.configurations = []
-                        self.selectedConfigs.options = []
-                        self.problemWidget.disabled = False
-                        self.instanceWidget.disabled = False
-                        self.settingsWidget.children[0].children[0].disabled = False
-                        self.settingsWidget.children[0].children[2].disabled = False
-                        self.on_change_algo(None)
-                        self.out.clear_output()
-                        self.data_available = {}
-                        self.iteration_df = pd.DataFrame()
-                        self.summaries = {}
-
-                reset.on_click(on_reset)
-
-                display(widgets.VBox([self.settingsWidget,self.problemWidget,self.instanceWidget,self.algoWidget,self.optionsWidget,
-                        self.add_instance,self.selectedConfigs, widgets.HBox([self.run_button, reset],layout=widgets.Layout(display='flex', justify_content='space-between',max_width='400px'))]))
-                display(self.out)
-
-        def on_add_instance(self, event):
-                params = self.prepare_parameters()
-                name = [f'{params.get("algo").name.lower()}']
-                for k,v in params.items():
-                        if not type(k) == Option or len(v) == 0:
-                                continue
-                        o = k.name.lower()+ '-' + '-'.join([str(p[1]) for p in v])
-                        name += [o] 
-
-                self.problemWidget.disabled = True
-                self.instanceWidget.disabled = True
-                self.settingsWidget.children[0].children[0].disabled = True
-                self.settingsWidget.children[0].children[2].disabled = True
-                options = list(self.selectedConfigs.options)
-                count = int(options[-1].split('.')[0]) + 1 if len(options) > 0 else 1
-                options.append(str(count) + '. ' + '_'.join(name))
-                params['name'] = options[-1]
-                self.configurations.append(params)
-                self.selectedConfigs.options = options
-                self.data_available[params['name']] = False
-
-        def run_visualisation(self, event):
-                if len(self.configurations) == 0:
-                        return
-
-                text = widgets.Label(value='running...')
-                display(text)
-                # only calculate data for configs that have not been calculated before
-                to_run = [c for c in self.configurations if not self.data_available[c['name']]]
-                settings = {s.description:s.value for s in self.settingsWidget.children[0].children}
-                if len(to_run) > 0:
-                        
-                        log_df,summaries = handler.run_algorithm_comparison(to_run, settings)
-                        # set data available to true
-                        self.data_available.update({c['name']:True for c in to_run})
-                        for c in log_df.columns.levels[0]:
-                                log_df[c,'max'] = log_df[c].max(axis=1)
-                                log_df[c,'min'] = log_df[c].min(axis=1)
-                        self.iteration_df = pd.concat([self.iteration_df,log_df], axis=1)
-                        self.summaries.update(summaries)
-
-                text.layout.display = 'None'
+                self.line_checkboxes = widgets.VBox()
+                self.run_button.description = 'Run configuration'
+                self.iter_slider = widgets.IntSlider(description='iteration', value=1)
+                self.iter_slider.layout.display = 'None'
                 plt.rcParams['axes.spines.left'] = True
                 plt.rcParams['axes.spines.right'] = True
                 plt.rcParams['axes.spines.top'] = True
                 plt.rcParams['axes.spines.bottom'] = True
 
 
-                with self.out:
+        def display_widgets(self):
 
-                        fig = plt.figure(num=f'{self.configurations[0]["prob"].value}, runs={settings["runs"]}',clear=True)
-                        ax = fig.add_subplot()
+                self.problemWidget.observe(self.on_change_problem, names='value')
+                self.algoWidget.observe(self.on_change_algo, names='value')
+                self.optionsWidget.children = self.get_options(Algorithm(self.algoWidget.value))
+                #self.add_instance.on_click(self.on_add_instance)
+                self.run_button.on_click(self.run)
+                self.settingsWidget.children[0].children += (widgets.IntText(value=5, description='runs'), widgets.Checkbox(value=False, description='use previously generated runs'))
+                self.settingsWidget.children[0].children[0].value = 100
+                reset = widgets.Button(description='Reset', icon='close',layout=widgets.Layout(width='100px',justify_self='end'))
+                save_selected = widgets.Button(description='Save selected runs',layout=widgets.Layout(width='150px',justify_self='end'))
+
+                def on_reset(event):
+                        self.settingsWidget.children[0].children[0].value = 100
+                        self.settingsWidget.children[0].children[1].value = 0
+                        self.settingsWidget.children[0].children[2].value = 5
+                        self.configurations = {}
+                        #self.selectedConfigs.options = []
+                        self.problemWidget.disabled = False
+                        self.instanceWidget.disabled = False
+                        self.settingsWidget.children[0].children[0].disabled = False
+                        self.settingsWidget.children[0].children[2].disabled = False
+                        self.on_change_algo(None)
+                        self.out.clear_output()
+                        plt.close()
+                        #self.data_available = {}
+                        self.iteration_df = pd.DataFrame()
+                        self.summaries = {}
+                        self.line_checkboxes.children = []
+                        self.iter_slider.layout.display= 'None'
+
+                def on_change_iter(change):
+                        i = change.new if change.new > 0 else 1
+                        self.plot_comparison(i)
+                self.iter_slider.observe(on_change_iter,names='value')
+        
+
+                reset.on_click(on_reset)
+                save_selected.on_click(self.save_runs)
+
+                display(widgets.VBox([self.settingsWidget,self.problemWidget,self.instanceWidget,self.algoWidget,self.optionsWidget,
+                        #self.add_instance,self.selectedConfigs, 
+                        self.run_button, self.line_checkboxes, widgets.HBox([save_selected,reset]),self.iter_slider]))
+
+                display(self.out)
+
+        def save_runs(self,event):
+
+                checked = {config.description for config in self.line_checkboxes.children if config.value}
+                not_saved = {name for name,config in self.configurations.items() if config['settings']['runs'] > len(config['saved'])}
+                to_save = checked.intersection(not_saved)
+
+                for s in to_save:
+                        config = self.configurations[s]
+                        description = self.create_configuration_description(config)
+                        name = s[s.find('.')+1:].strip()
+                        filepath = self.configuration_exists_in_saved(name, description)
+
+                        use_log = config['settings']['use previously generated runs']
+                        runs = config['settings']['runs']
+                        seed = config['settings']['seed']
+
+                        if filepath:
+                                if seed == 0:
+                                        self.save_to_logfile(config,filepath,append=True)
+                                        return
+                                elif use_log and runs <= len(config['saved']):
+                                        # do nothing, only existing runs were loaded
+                                        return
+                                else:
+                                        # write everything to existing file
+                                        self.save_to_logfile(config,filepath)
+                                        return
+                        # create new file and write to it
+                        filepath = 'logs'+ os.path.sep + 'saved_runtime' + os.path.sep + config['prob'].name.lower() + os.path.sep +\
+                                        name + '_' + time.strftime('_%Y%m%d_%H%M%S') + '.log'
+                        self.save_to_logfile(config,filepath,description=description)
+
+                                        
+                                
+        def save_to_logfile(self, config: dict, filepath: str, description: str=None, append: bool=False):
+                mode = 'w' if description else 'r+'
+                f = open(filepath, mode)
+
+                if description:
+                        f.write(description+'\n')
+                        df = self.iteration_df[config['name']].T
+                        df.to_csv(f,sep=' ',na_rep='NaN', mode='a', line_terminator='\n')
+                        f.write('S summary\n')
+                        self.summaries[config['name']].to_csv(f,na_rep='NaN', sep=' ',mode='a',line_terminator='\n')
+                else:
+                        saved_runs = set(config['saved'])
+                        runs = set(range(1,config['settings']['runs']+1))
+                        to_save = list(runs - saved_runs)
+                        to_save.sort()
+                        if len(to_save) == 0:
+                                return
+                        data = f.readlines()
+                        df = self.iteration_df[config['name']][to_save].T
+                        sm = self.summaries[config['name']].loc[to_save]
+                        if append: #seed==0
+                                existing_runs =int(data[0].split('=')[1].strip())
+                                idx = next((i for i,v in enumerate(data) if v.startswith('S ')), 0)
+                                df.index = pd.Index(range(existing_runs+1,existing_runs+1+len(to_save)))
+                                sm.index = pd.MultiIndex.from_tuples(zip(df.index.repeat(len(sm)/len(to_save)),sm.index.get_level_values(1)),names=sm.index.names)
+                                sm.reset_index(inplace=True)
+                                data.insert(idx, df.to_csv(sep=' ',line_terminator='\n',header=False))
+                                data += [sm.to_csv(sep=' ',line_terminator='\n', index=False,header=False)]
+                                data[0] = f'R runs={df.index[-1]}\n'
+                                f.seek(0)
+                                f.writelines(data)
+                                f.truncate()
+                                
+                        else: # seed!= 0
+                                data[0] = f"R runs={config['settings']['runs']}\n"
+                                idx = next((i for i,v in enumerate(data) if not v[0] in ['R','D']), 0)
+                                data = data[:idx]
+                                data += [df.to_csv(sep=' ',line_terminator='\n')]
+                                data += ['S summary\n']
+                                data += [sm.to_csv(sep=' ',line_terminator='\n')]
+                                f.seek(0)
+                                f.writelines(data)
+                                f.truncate()
+                                
+                f.close()
+                self.configurations[config['name']].update({'saved':list(range(1,config['settings']['runs']+1))})
+
+
+        def configuration_exists_in_saved(self, name: str, description: str):
+                description = description[description.find('D '):]
+                path = 'logs'+ os.path.sep + 'saved_runtime' + os.path.sep + Problem(self.problemWidget.value).name.lower()
+                log_files = os.listdir(path)
+                for l in log_files:
+                        if l.startswith(name):
+                                file_des = ''
+                                with open(path + os.path.sep + l) as file:
+                                        for line in file:
+                                                if line.startswith('R'):
+                                                        continue
+                                                if line.startswith('D'):
+                                                        file_des += line
+                                                else:
+                                                        break
+                                if file_des.strip() == description:
+                                        return path + os.path.sep + l
+                return False
+        
+
+        def create_configuration_description(self, config: dict):
+                s = f"R runs={config['settings']['runs']}\n"
+                s += f'D inst={config["inst"]}\n'
+                s += f"D seed={config['settings']['seed']}\n"
+                s += f"D iterations={config['settings']['iterations']}\n"
+
+                for o in config.get(Option.CH,[]):
+                        s += f'D CH{o}\n'
+                for o in config.get(Option.LI,[]):
+                        s += f'D LI{o}\n'
+                for o in config.get(Option.SH,[]):
+                        s += f'D SH{o}\n'
+                for o in config.get(Option.RGC,[]):
+                        s += f'D RGC{o}\n'
+
+                return s.strip()
+                
+                
+        def init_checkbox(self,name: str):
+                def on_change(change):
+                        self.iter_slider.value = self.get_best_idx()
+                        self.plot_comparison(self.iter_slider.value)
+                        
+                cb = widgets.Checkbox(description=name, value=True)
+                cb.observe(on_change,names='value')
+                return cb
+        
+
+        def run(self, event):
+                text = widgets.Label(value='running...')
+                display(text)
+                # disable prob + inst + iteration + run button
+                self.problemWidget.disabled = self.instanceWidget.disabled = True
+                self.settingsWidget.children[0].children[0].disabled = True
+                self.run_button.disabled = True
+
+                # prepare params and name, save params in dict of configurations
+                params = self.prepare_parameters()
+
+                # run algorithm with params or load data from file
+                log_df,summary = self.load_datafile_or_run_algorithm(params)
+
+                text.layout.display = 'None'
+                self.run_button.disabled = False
+
+                self.iteration_df = pd.concat([self.iteration_df,log_df], axis=1)
+                self.summaries[params['name']] = summary
+
+                # add name to checkbox list
+                self.line_checkboxes.children +=(self.init_checkbox(params['name']),)
+                self.iter_slider.layout.display = 'flex'
+
+                # plot checked data
+                self.iter_slider.value = self.get_best_idx()
+                self.iter_slider.max = len(self.iteration_df)
+                self.plot_comparison(self.iter_slider.value)
+
+
+        def load_datafile_or_run_algorithm(self,params: dict):
+                settings = params['settings']
+                if settings['use previously generated runs']:
+                        name = params['name'][params['name'].find('.')+1:].strip()
+                        description = self.create_configuration_description(params)
+                        file_name = self.configuration_exists_in_saved(name,description)
+                        if file_name:
+                                f = open(file_name, 'r')
+                                ex_runs = int(f.readline().split('=')[1].strip())
+                                if settings['runs'] <= ex_runs:
+                                        data, sm = self.load_datafile(file_name,settings['runs'])
+                                        data.columns = pd.MultiIndex.from_tuples(zip([params['name']]*len(data.columns), data.columns))
+                                        self.configurations[params['name']].update({'saved':list(data.columns.get_level_values(1))})
+                                        return data, sm
+                                if settings['seed'] == 0:
+                                        runs = settings['runs']
+                                        # load existing runs
+                                        data, sm = self.load_datafile(file_name,ex_runs)
+                                        data.columns = pd.MultiIndex.from_tuples(zip([params['name']]*len(data.columns), data.columns))
+                                        # generate runs-ex_runs new ones and set correct run numbers
+                                        params['settings'].update({'runs':runs-ex_runs})
+                                        new_data, new_sm = handler.run_algorithm_comparison(params)
+                                        params['settings'].update({'runs':runs})
+                                        new_data.columns = pd.MultiIndex.from_tuples([(n,int(r)+ex_runs) for (n,r) in new_data.columns])
+                                        new_sm.index = pd.MultiIndex.from_tuples([(int(r)+ex_runs,m) for (r,m) in new_sm.index])
+
+                                        self.configurations[params['name']].update({'saved':list(data.columns.get_level_values(1))})
+                                        # concatenate them
+                                        return pd.concat([data,new_data],axis=1),pd.concat([sm,new_sm])
+                                
+                return handler.run_algorithm_comparison(params)
+
+        def load_datafile(self,filename,runs: int):
+                f = open(filename, 'r')
+                pos = 0
+                while True:
+                        l = f.readline()
+                        if not l[0] in ['D','R']:
+                                break
+                        pos = f.tell()
+                f.seek(pos)
+                data = pd.read_csv(f, sep=r'\s+', nrows=runs).T
+                data.reset_index(drop=True, inplace=True)
+                data.index += 1
+                f.seek(pos)
+                
+                while True:
+                        l = f.readline()
+                        if l[0] == 'S':
+                                break
+                sm = pd.read_csv(f,sep=r'\s+',index_col=['run','method'])
+                sm = sm[sm.index.get_level_values('run') <= runs]
+                f.close()
+
+                return data,sm
+
+
+        def get_best_idx(self):
+                checked = [c.description for c in self.line_checkboxes.children if c.value]
+                if checked == []:
+                        return 1
+                df = self.iteration_df[checked]
+                m = 1
+                if Problem(self.problemWidget.value) in [Problem.MAXSAT,Problem.MISP]:
+                        m = df.max().max()
+                else:
+                        m = df.min().min()
+                return df.loc[df.isin([m]).any(axis=1)].index.min()
+
+
+        def prepare_parameters(self):
+                params = super().prepare_parameters()
+                name = [f'{params.get("algo").name.lower()}']
+                for k,v in params.items():
+                        if not type(k) == Option or len(v) == 0:
+                                continue
+                        o = k.name.lower()+ '-' + '-'.join([str(p[1]) for p in v])
+                        o = o.replace('.','')
+                        name += [o]
+
+                count = len(self.line_checkboxes.children) + 1
+                params['name'] = str(count) + '. ' + '_'.join(name)
+                params['saved'] = []
+                self.configurations[params['name']] = params
+                return params
+
+
+        def plot_comparison(self, i):
+                with self.out:
+                        fig = plt.figure(num=f'{self.problemWidget.value}',clear=True)
+                        g = gs.GridSpec(2,2)
+                        ax = fig.add_subplot(g[0,:])
+                        ax_bb = fig.add_subplot(g[1,0])
+                        ax_sum = fig.add_subplot(g[1,1])
+                        
                         legend_handles=[]
-                        for i,c in enumerate(self.iteration_df.columns.levels[0]):
-                                self.iteration_df[c][['min','max']].plot(color=f'C{i % 10}', ax=ax)
-                                ax.fill_between(self.iteration_df.index, self.iteration_df[c]['max'], self.iteration_df[c]['min'], where=self.iteration_df[c]['max'] > self.iteration_df[c]['min'] , facecolor=f'C{i % 10}', alpha=0.2)
-                                legend_handles += [Line2D([0],[0],color=f'C{i % 10}',label=c)]
+                        checked = [c.description for c in self.line_checkboxes.children if c.value]
+                        if checked == []:
+                                return
+                        for i,c in enumerate(checked):
+                                
+                                col = f'C{int(c.split(".")[0]) % 10}'
+                                maxi = self.iteration_df[c].max(axis=1)
+                                mini = self.iteration_df[c].min(axis=1)
+                                maxi.plot(color=col, ax=ax)
+                                mini.plot(color=col, ax=ax)
+                                ax.fill_between(self.iteration_df.index, maxi, mini, where=maxi > mini , facecolor=col, alpha=0.2, interpolate=True)
+                                legend_handles += [Line2D([0],[0],color=col,label=c + f' (n={len(self.iteration_df[c].columns)})')]
                         loc = ''
                         best = None
-                        if self.configurations[0]['prob'] in [Problem.MAXSAT,Problem.MISP]:
-                                best = self.iteration_df.cummax(axis=0).cummax(axis=1).iloc[:,-1:]
+                        selected_data = self.iteration_df[checked]
+                        if Problem(self.problemWidget.value) in [Problem.MAXSAT,Problem.MISP]:
+                                best = selected_data.cummax(axis=0).cummax(axis=1).iloc[:,-1:]
                                 loc = 'lower right'
                         else:
-                                best = self.iteration_df.cummin(axis=0).cummin(axis=1).iloc[:,-1:]
+                                best = selected_data.cummin(axis=0).cummin(axis=1).iloc[:,-1:]
                                 loc = 'upper right'
                         best.plot(color='black',ax=ax)
                         legend_handles += [Line2D([0],[0],color='black',label='best')]
                         ax.legend(handles=legend_handles,loc=loc)
+
+                        ax.axvline(x=self.iter_slider.value)
+
+                        #create boxplot
+                        col = selected_data.columns
+                        col = [c for c in col if not c[1] in ['max','min']]
+                        bb_data = selected_data[[c for c in col if not c[1] in ['max','min']]]
+                        bb_data = bb_data.loc[self.iter_slider.value].reset_index(level=1, drop=True).reset_index()
+                        bb_data = bb_data.rename(columns={self.iter_slider.value:f'iteration={self.iter_slider.value}'})
+                        bb_data.boxplot(by='index',rot=25,ax=ax_bb)
+                        fig.suptitle('')
+                        ax_bb.set_xlabel('')
+                        ax_bb.set_ylabel('objective value')
                         widgets.interaction.show_inline_matplotlib_plots()
-
-                        
-
-
-                
-
-
 
         
         

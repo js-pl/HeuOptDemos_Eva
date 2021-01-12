@@ -93,7 +93,9 @@ class Draw(ABC):
 
         def load_pc_img(self, log_info: dict):
                 # TODO: load correct image according to current step
-                img_path = (os.path.sep).join( [pc_dir, self.algorithm.name.lower(), self.algorithm.name.lower() + '.PNG'] )
+                m = log_info.get('m',False) if log_info.get('m',False) else log_info.get('status')
+                m = '_'+m
+                img_path = (os.path.sep).join( [pc_dir, self.algorithm.name.lower(), self.algorithm.name.lower() +m+ '.PNG'] )
                 img = mpimg.imread(img_path)
                 self.img_ax.set_aspect('equal', anchor='E')
                 self.img_ax.imshow(img)#,extent=[0, 1, 0, 1])
@@ -207,13 +209,7 @@ class MISPDraw(Draw):
                 self.add_description(log_data[i])
 
         def add_legend(self):
-                #legend_elements = (#Line2D([0], [0], color='b', lw=4, label='Line'),
-                #       Line2D([0], [0], marker='o', color='w', label='current solution',
-                #             markerfacecolor='g', markersize=13),
-                #       Line2D([0], [0], marker='o', linestyle='none', label='best solution'
-                #             markerfacecolor='w',markeredgecolor="gold",markeredgewidth=2, markersize=11),
-                        # , Patch(facecolor='orange', edgecolor='r',label='Color Patch')
-                #     )
+
                 legend_elements = tuple()
                 if self.algorithm == Algorithm.GVNS:
                         legend_elements = (
@@ -229,17 +225,17 @@ class MISPDraw(Draw):
 
                 if self.algorithm == Algorithm.GRASP:
                         legend_elements = (
-                        Line2D([0], [0],linestyle='none'),
-                        Line2D([0], [0], marker='o', color='w',
-                                markerfacecolor='gold', markersize=13),
-                        Line2D([0], [0],linestyle='none'), 
-                        Line2D([0], [0], marker='o', color='w',
-                                markerfacecolor='g', markersize=13),
-                        Line2D([0], [0], marker='o', linestyle='none',
-                                markerfacecolor='w',markeredgecolor="gold",markeredgewidth=2, markersize=11),
-                        Line2D([0], [0], marker='o', color='w',
-                                markerfacecolor='darksalmon', markersize=13)
-                        )
+                                Line2D([0], [0],linestyle='none'),
+                                Line2D([0], [0], marker='o', color='w',
+                                        markerfacecolor='gold', markersize=13),
+                                Line2D([0], [0],linestyle='none'), 
+                                Line2D([0], [0], marker='o', color='w',
+                                        markerfacecolor='g', markersize=13),
+                                Line2D([0], [0], marker='o', linestyle='none',
+                                        markerfacecolor='w',markeredgecolor="gold",markeredgewidth=2, markersize=11),
+                                Line2D([0], [0], marker='o', color='w',
+                                        markerfacecolor='darksalmon', markersize=13)
+                                )
 
                         self.ax.legend(legend_elements, ('','','','current solution','best solution','blocked neighbors'),  ncol=2, handlelength=1, borderpad=0.7, columnspacing=0, loc='lower left')
 

@@ -201,37 +201,27 @@ def run_algorithm_visualisation(options: dict):
 
 
 
-def run_algorithm_comparison(configs: list, settings: dict):
+def run_algorithm_comparison(config: dict):
 
-    #log_df = pd.DataFrame({'iteration':[]})
-    data = []
-    log_df = pd.DataFrame()
-    summaries = {}
-    for config in configs:
+    iter_fh = logging.FileHandler(f"logs/iter.log", mode="w")
+    iter_logger = logging.getLogger("pymhlib_iter")
+    iter_logger.handlers = []
+    iter_logger.addHandler(iter_fh)
 
-        iter_fh = logging.FileHandler(f"logs/iter.log", mode="w")
-        iter_logger = logging.getLogger("pymhlib_iter")
-        iter_logger.handlers = []
-        iter_logger.addHandler(iter_fh)
+    sum_fh = logging.FileHandler(f"logs/summary.log", mode="w")
+    sum_logger = logging.getLogger("pymhlib")
+    sum_logger.handlers = []
+    sum_logger.addHandler(sum_fh)
 
-        sum_fh = logging.FileHandler(f"logs/summary.log", mode="w")
-        sum_logger = logging.getLogger("pymhlib")
-        sum_logger.handlers = []
-        sum_logger.addHandler(sum_fh)
+    file_path = demo_data_path + os.path.sep + config['inst']
+    name = config['name']
+    settings = config['settings']
+    for i in range(settings.get('runs',1)):
+        _ = run_algorithm(config, file_path, visualisation=False)
+    log_df = read_iter_log(name)
+    summary = read_sum_log()
 
-        file_path = demo_data_path + os.path.sep + config['inst']
-        name = config['name']
-        for i in range(1,settings.get('runs',1)+1):
-            _ = run_algorithm(config,file_path, visualisation=False)
-        log_df = read_iter_log()
-        log_df.columns = pd.MultiIndex.from_tuples(zip([name]*settings.get('runs',1), log_df.columns))
-        data.append(log_df)
-        summaries[name] = read_sum_log()
-
-    df = pd.concat(data, axis=1)
-    df.index += 1
-
-    return df, summaries
+    return log_df, summary
 
 def read_sum_log():
     idx = []
@@ -253,23 +243,27 @@ def read_sum_log():
     return df
 
 
-def read_iter_log():
-        df = pd.read_csv('logs' + os.path.sep + 'iter.log', sep=r'\s+', usecols=['obj_new'])
-        indices = [0] + list(df[df.obj_new == 'obj_new'].index)
-        log_df = pd.DataFrame()
-        for i, idx in enumerate(indices, start=1):
-            j = 1 if i == 1 else 2
-            if i >= len(indices):
-                log_df[i] = list(df.obj_new[idx+j:])
-                break
-            else:
+def read_iter_log(name):
 
-                log_df[i] = list(df.obj_new[idx+j:indices[i]])
+        df = pd.read_csv('logs' + os.path.sep + 'iter.log', sep=r'\s+', header=None)
 
-        log_df.dropna(inplace=True)
-        log_df = log_df.astype(float)
-        return log_df
-        
+        df.drop(df[ df[1] == '0' ].index , inplace=True) #drop initialisation line
+        df = df[4].reset_index().drop(columns='index') #extract 'obj_new'
+        indices = list((df[df[4] == 'obj_new'].index)) + [len(df)] #get indices of start of each run
+        list_df = []
+        #split data in single dataframes
+        for i in range(len(indices) - 1):
+            j = indices[i+1]-1
+            frame = df.loc[indices[i]:j]
+            frame = frame.reset_index().drop(columns='index')
+            list_df.append(frame)
+        full = pd.concat(list_df,axis=1) #concatenate dataframes
+        full.columns = [i for i in range(1,len(full.columns)+1)] #rename columns to run numbers
+        full.columns = pd.MultiIndex.from_tuples(zip([name]*len(full.columns), full.columns)) # set level of column
+        full = full.drop([0]) #drop line that holds old column names
+        full = full.astype(float)
+       
+        return full
 
         
 
