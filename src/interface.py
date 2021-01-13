@@ -408,22 +408,21 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
 
         def __init__(self):
                 super().__init__(visualisation=False)
-                #self.add_instance = widgets.Button(description='Add configuration')
                 self.configurations = {}
-                #self.selectedConfigs = widgets.Select(options=[])
                 self.out = widgets.Output()
-                #self.data_available = {}
                 self.iteration_df = pd.DataFrame()
                 self.summaries = {}
                 self.line_checkboxes = widgets.VBox()
                 self.run_button.description = 'Run configuration'
-                self.iter_slider = widgets.IntSlider(description='iteration', value=1)
+                self.iter_slider = widgets.IntSlider(description='iteration', value=1, min=1)
                 self.iter_slider.layout.display = 'None'
-                self.plot_options = widgets.HBox()
+                self.plot_options = None
                 plt.rcParams['axes.spines.left'] = True
                 plt.rcParams['axes.spines.right'] = True
                 plt.rcParams['axes.spines.top'] = True
                 plt.rcParams['axes.spines.bottom'] = True
+                plt.rcParams['figure.figsize'] = (12,7)
+                plt.rcParams['figure.autolayout'] = True
 
 
         def display_widgets(self):
@@ -431,7 +430,6 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                 self.problemWidget.observe(self.on_change_problem, names='value')
                 self.algoWidget.observe(self.on_change_algo, names='value')
                 self.optionsWidget.children = self.get_options(Algorithm(self.algoWidget.value))
-                #self.add_instance.on_click(self.on_add_instance)
                 self.run_button.on_click(self.run)
                 self.settingsWidget.children[0].children += (widgets.IntText(value=5, description='runs'), widgets.Checkbox(value=False, description='use previously generated runs'))
                 self.settingsWidget.children[0].children[0].value = 100
@@ -443,45 +441,53 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                         self.settingsWidget.children[0].children[1].value = 0
                         self.settingsWidget.children[0].children[2].value = 5
                         self.configurations = {}
-                        #self.selectedConfigs.options = []
-                        self.problemWidget.disabled = False
-                        self.instanceWidget.disabled = False
-                        self.settingsWidget.children[0].children[0].disabled = False
-                        self.settingsWidget.children[0].children[2].disabled = False
+                        for widget in [self.problemWidget,self.instanceWidget,self.settingsWidget.children[0].children[0]]:
+                                widget.disabled = False
+
                         self.on_change_algo(None)
                         self.out.clear_output()
                         plt.close()
-                        #self.data_available = {}
                         self.iteration_df = pd.DataFrame()
                         self.summaries = {}
                         self.line_checkboxes.children = []
-                        self.iter_slider.layout.display= 'None'
-                        self.plot_options.layout.display = 'None'
+                        self.iter_slider.layout.display = self.plot_options.layout.display = 'None'
 
                 def on_change_iter(change):
                         i = change.new if change.new > 0 else 1
                         self.plot_comparison(i)
+
                 self.iter_slider.observe(on_change_iter,names='value')
-                solutions = widgets.RadioButtons(options=['current soluntions','best solutions'])
-                checkboxes = widgets.GridspecLayout(3,2)
-                for i in range(3):
-                        for j in range(2):
-                                checkboxes[i,j] = self.init_checkbox(['max','min','polygon','median','mean','best'][j*3+i])
+
+                solutions = widgets.RadioButtons(options=['best solutions','current solutions'], layout=widgets.Layout(width='auto', grid_area='sol'))
+                #checkboxes = widgets.GridspecLayout(3,2)
+                #for i in range(3):
+                #        for j in range(2):
+                #                checkboxes[i,j] = self.init_checkbox(['max','min','polygon','median','mean','best'][j*3+i])
+                #TODO!!!!!!
+                checkboxes = []
+                for o in ['max','min','polygon','median','mean','best']:
+                        checkboxes.append(self.init_checkbox(o))
+                        checkboxes[-1].layout = widgets.Layout(width='auto', grid_area=o)
 
                 def on_change_plotoptions(change):
                         self.plot_comparison(self.iter_slider.value)
 
                 solutions.observe(on_change_plotoptions,names='value')
-                self.plot_options.children = (solutions,checkboxes)
-                self.plot_options.layout.display = 'None'
+                self.plot_options = widgets.GridBox(children=[solutions] + checkboxes, layout=widgets.Layout(
+                                                                                        display='None',
+                                                                                        width='40%',
+                                                                                        grid_template_rows='100px 100px 100px',
+                                                                                        grid_template_columns='40% 30% 30%',
+                                                                                        grid_template_areas='''"sol max median" "sol min mean" "sol polygon best"'''))
+
 
                 reset.on_click(on_reset)
                 save_selected.on_click(self.save_runs)
 
 
                 display(widgets.VBox([self.settingsWidget,self.problemWidget,self.instanceWidget,self.algoWidget,self.optionsWidget,
-                        #self.add_instance,self.selectedConfigs, 
-                        self.run_button, self.line_checkboxes, widgets.HBox([save_selected,reset]),self.plot_options,self.iter_slider]))
+                        self.run_button, self.line_checkboxes, widgets.HBox([save_selected,reset]),self.iter_slider]))
+                display(self.plot_options)
 
                 display(self.out)
 
@@ -737,20 +743,19 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
 
         def plot_comparison(self, i):
                 with self.out:
+
                         fig = plt.figure(num=f'{self.problemWidget.value}',clear=True)
-                        g = gs.GridSpec(2,2)
-                        ax = fig.add_subplot(g[0,:])
-                        ax_bb = fig.add_subplot(g[1,0])
-                        ax_sum = fig.add_subplot(g[1,1])
+                        g = gs.GridSpec(3,2)
+                        ax = fig.add_subplot(g[0:2,:])
+                        ax_bb = fig.add_subplot(g[2,0])
+                        ax_sum = fig.add_subplot(g[2,1])
                         
                         legend_handles=[]
                         checked = [c.description for c in self.line_checkboxes.children if c.value]
                         if checked == []:
                                 return
                         sol = 'best' if self.plot_options.children[0].value.startswith('best') else 'current'
-                        lines = [o.description for o in self.plot_options.children[1].children if o.value]
-                        if 'polygon' in lines and not ('max' in lines and 'min' in lines):
-                                lines.remove('polygon')
+                        lines = [o.description for o in self.plot_options.children[1:] if o.value]
                         selected_data = self.iteration_df[checked]
 
                         if sol == 'best':

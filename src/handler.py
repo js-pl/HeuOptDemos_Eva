@@ -17,7 +17,7 @@ import random
 import ast
 
 # pymhlib imports
-from pymhlib.settings import settings, parse_settings
+from pymhlib.settings import settings, parse_settings, seed_random_generators
 from pymhlib.log import init_logger
 from pymhlib.demos.maxsat import MAXSATInstance, MAXSATSolution
 from pymhlib.demos.misp import MISPInstance, MISPSolution
@@ -190,7 +190,8 @@ def run_algorithm_visualisation(options: dict):
     logger_step.handlers = []
     logger_step.addHandler(fh)
     logger_step.info(f"{options['prob'].name}\n{options['algo'].name}")
-
+    settings.seed =  options.get('settings').get('seed',0)
+    seed_random_generators()
     file_path = instance_path + problems[options['prob']].name + os.path.sep + options['inst']
     if options['inst'].startswith('random'):
         file_path = options['inst']
@@ -215,8 +216,10 @@ def run_algorithm_comparison(config: dict):
 
     file_path = demo_data_path + os.path.sep + config['inst']
     name = config['name']
-    settings = config['settings']
-    for i in range(settings.get('runs',1)):
+    s = config['settings']
+    settings.seed =  s.get('seed',0)
+    seed_random_generators()
+    for i in range(s.get('runs',1)):
         _ = run_algorithm(config, file_path, visualisation=False)
     log_df = read_iter_log(name)
     summary = read_sum_log()
@@ -272,7 +275,7 @@ def run_algorithm(options: dict, file_path: str, visualisation=True):
 
     if options.get('settings', False):
         settings.mh_titer = options['settings'].get('iterations',100)
-        settings.seed = options['settings'].get('seed',0)
+
 
     # initialize solution for problem
     solution = problems[options['prob']].get_solution(file_path)
