@@ -14,3 +14,8 @@ class Option(enum.Enum):
     LI = 'Local Improvement'
     SH = 'Shaking'
     RGC = 'Randomized Greedy Construction'
+
+class InitSolution(enum.Enum):
+    random = 0
+    greedy = 1
+

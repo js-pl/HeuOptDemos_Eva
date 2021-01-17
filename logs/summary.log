@@ -1,95 +1,36 @@
 Method statistics:
 S  method    iter   succ succ-rate%    tot-obj-gain    avg-obj-gain rel-succ%  net-time  net-time%  brut-time  brut-time%
-S     ch0       1      1   100.0000         4.00000         4.00000    1.6949    0.0000     0.0000     0.0000      0.0000
-S     li1      77     55    71.4286       133.00000         1.72727   93.2203    0.9531    89.7059     0.9531     89.7059
-S     sh1      22      3    13.6364        56.00000         2.54545    5.0847    0.0000     0.0000     0.8438     79.4118
-S SUM/AVG     100     59    59.0000       193.00000         1.93000   33.3333    0.9531    89.7059     1.7969    169.1176
+S     li1      93     86    92.4731       150.00000         1.61290   96.6292    0.6875    12.3944     0.6875     12.3944
+S   rgc10       7      3    42.8571        62.00000         8.85714    3.3708    4.8438    87.3239     5.3594     96.6197
+S SUM/AVG     100     89    89.0000       212.00000         2.12000   50.0000    5.5312    99.7183     6.0469    109.0141
 
-T best solution: [False False  True False  True False False False  True False False  True
-  True  True False False  True False False False False  True  True False
- False False False False  True  True  True False  True  True  True False
- False False  True  True False False  True  True  True  True  True False
-  True False False False False False  True  True  True False  True False
-  True  True  True  True False False False  True False False]
-T best obj: 763
-T best iteration: 87
+T best solution: [ True False  True  True False False False False  True False False False
+  True False  True False  True False False  True False  True False False
+  True  True False False  True  True False False False False  True  True
+ False False  True  True False  True  True  True False  True  True False
+ False False False False  True False  True  True  True False  True False
+ False  True  True False False False False  True False  True]
+T best obj: 765
+T best iteration: 97
 T total iterations: 100
-T best time [s]: 0.922
-T total time [s]: 1.0625
+T best time [s]: 4.797
+T total time [s]: 5.5469
 
 Method statistics:
 S  method    iter   succ succ-rate%    tot-obj-gain    avg-obj-gain rel-succ%  net-time  net-time%  brut-time  brut-time%
-S     ch0       1      0     0.0000         0.00000         0.00000    0.0000    0.0000     0.0000     0.0000      0.0000
-S     li1      79     59    74.6835       141.00000         1.78481   96.7213    0.8906    95.0000     0.8906     95.0000
-S     sh1      20      2    10.0000        71.00000         3.55000    3.2787    0.0000     0.0000     0.8281     88.3333
-S SUM/AVG     100     61    61.0000       212.00000         2.12000   33.3333    0.8906    95.0000     1.7188    183.3333
+S     li1      93     86    92.4731       153.00000         1.64516   96.6292    0.7031    13.1965     0.7031     13.1965
+S   rgc10       7      3    42.8571        63.00000         9.00000    3.3708    4.6250    86.8035     5.2188     97.9472
+S SUM/AVG     100     89    89.0000       216.00000         2.16000   50.0000    5.3281   100.0000     5.9219    111.1437
 
-T best solution: [False False  True  True False False False False False False  True  True
-  True False  True False  True False False  True False  True  True  True
- False  True False False False  True False False  True False  True  True
- False False False  True False  True  True  True  True  True  True False
- False  True False False False  True  True False  True  True  True False
- False  True  True False  True False  True  True False  True]
+T best solution: [ True False  True  True False False  True False  True False False False
+  True False  True  True  True  True  True  True False  True False  True
+  True  True  True False  True  True False  True False  True  True  True
+ False  True False  True False  True  True  True False False  True  True
+ False  True False False  True False  True  True  True  True  True False
+ False False  True False  True  True  True False False  True]
 T best obj: 766
-T best iteration: 64
+T best iteration: 74
 T total iterations: 100
-T best time [s]: 0.453
-T total time [s]: 0.9375
-
-Method statistics:
-S  method    iter   succ succ-rate%    tot-obj-gain    avg-obj-gain rel-succ%  net-time  net-time%  brut-time  brut-time%
-S     ch0       1      0     0.0000         0.00000         0.00000    0.0000    0.0000     0.0000     0.0000      0.0000
-S     li1      80     61    76.2500       101.00000         1.26250   95.3125    0.7656    87.5000     0.7656     87.5000
-S     sh1      19      3    15.7895        55.00000         2.89474    4.6875    0.0000     0.0000     0.7656     87.5000
-S SUM/AVG     100     64    64.0000       156.00000         1.56000   33.3333    0.7656    87.5000     1.5312    175.0000
-
-T best solution: [False  True False False  True False False  True  True False  True  True
- False False False False  True  True False False False False  True False
-  True False False  True False  True  True False  True False False  True
- False False  True  True False  True  True  True  True  True  True  True
-  True  True False False False  True  True  True False  True  True False
- False  True  True  True False False  True False False False]
-T best obj: 756
-T best iteration: 90
-T total iterations: 100
-T best time [s]: 0.766
-T total time [s]: 0.8750
-
-Method statistics:
-S  method    iter   succ succ-rate%    tot-obj-gain    avg-obj-gain rel-succ%  net-time  net-time%  brut-time  brut-time%
-S     ch0       1      1   100.0000         3.00000         3.00000    1.6949    0.0000     0.0000     0.0000      0.0000
-S     li1      76     53    69.7368       102.00000         1.34211   89.8305    0.9375    90.9091     0.9375     90.9091
-S     sh1      23      5    21.7391        51.00000         2.21739    8.4746    0.0000     0.0000     0.9219     89.3939
-S SUM/AVG     100     59    59.0000       156.00000         1.56000   33.3333    0.9375    90.9091     1.8594    180.3030
-
-T best solution: [False  True  True False  True  True False  True False False  True  True
-  True False  True False  True False  True False False False  True False
-  True  True False False False  True  True False False False  True  True
- False False False False False  True False  True False  True  True  True
- False False  True False False  True  True  True  True False  True False
- False  True  True False False  True  True  True False False]
-T best obj: 757
-T best iteration: 79
-T total iterations: 100
-T best time [s]: 0.766
-T total time [s]: 1.0312
-
-Method statistics:
-S  method    iter   succ succ-rate%    tot-obj-gain    avg-obj-gain rel-succ%  net-time  net-time%  brut-time  brut-time%
-S     ch0       1      0     0.0000         0.00000         0.00000    0.0000    0.0000     0.0000     0.0000      0.0000
-S     li1      81     63    77.7778       114.00000         1.40741   94.0299    0.8125    98.1132     0.8125     98.1132
-S     sh1      18      4    22.2222        61.00000         3.38889    5.9701    0.0000     0.0000     0.6875     83.0189
-S SUM/AVG     100     67    67.0000       175.00000         1.75000   33.3333    0.8125    98.1132     1.5000    181.1321
-
-T best solution: [False False  True  True False False False  True  True  True False  True
-  True  True  True False  True False False False False  True  True False
- False False False  True  True  True False False  True  True  True  True
- False False  True  True False False  True  True  True  True  True False
-  True False False False  True  True  True False  True False  True False
- False  True  True  True False False False  True  True  True]
-T best obj: 763
-T best iteration: 63
-T total iterations: 100
-T best time [s]: 0.406
-T total time [s]: 0.8281
+T best time [s]: 3.125
+T total time [s]: 5.3281
 
