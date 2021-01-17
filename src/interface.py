@@ -8,7 +8,7 @@ import statistics
 from IPython.display import display, display_html 
 import ipywidgets as widgets
 import src.handler as handler
-from src.handler import Problem, Algorithm, Option
+from src.problems import Problem, Algorithm, Option, InitSolution
 from pymhlib.demos.maxsat import MAXSATInstance, MAXSATSolution
 from pymhlib.demos.misp import MISPInstance, MISPSolution
 import src.plotting as p
@@ -180,7 +180,7 @@ class InterfaceVisualisation():
                 # store each option as list of tuples (<name>,<parameter>)
                 # extend if further options are needed
                 if Option.CH in self.optionsHandles:
-                        params[Option.CH] = [(self.optionsHandles.get(Option.CH).value, 0)]
+                        params[Option.CH] = [(self.optionsHandles.get(Option.CH).value, InitSolution[self.optionsHandles.get(Option.CH).value].value)]
                 if Option.LI in self.optionsHandles:
                         #TODO: make sure name splitting works if no 'k=' given (ok for now because k is always added)
                         params[Option.LI] = [(name.split(',')[0], int(name.split('=')[1])) for name in list(self.optionsHandles.get(Option.LI).options)]
