@@ -790,6 +790,7 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                                                 else selected_data.cummin(axis=0)
                                 
                         for i,c in enumerate(checked):
+
                                 col = f'C{int(c.split(".")[0]) % 10}'
                                 df = selected_data[c]
 
@@ -831,7 +832,13 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                         fig.suptitle('')
                         ax_bb.set_xlabel('')
                         ax_bb.set_ylabel('objective value')
+
+
+                        # aggregation and plotting of summary
+
                         widgets.interaction.show_inline_matplotlib_plots()
+                
+                display(list(self.summaries.values())[0])
 
         
         
