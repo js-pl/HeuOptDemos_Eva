@@ -1,16 +1,16 @@
-import sys
-sys.path.append('..\\HeuOptDemos_Eva')
+
+
 import matplotlib.image as mpimg
 import os
 import networkx as nx
 import numpy as np
 import matplotlib.pyplot as plt
 import statistics
-from pymhlib.demos.maxsat import MAXSATInstance
-from pymhlib.demos.misp import MISPInstance
-from src.problems import Problem, Algorithm, Option
+from .pymhlib.demos.maxsat import MAXSATInstance
+from .pymhlib.demos.misp import MISPInstance
+from .problems import Problem, Algorithm, Option
 from abc import ABC, abstractmethod
-from src.logdata import read_from_logfile
+from .logdata import read_from_logfile
 from matplotlib.patches import Patch,Rectangle
 from matplotlib.lines import Line2D
 

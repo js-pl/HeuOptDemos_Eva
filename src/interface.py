@@ -2,17 +2,20 @@
 module which builds all necessary widgets for visualisation and runtime analysis based on information received from handler/logdata module
 
 """
+
+
+from .pymhlib.demos.maxsat import MAXSATInstance, MAXSATSolution
+from .pymhlib.demos.misp import MISPInstance, MISPSolution
+
 import networkx as nx
 import matplotlib.pyplot as plt
 import statistics        
 from IPython.display import display, display_html 
 import ipywidgets as widgets
-import src.handler as handler
-from src.problems import Problem, Algorithm, Option, InitSolution
-from pymhlib.demos.maxsat import MAXSATInstance, MAXSATSolution
-from pymhlib.demos.misp import MISPInstance, MISPSolution
-import src.plotting as p
-from src.logdata import Log, LogData, save_visualisation, read_from_logfile, get_log_description
+from . import handler
+from .problems import Problem, Algorithm, Option, InitSolution
+from . import plotting as p
+from .logdata import Log, LogData, save_visualisation, read_from_logfile, get_log_description
 from IPython.display import clear_output
 import os
 from matplotlib.lines import Line2D
@@ -834,11 +837,9 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                         ax_bb.set_ylabel('objective value')
 
 
-                        # aggregation and plotting of summary
-
                         widgets.interaction.show_inline_matplotlib_plots()
                 
-                display(list(self.summaries.values())[0])
+
 
         
         

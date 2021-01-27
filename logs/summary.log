@@ -1,28 +1,13 @@
 Method statistics:
 S  method    iter   succ succ-rate%    tot-obj-gain    avg-obj-gain rel-succ%  net-time  net-time%  brut-time  brut-time%
-S     ch0       1      1   100.0000         3.00000         3.00000    1.8868    0.0000     0.0000     0.0000      0.0000
-S     li1      75     51    68.0000        89.00000         1.18667   96.2264    0.0938    85.7143     0.0938     85.7143
-S     sh4      24      1     4.1667         6.00000         0.25000    1.8868    0.0156    14.2857     0.1094    100.0000
-S SUM/AVG     100     53    53.0000        98.00000         0.98000   33.3333    0.1094   100.0000     0.2031    185.7143
+S     li2      68     36    52.9412        37.00000         0.54412   94.7368    0.1094    28.0000     0.1094     28.0000
+S rgc0.85      32      2     6.2500        21.00000         0.65625    5.2632    0.1875    48.0000     0.3906    100.0000
+S SUM/AVG     100     38    38.0000        58.00000         0.58000   50.0000    0.2969    76.0000     0.5000    128.0000
 
-T best solution: [False  True  True  True False False  True]
-T best obj: 46
-T best iteration: 4
+T best solution: [ 0  5  6  8 11 17 18 19 20 23 24 27 28 30 31 32 33 34 36 37 40]
+T best obj: 21
+T best iteration: 7
 T total iterations: 100
-T best time [s]: 0.000
-T total time [s]: 0.1094
-
-Method statistics:
-S  method    iter   succ succ-rate%    tot-obj-gain    avg-obj-gain rel-succ%  net-time  net-time%  brut-time  brut-time%
-S     ch0       1      1   100.0000         9.00000         9.00000   10.0000    0.0000     0.0000     0.0000      0.0000
-S     li1      14      9    64.2857        18.00000         1.28571   90.0000    0.0156    50.0000     0.0156     50.0000
-S     sh4       5      0     0.0000         0.00000         0.00000    0.0000    0.0156    50.0000     0.0312    100.0000
-S SUM/AVG      20     10    50.0000        27.00000         1.35000   33.3333    0.0312   100.0000     0.0469    150.0000
-
-T best solution: [False  True  True  True  True False  True]
-T best obj: 46
-T best iteration: 1
-T total iterations: 20
-T best time [s]: 0.000
-T total time [s]: 0.0312
+T best time [s]: 0.031
+T total time [s]: 0.3906
 

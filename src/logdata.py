@@ -3,13 +3,12 @@ import ast
 import re
 import os
 import sys
-sys.path.append('..\\HeuOptDemos_Eva')
 
 import enum
 import time
-from src.problems import Problem, Algorithm, Option
-from pymhlib.demos.misp import MISPInstance
-from pymhlib.demos.maxsat import MAXSATInstance
+from .problems import Problem, Algorithm, Option
+from .pymhlib.demos.misp import MISPInstance
+from .pymhlib.demos.maxsat import MAXSATInstance
 
 class Log(enum.Enum):
         StepInter = 'step-by-step (intermediate steps)' # start-frame and end-frame for each step

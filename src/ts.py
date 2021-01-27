@@ -1,26 +1,25 @@
+import sys
+import sys
+import os
+
 
 # for testing
-import sys
-sys.path.append('..\\HeuOptDemos_Eva')
-from pymhlib.demos.maxsat import MAXSATInstance, MAXSATSolution
+from .pymhlib.demos.maxsat import MAXSATInstance, MAXSATSolution
 ########
 
 
-from typing import List, Callable
+from typing import List, Callable, Any
 import time
-from pymhlib.scheduler import Method, Scheduler
-from pymhlib.settings import parse_settings, get_settings_parser, settings
-from pymhlib.solution import Solution
+from .pymhlib.scheduler import Method, Scheduler
+from .pymhlib.settings import get_settings_parser, settings
+from .pymhlib.solution import Solution
+import random as rd
 
 
-#parser = get_settings_parser()
-#parser.add_argument("--mh_ts_ll", type=int, default=5,
-                    #help='TS length of tabu list')
-#parse_settings()
 
 class TabuAttribute():
-    # maybe use this class for variable lifespan of elements
-    def __init__(self, attr,lifespan=settings.mh_ts_ll):
+
+    def __init__(self, attr,lifespan: int):
         self.attribute = attr
         self.lifespan = lifespan
 
@@ -34,30 +33,45 @@ class TabuAttribute():
 
 
 class TabuList():
-    #min
-    #max
-    #iterations
-    #list
+
+    def __init__(self,min_ll, max_ll, change_ll_iter):
+        self.min_ll = min_ll
+        self.max_ll = max_ll
+        self.change_ll_iter = change_ll_iter
+        self.tabu_list = []
+        self.current_ll = max_ll # what should be initial list length? random?
+
     #generate new tabu list
 
-    #append
-    #delete
-    #update list elements (-1) and remove if 0
-    pass
+    def append(self,elem: Any, current_iter: int):
+        if current_iter % self.change_ll_iter == 0:
+            self.current_ll = rd.choice(range(self.min_ll,self.max_ll+1))
 
+        self.tabu_list.append(TabuAttribute(elem,self.current_ll))
+        
+
+    #delete
+
+    def update_list(self):
+        self.tabu_list = list(map(lambda x: x.update(),self.tabu_list))
+        self.tabu_list = [x for x in self.tabu_list if not x.remove()]
+    
+    
 
 
 
 class TS(Scheduler):
 
     def __init__(self, sol: Solution, meths_ch: List[Method], meths_rli: List[Method],
-                get_tabu_attribute: Callable, own_settings: dict = None, consider_initial_sol=False):
+                #get_tabu_attribute: Callable,
+                min_ll: int=5,max_ll: int=5,change_ll_iter: int=1,
+                own_settings: dict = None, consider_initial_sol=False):
         super().__init__(sol, meths_ch+meths_rli, own_settings, consider_initial_sol)
 
-        self.tabu_list = [] #init tabulist with min max iteration
+        self.tabu_list = TabuList(min_ll, max_ll, change_ll_iter)
         self.meths_ch = meths_ch
         self.meths_rli = meths_rli # restricted neighborhood search with best improvement
-        self.get_tabu_attribute = get_tabu_attribute # problem specific function which takes new and old solution and returns the tabu attribute
+        #self.get_tabu_attribute = get_tabu_attribute # problem specific function which takes new and old solution and returns the tabu attribute
 
 
     def update_tabu_list(self, sol: Solution, sol_old: Solution):

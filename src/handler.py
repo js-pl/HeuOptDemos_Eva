@@ -3,23 +3,21 @@ handler module which provides information for widgets in interface module and us
 to issue pymhlib calls
 """
 
-import sys
-sys.path.append('..\\HeuOptDemos_Eva')
-
 import os
 import logging
 import numpy as np
 import pandas as pd
 
-
 # pymhlib imports
-from pymhlib.settings import settings, parse_settings, seed_random_generators
-from pymhlib.log import init_logger
-import pymhlib.demos as demos
+
+from .pymhlib.settings import settings, parse_settings, seed_random_generators
+from .pymhlib.log import init_logger
+from .pymhlib import demos
+from .pymhlib.gvns import GVNS
 
 # module imports
-from src.problems import Problem, Algorithm, Option, MAXSAT, MISP, MyGVNS
-from src.logdata import get_log_data
+from .problems import Problem, Algorithm, Option, MAXSAT, MISP
+from .logdata import get_log_data
 
 
 if not settings.__dict__: parse_settings(args='')
@@ -28,13 +26,15 @@ if not settings.__dict__: parse_settings(args='')
 settings.mh_lfreq = 1
 settings.mh_out = "logs" + os.path.sep + "summary.log"
 settings.mh_log = "logs" + os.path.sep + "iter.log"
-init_logger()
+settings.mh_log_step = 'None'
+   
 
-logger_step = logging.getLogger("step-by-step")
-logger_step.setLevel(logging.INFO)
+
+#logger_step = logging.getLogger("step-by-step")
+#logger_step.setLevel(logging.INFO)
 instance_path = "instances" + os.path.sep
 demo_data_path = os.path.dirname(demos.__file__) + os.path.sep + 'data'
-
+step_log_path = "logs" + os.path.sep
 
 
 # initialize available problems
@@ -60,10 +60,12 @@ def get_options(prob: Problem, algo: Algorithm):
 
 def run_algorithm_visualisation(options: dict):
 
-    fh = logging.FileHandler(f"logs/{options['prob'].name.lower()}/{options['algo'].name.lower()}/{options['algo'].name.lower()}.log", mode="w")
-    logger_step.handlers = []
-    logger_step.addHandler(fh)
-    logger_step.info(f"{options['prob'].name}\n{options['algo'].name}")
+    #fh = logging.FileHandler(f"logs/{options['prob'].name.lower()}/{options['algo'].name.lower()}/{options['algo'].name.lower()}.log", mode="w")
+    #logger_step.handlers = []
+    #logger_step.addHandler(fh)
+    #logger_step.info(f"{options['prob'].name}\n{options['algo'].name}")
+    settings.mh_log_step = step_log_path + os.path.sep.join([options['prob'].name.lower(),options['algo'].name.lower(),options['algo'].name.lower()]) + ".log"
+    init_logger()
 
     settings.seed =  options.get('settings').get('seed',0)
     seed_random_generators()
@@ -79,15 +81,8 @@ def run_algorithm_visualisation(options: dict):
 
 def run_algorithm_comparison(config: dict):
 
-    iter_fh = logging.FileHandler(f"logs/iter.log", mode="w")
-    iter_logger = logging.getLogger("pymhlib_iter")
-    iter_logger.handlers = []
-    iter_logger.addHandler(iter_fh)
-
-    sum_fh = logging.FileHandler(f"logs/summary.log", mode="w")
-    sum_logger = logging.getLogger("pymhlib")
-    sum_logger.handlers = []
-    sum_logger.addHandler(sum_fh)
+    settings.mh_log_step = 'None'
+    init_logger()
 
     s = config['settings']
     file_path = demo_data_path + os.path.sep + config['inst'] + \
@@ -174,13 +169,13 @@ def run_gvns(solution, options: dict, visualisation: bool):
     li = [ prob.get_method(Algorithm.GVNS, Option.LI, m[0], m[1]) for m in options[Option.LI] ]
     sh = [ prob.get_method(Algorithm.GVNS, Option.SH, m[0], m[1]) for m in options[Option.SH] ]
     
-    ### the overwritten GVNS is called
-    alg = MyGVNS(solution, ch, li, sh, consider_initial_sol=True, logger_step=visualisation)
+    alg = GVNS(solution, ch, li, sh, consider_initial_sol=True)
 
     alg.run()
     alg.method_statistics()
     alg.main_results()
     logging.getLogger("pymhlib_iter").handlers[0].flush()
+
 
 
 def run_grasp(solution, options: dict, visualisation):
@@ -191,8 +186,7 @@ def run_grasp(solution, options: dict, visualisation):
     li = [ prob.get_method(Algorithm.GRASP, Option.LI, m[0], m[1]) for m in options[Option.LI] ]
     rgc = [ prob.get_method(Algorithm.GRASP, Option.RGC, m[0], m[1]) for m in options[Option.RGC] ]
 
-    ### the overwritten gvns is called
-    alg = MyGVNS(solution,ch,li,rgc,consider_initial_sol=True, logger_step=visualisation)
+    alg = GVNS(solution,ch,li,rgc,consider_initial_sol=True)
     alg.run()
     alg.method_statistics()
     alg.main_results()
