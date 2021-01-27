@@ -6,7 +6,7 @@ import sys
 
 import enum
 import time
-from .problems import Problem, Algorithm, Option
+from .problems import Configuration, Problem, Algorithm, Option
 from .pymhlib.demos.misp import MISPInstance
 from .pymhlib.demos.maxsat import MAXSATInstance
 
@@ -60,7 +60,7 @@ class LogData():
 
 def get_log_data(prob: str, alg: str):
 
-    filepath = (os.path.sep).join(['logs', prob, alg, alg+'.log'])
+    filepath = 'logs'+ os.path.sep + 'step.log'
     data = list()
     with open(filepath, 'r') as logfile:
         for line in logfile:
@@ -168,23 +168,23 @@ def cast_number(data: str):
         return float(data)
 
 
-def save_visualisation(params: dict, graph=None):
+def save_visualisation(params: Configuration, graph=None):
     # if instance==random, create instance file from graph, save in instance folder and keep filename
-    inst_filename = params['inst']
+    inst_filename = params.instance
     if inst_filename.startswith('random'):
         # for now only available for misp
-        if params['prob'].name == 'MISP':
+        if params.problem.name == 'MISP':
             inst_filename = save_misp_instance(graph)
 
     # get current log file according to problem and algo and copy content
-    logfile = os.path.sep.join( ['logs', params['prob'].name.lower(), params['algo'].name.lower(), params['algo'].name.lower() + '.log'] )
+    logfile = 'logs' + os.path.sep + 'step.log'
     with open(logfile, 'r') as source:
         timestamp = time.strftime('_%Y%m%d_%H%M%S')
-        with open(os.path.sep.join(['logs','saved',params['prob'].name.lower()+ '_' + params['algo'].name.lower() + timestamp + '.log']), 'w') as destination:
+        with open(os.path.sep.join(['logs','saved',params.problem.name.lower()+ '_' + params.algorithm.name.lower() + timestamp + '.log']), 'w') as destination:
             data = source.read()
             # prepend description block to log file (instance filename, options)
             destination.write('I: ' + inst_filename + '\n')
-            for k,v in params.items():
+            for k,v in params.options.items():
                 if type(k) == Option:
                     destination.writelines( [f'O: {k.name} {o}\n' for o in v] )
             destination.write(data)
@@ -194,7 +194,7 @@ def save_visualisation(params: dict, graph=None):
 
 def save_misp_instance(graph):
     filename = '_'.join(['gnm', str(graph.order()), str(graph.size()), time.strftime('%Y%m%d%H%M%S')]) + '.mis'
-    pathname = 'instances' + os.path.sep + 'misp' + os.path.sep + filename
+    pathname = 'instances' + os.path.sep + filename
     with open(pathname, 'w') as inst_file:
         inst_file.writelines(['c "source: networkx.gnm_random_graph()"\n', f'p edge {graph.order()} {graph.size()}\n'])
         for u,v in graph.edges():
@@ -216,7 +216,7 @@ def read_from_logfile(filename: str):
             data.append(cast_line(line.strip()))
         logfile.close()
     
-    instance_path = 'instances' + os.path.sep + data[0].lower() + os.path.sep + instance_file
+    instance_path = 'instances' + os.path.sep + instance_file
     inst = None
     if data[0] == 'misp':
         inst = MISPInstance(instance_path)

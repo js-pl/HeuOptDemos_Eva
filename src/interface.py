@@ -13,7 +13,7 @@ import statistics
 from IPython.display import display, display_html 
 import ipywidgets as widgets
 from . import handler
-from .problems import Problem, Algorithm, Option, InitSolution
+from .problems import Problem, Algorithm, Option, InitSolution, Configuration
 from . import plotting as p
 from .logdata import Log, LogData, save_visualisation, read_from_logfile, get_log_description
 from IPython.display import clear_output
@@ -75,7 +75,7 @@ class InterfaceVisualisation():
                 seed = widgets.IntText(description='seed', value=0)
                 iterations = widgets.IntText(description='iterations', value=100)
                 runs = widgets.IntText(description='runs',value=1,layout=widgets.Layout(display='None'))
-                use_runs = widgets.Checkbox(description='use previously generated runs',value=False,layout=widgets.Layout(display='None'))
+                use_runs = widgets.Checkbox(description='use saved runs',value=False,layout=widgets.Layout(display='None'))
                 seed.observe(on_change_settings,names='value')
                 iterations.observe(on_change_settings,names='value')
                 runs.observe(on_change_settings,names='value')
@@ -146,11 +146,11 @@ class InterfaceVisualisation():
 
 
         def run_visualisation(self, event):
-                params = dict()
+                params = None
                 log_data = list()
                 if self.mainSelection.value == 'load from log file':
                         log_data, instance = read_from_logfile(self.logfileWidget.value)
-                        params.update({'prob':Problem[log_data[0].upper()], 'algo':Algorithm[log_data[1].upper()]})
+                        params = Configuration(Problem[log_data[0].upper()].value, Algorithm[log_data[1].upper()].value, '')
                         
                 else:
                         params = self.prepare_parameters()
@@ -162,7 +162,7 @@ class InterfaceVisualisation():
                 # initialize graph from instance
                 with self.out:
                         self.out.clear_output()
-                        self.plot_instance = p.get_visualisation(params['prob'],params['algo'], instance)
+                        self.plot_instance = p.get_visualisation(params.problem,params.algorithm, instance)
                         widgets.interaction.show_inline_matplotlib_plots()
 
                 self.controls.children[1].value = 0
@@ -175,26 +175,27 @@ class InterfaceVisualisation():
                 self.save_button.disabled = self.mainSelection.value == 'load from log file' 
 
         def prepare_parameters(self):
-                # prepare current widget parameters for call to run algorithm
-                params = {'prob':Problem(self.problemWidget.value),
-                                'algo':Algorithm(self.algoWidget.value),
-                                'inst':'-'.join([str(c.value) for c in self.instanceBox.children])}
 
-                # store each option as list of tuples (<name>,<parameter>)
+                instance = '-'.join([str(c.value) for c in self.instanceBox.children])
+                params = Configuration(self.problemWidget.value, self.algoWidget.value, instance)
+
                 # extend if further options are needed
                 if Option.CH in self.optionsHandles:
-                        params[Option.CH] = [(self.optionsHandles.get(Option.CH).value, InitSolution[self.optionsHandles.get(Option.CH).value].value)]
+                        params.options[Option.CH] = [(self.optionsHandles.get(Option.CH).value, InitSolution[self.optionsHandles.get(Option.CH).value].value)]
                 if Option.LI in self.optionsHandles:
                         #TODO: make sure name splitting works if no 'k=' given (ok for now because k is always added)
-                        params[Option.LI] = [(name.split(',')[0], int(name.split('=')[1])) for name in list(self.optionsHandles.get(Option.LI).options)]
+                        params.options[Option.LI] = [(name.split(',')[0], int(name.split('=')[1])) for name in list(self.optionsHandles.get(Option.LI).options)]
                 if Option.SH in self.optionsHandles:
-                        params[Option.SH] = [(name.split(',')[0], int(name.split('=')[1])) for name in list(self.optionsHandles.get(Option.SH).options)]
+                        params.options[Option.SH] = [(name.split(',')[0], int(name.split('=')[1])) for name in list(self.optionsHandles.get(Option.SH).options)]
                 if Option.RGC in self.optionsHandles:
-                        params[Option.RGC] = [(self.optionsHandles[Option.RGC].children[0].value,self.optionsHandles[Option.RGC].children[1].value)]
+                        params.options[Option.RGC] = [(self.optionsHandles[Option.RGC].children[0].value,self.optionsHandles[Option.RGC].children[1].value)]
 
                 # add settings params
-                settings = {c.description:c.value for c in self.settingsWidget.children[0].children}
-                params['settings'] = settings
+                params.iterations = self.settingsWidget.children[0].children[0].value
+                params.seed = self.settingsWidget.children[0].children[1].value
+                if params.instance.startswith('random') and params.seed > 0 :
+                        params.instance += f'-{params.seed}'
+
                 return params
 
 
@@ -515,23 +516,20 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
         def save_runs(self,event):
 
                 checked = {config.description for config in self.line_checkboxes.children if config.value}
-                not_saved = {name for name,config in self.configurations.items() if config['settings']['runs'] > len(config['saved'])}
+                not_saved = {name for name,config in self.configurations.items() if config.runs > len(config.saved_runs)}
                 to_save = checked.intersection(not_saved)
 
                 for s in to_save:
                         config = self.configurations[s]
-                        runs = config['settings']['runs']
-                        seed = config['settings']['seed']
-                        iter = config['settings']['iterations']
                         description = self.create_configuration_description(config)
-                        name = f'i{iter}_s{seed}_' + s[s.find('.')+1:].strip()
+                        name = f'i{config.iterations}_s{config.seed}_' + s[s.find('.')+1:].strip()
                         filepath = self.configuration_exists_in_saved(name, description)
 
                         if filepath:
-                                if seed == 0:
+                                if config.seed == 0:
                                         self.save_to_logfile(config,filepath,append=True)
                                         return
-                                elif runs <= len(config['saved']):
+                                elif config.runs <= len(config.saved_runs):
                                         # do nothing, only existing runs were loaded
                                         return
                                 else:
@@ -539,34 +537,34 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                                         self.save_to_logfile(config,filepath)
                                         return
                         # create new file and write to it
-                        filepath = 'logs'+ os.path.sep + 'saved_runtime' + os.path.sep + config['prob'].name.lower() + os.path.sep +\
-                                          f'r{runs}_' + name + '_' + time.strftime('_%Y%m%d_%H%M%S') + '.log'
+                        filepath = 'logs'+ os.path.sep + 'saved_runtime' + os.path.sep + config.problem.name.lower() + os.path.sep +\
+                                          f'r{config.runs}_' + name + '_' + time.strftime('_%Y%m%d_%H%M%S') + '.log'
                         self.save_to_logfile(config,filepath,description=description)
 
                                         
                                 
-        def save_to_logfile(self, config: dict, filepath: str, description: str=None, append: bool=False):
+        def save_to_logfile(self, config: Configuration, filepath: str, description: str=None, append: bool=False):
                 mode = 'w' if description else 'r+'
                 f = open(filepath, mode)
 
                 if description:
                         f.write(description+'\n')
-                        df = self.iteration_df[config['name']].T
+                        df = self.iteration_df[config.name].T
                         df.to_csv(f,sep=' ',na_rep='NaN', mode='a', line_terminator='\n')
                         f.write('S summary\n')
-                        self.summaries[config['name']].to_csv(f,na_rep='NaN', sep=' ',mode='a',line_terminator='\n')
+                        self.summaries[config.name].to_csv(f,na_rep='NaN', sep=' ',mode='a',line_terminator='\n')
                         f.close()
                 else:
-                        saved_runs = set(config['saved'])
-                        runs = set(range(1,config['settings']['runs']+1))
+                        saved_runs = set(config.saved_runs)
+                        runs = set(range(1,config.runs+1))
                         to_save = list(runs - saved_runs)
                         to_save.sort()
                         if len(to_save) == 0:
                                 f.close()
                                 return
                         data = f.readlines()
-                        df = self.iteration_df[config['name']][to_save].T
-                        sm = self.summaries[config['name']].loc[to_save]
+                        df = self.iteration_df[config.name][to_save].T
+                        sm = self.summaries[config.name].loc[to_save]
                         existing_runs =int(data[0].split('=')[1].strip())
                         if append: #seed==0
 
@@ -588,7 +586,7 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                                 if len(runs) <= existing_runs:
                                         f.close()
                                         return
-                                data[0] = f"R runs={config['settings']['runs']}\n"
+                                data[0] = f"R runs={config.runs}\n"
                                 idx = next((i for i,v in enumerate(data) if not v[0] in ['R','D']), 0)
                                 data = data[:idx]
                                 data += [df.to_csv(sep=' ',line_terminator='\n')]
@@ -601,7 +599,7 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
 
                                 os.rename(filepath,filepath.replace(f'r{existing_runs}',f'r{len(to_save)}',1))
                                 
-                self.configurations[config['name']].update({'saved':list(range(1,config['settings']['runs']+1))})
+                self.configurations[config.name].saved_runs = list(range(1,config.runs+1))
 
 
         def configuration_exists_in_saved(self, name: str, description: str):
@@ -625,20 +623,16 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                 return False
         
 
-        def create_configuration_description(self, config: dict):
-                s = f"R runs={config['settings']['runs']}\n"
-                s += f'D inst={config["inst"]}\n'
-                s += f"D seed={config['settings']['seed']}\n"
-                s += f"D iterations={config['settings']['iterations']}\n"
+        def create_configuration_description(self, config: Configuration):
+                s = f"R runs={config.runs}\n"
+                s += f'D inst={config.instance}\n'
+                s += f"D seed={config.seed}\n"
+                s += f"D iterations={config.iterations}\n"
 
-                for o in config.get(Option.CH,[]):
-                        s += f'D CH{o}\n'
-                for o in config.get(Option.LI,[]):
-                        s += f'D LI{o}\n'
-                for o in config.get(Option.SH,[]):
-                        s += f'D SH{o}\n'
-                for o in config.get(Option.RGC,[]):
-                        s += f'D RGC{o}\n'
+                for o,v in config.options.items():
+                        v = v if type(v) == list else [v]
+                        for i in v:
+                                s += f'D {o.name}{i}\n'
 
                 return s.strip()
                 
@@ -671,10 +665,10 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                 self.run_button.disabled = False
 
                 self.iteration_df = pd.concat([self.iteration_df,log_df], axis=1)
-                self.summaries[params['name']] = summary
+                self.summaries[params.name] = summary
 
                 # add name to checkbox list
-                self.line_checkboxes.children +=(self.init_checkbox(params['name']),)
+                self.line_checkboxes.children +=(self.init_checkbox(params.name),)
                 #self.iter_slider.layout.visibility = 'visible'
                 self.plot_options.layout.visibility = 'visible'
 
@@ -684,33 +678,33 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                 self.plot_comparison(self.iter_slider.value)
 
 
-        def load_datafile_or_run_algorithm(self,params: dict):
-                settings = params['settings']
-                if settings['use previously generated runs']:
-                        name = f'i{settings["iterations"]}_s{settings["seed"]}_' +params['name'][params['name'].find('.')+1:].strip()
+        def load_datafile_or_run_algorithm(self,params: Configuration):
+                #settings = params['settings']
+                if params.use_runs:
+                        name = f'i{params.iterations}_s{params.seed}_' + params.name[params.name.find('.')+1:].strip()
                         description = self.create_configuration_description(params)
                         file_name = self.configuration_exists_in_saved(name,description)
                         if file_name:
                                 f = open(file_name, 'r')
                                 ex_runs = int(f.readline().split('=')[1].strip())
-                                if settings['runs'] <= ex_runs:
-                                        data, sm = self.load_datafile(file_name,settings['runs'])
-                                        data.columns = pd.MultiIndex.from_tuples(zip([params['name']]*len(data.columns), data.columns))
-                                        self.configurations[params['name']].update({'saved':list(data.columns.get_level_values(1))})
+                                if params.runs <= ex_runs:
+                                        data, sm = self.load_datafile(file_name,params.runs)
+                                        data.columns = pd.MultiIndex.from_tuples(zip([params.name]*len(data.columns), data.columns))
+                                        self.configurations[params.name].saved_runs = list(data.columns.get_level_values(1))
                                         return data, sm
-                                if settings['seed'] == 0:
-                                        runs = settings['runs']
+                                if params.seed == 0:
+                                        runs = params.runs
                                         # load existing runs
                                         data, sm = self.load_datafile(file_name,ex_runs)
-                                        data.columns = pd.MultiIndex.from_tuples(zip([params['name']]*len(data.columns), data.columns))
+                                        data.columns = pd.MultiIndex.from_tuples(zip([params.name]*len(data.columns), data.columns))
                                         # generate runs-ex_runs new ones and set correct run numbers
-                                        params['settings'].update({'runs':runs-ex_runs})
+                                        params.runs = runs-ex_runs
                                         new_data, new_sm = handler.run_algorithm_comparison(params)
-                                        params['settings'].update({'runs':runs})
+                                        params.runs = runs
                                         new_data.columns = pd.MultiIndex.from_tuples([(n,int(r)+ex_runs) for (n,r) in new_data.columns])
                                         new_sm.index = pd.MultiIndex.from_tuples([(int(r)+ex_runs,m) for (r,m) in new_sm.index])
 
-                                        self.configurations[params['name']].update({'saved':list(data.columns.get_level_values(1))})
+                                        self.configurations[params.name].saved_runs = list(data.columns.get_level_values(1))
                                         # concatenate them
                                         return pd.concat([data,new_data],axis=1),pd.concat([sm,new_sm])
                                 
@@ -756,8 +750,10 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
 
         def prepare_parameters(self):
                 params = super().prepare_parameters()
-                name = [f'{params.get("algo").name.lower()}']
-                for k,v in params.items():
+                params.runs = self.settingsWidget.children[0].children[2].value
+                params.use_runs = self.settingsWidget.children[0].children[3].value
+                name = [f'{params.algorithm.name.lower()}']
+                for k,v in params.options.items():
                         if not type(k) == Option or len(v) == 0:
                                 continue
                         o = k.name.lower()+ '-' + '-'.join([str(p[1]) for p in v])
@@ -765,9 +761,8 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                         name += [o]
 
                 count = len(self.line_checkboxes.children) + 1
-                params['name'] = str(count) + '. ' + '_'.join(name)
-                params['saved'] = []
-                self.configurations[params['name']] = params
+                params.name = str(count) + '. ' + '_'.join(name)
+                self.configurations[params.name] = params
                 return params
 
 
@@ -811,7 +806,7 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                                 if 'median' in lines:
                                         m = df.median(axis=1)
                                         m.plot(color=col, ax=ax,linestyle='dashed')
-                                legend_handles += [Line2D([0],[0],color=col,label=c + f' (n={len(self.iteration_df[c].columns)},s={self.configurations[c]["settings"]["seed"]})')]
+                                legend_handles += [Line2D([0],[0],color=col,label=c + f' (n={len(self.iteration_df[c].columns)},s={self.configurations[c].seed})')]
                         loc = ''
                         best = None
 

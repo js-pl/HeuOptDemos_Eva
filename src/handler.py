@@ -9,44 +9,35 @@ import numpy as np
 import pandas as pd
 
 # pymhlib imports
-
 from .pymhlib.settings import settings, parse_settings, seed_random_generators
 from .pymhlib.log import init_logger
 from .pymhlib import demos
 from .pymhlib.gvns import GVNS
 
 # module imports
-from .problems import Problem, Algorithm, Option, MAXSAT, MISP
+from .problems import Problem, Algorithm, Option, MAXSAT, MISP, Configuration, ProblemDefinition
 from .logdata import get_log_data
 
 
 if not settings.__dict__: parse_settings(args='')
 
-# TODO: pymhlib settings
+# pymhlib settings
 settings.mh_lfreq = 1
 settings.mh_out = "logs" + os.path.sep + "summary.log"
 settings.mh_log = "logs" + os.path.sep + "iter.log"
 settings.mh_log_step = 'None'
-   
 
-
-#logger_step = logging.getLogger("step-by-step")
-#logger_step.setLevel(logging.INFO)
-instance_path = "instances" + os.path.sep
+vis_instance_path = "instances" + os.path.sep
 demo_data_path = os.path.dirname(demos.__file__) + os.path.sep + 'data'
-step_log_path = "logs" + os.path.sep
+step_log_path = "logs" + os.path.sep + "step.log"
 
 
-# initialize available problems
-problems = {
-            Problem.MAXSAT: MAXSAT(),
-            Problem.MISP: MISP()
-            }
-
+# get available problems
+problems = {p.name: p for p in [prob() for prob in ProblemDefinition.__subclasses__()]}
 
 # methods used by module interface to extract information for widgets
 def get_problems():
-    return [p.value for p,_ in problems.items()]
+    return [p.value for p in problems.keys()]
 
 def get_instances(prob: Problem,visualisation):
     return problems[prob].get_instances(visualisation)
@@ -58,45 +49,33 @@ def get_options(prob: Problem, algo: Algorithm):
     return problems[prob].get_options(algo)
 
 
-def run_algorithm_visualisation(options: dict):
+def run_algorithm_visualisation(config: Configuration):
 
-    #fh = logging.FileHandler(f"logs/{options['prob'].name.lower()}/{options['algo'].name.lower()}/{options['algo'].name.lower()}.log", mode="w")
-    #logger_step.handlers = []
-    #logger_step.addHandler(fh)
-    #logger_step.info(f"{options['prob'].name}\n{options['algo'].name}")
-    settings.mh_log_step = step_log_path + os.path.sep.join([options['prob'].name.lower(),options['algo'].name.lower(),options['algo'].name.lower()]) + ".log"
+    settings.mh_log_step = step_log_path 
     init_logger()
 
-    settings.seed =  options.get('settings').get('seed',0)
+    settings.seed =  config.seed
     seed_random_generators()
 
-    file_path = instance_path + problems[options['prob']].name + os.path.sep + options['inst']
-    if options['inst'].startswith('random'):
-        file_path = options['inst']
-
-    solution = run_algorithm(options, file_path)
-    return get_log_data(options['prob'].name.lower(), options['algo'].name.lower()), solution.inst
+    solution = run_algorithm(config,True)
+    return get_log_data(config.problem.name.lower(), config.algorithm.name.lower()), solution.inst
 
 
 
-def run_algorithm_comparison(config: dict):
+def run_algorithm_comparison(config: Configuration):
 
     settings.mh_log_step = 'None'
     init_logger()
-
-    s = config['settings']
-    file_path = demo_data_path + os.path.sep + config['inst'] + \
-        (f'-{s["seed"]}' if config['inst'].startswith('random') and s['seed'] > 0 else '')
-    name = config['name']
- 
-    settings.seed =  s.get('seed',0)
+    settings.seed =  config.seed
     seed_random_generators()
-    for i in range(s.get('runs',1)):
-        _ = run_algorithm(config, file_path, visualisation=False)
-    log_df = read_iter_log(name)
+
+    for i in range(config.runs):
+        _ = run_algorithm(config)
+    log_df = read_iter_log(config.name)
     summary = read_sum_log()
 
     return log_df, summary
+
 
 def read_sum_log():
     idx = []
@@ -140,34 +119,31 @@ def read_iter_log(name):
        
         return full
 
-        
 
 
-def run_algorithm(options: dict, file_path: str, visualisation=True):
+def run_algorithm(config: Configuration, visualisation: bool=False):
 
-    if options.get('settings', False):
-        settings.mh_titer = options['settings'].get('iterations',100)
-
+    settings.mh_titer = config.iterations
 
     # initialize solution for problem
-    solution = problems[options['prob']].get_solution(file_path)
+    solution = problems[config.problem].get_solution(config.get_inst_path(visualisation))
 
     # run specified algorithm
-    if options['algo'] == Algorithm.GVNS:
-        run_gvns(solution, options, visualisation)
+    if config.algorithm == Algorithm.GVNS:
+        run_gvns(solution, config)
 
-    if options['algo'] == Algorithm.GRASP:
-        run_grasp(solution, options, visualisation)
+    if config.algorithm == Algorithm.GRASP:
+        run_grasp(solution, config)
         
     return solution
 
 
-def run_gvns(solution, options: dict, visualisation: bool):
+def run_gvns(solution, config: Configuration):
 
-    prob = problems[options['prob']]
-    ch = [ prob.get_method(Algorithm.GVNS, Option.CH, m[0], m[1]) for m in options[Option.CH] ]
-    li = [ prob.get_method(Algorithm.GVNS, Option.LI, m[0], m[1]) for m in options[Option.LI] ]
-    sh = [ prob.get_method(Algorithm.GVNS, Option.SH, m[0], m[1]) for m in options[Option.SH] ]
+    prob = problems[config.problem]
+    ch = [ prob.get_method(Algorithm.GVNS, Option.CH, m[0], m[1]) for m in config.options[Option.CH] ]
+    li = [ prob.get_method(Algorithm.GVNS, Option.LI, m[0], m[1]) for m in config.options[Option.LI] ]
+    sh = [ prob.get_method(Algorithm.GVNS, Option.SH, m[0], m[1]) for m in config.options[Option.SH] ]
     
     alg = GVNS(solution, ch, li, sh, consider_initial_sol=True)
 
@@ -178,13 +154,13 @@ def run_gvns(solution, options: dict, visualisation: bool):
 
 
 
-def run_grasp(solution, options: dict, visualisation):
+def run_grasp(solution, config: Configuration):
     
-    prob = problems[options['prob']]
+    prob = problems[config.problem]
 
     ch = []
-    li = [ prob.get_method(Algorithm.GRASP, Option.LI, m[0], m[1]) for m in options[Option.LI] ]
-    rgc = [ prob.get_method(Algorithm.GRASP, Option.RGC, m[0], m[1]) for m in options[Option.RGC] ]
+    li = [ prob.get_method(Algorithm.GRASP, Option.LI, m[0], m[1]) for m in config.options[Option.LI] ]
+    rgc = [ prob.get_method(Algorithm.GRASP, Option.RGC, m[0], m[1]) for m in config.options[Option.RGC] ]
 
     alg = GVNS(solution,ch,li,rgc,consider_initial_sol=True)
     alg.run()
@@ -196,12 +172,12 @@ def run_grasp(solution, options: dict, visualisation):
 
 # only used for debugging
 if __name__ == '__main__':
-        filepath = instance_path + 'maxsat' + os.path.sep + 'cnf_7_50.cnf'
+        filepath = vis_instance_path + 'maxsat' + os.path.sep + 'cnf_7_50.cnf'
         _ = run_algorithm_visualisation({'prob':Problem.MAXSAT, Option.CH:[('random',0)], 'inst':'cnf_7_50.cnf','algo':Algorithm.GRASP,
            Option.LI:[('two-exchange random fill neighborhood search',2)],
           Option.RGC:[('k-best',5)]})
 
-        #print(log_data)
+
 
 
 
