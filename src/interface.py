@@ -2,10 +2,11 @@
 module which builds all necessary widgets for visualisation and runtime analysis based on information received from handler/logdata module
 
 """
+import sys
+sys.path.append("C:/Users/Eva/Desktop/BakkArbeit/pymhlib")
 
-
-from .pymhlib.demos.maxsat import MAXSATInstance, MAXSATSolution
-from .pymhlib.demos.misp import MISPInstance, MISPSolution
+from pymhlib.demos.maxsat import MAXSATInstance, MAXSATSolution
+from pymhlib.demos.misp import MISPInstance, MISPSolution
 
 import networkx as nx
 import matplotlib.pyplot as plt

@@ -1,18 +1,13 @@
 import sys
-import sys
+sys.path.append("C:/Users/Eva/Desktop/BakkArbeit/pymhlib")
+from pymhlib.scheduler import Method, Scheduler
+from pymhlib.settings import get_settings_parser, settings
+from pymhlib.solution import Solution
+from pymhlib.demos.maxsat import MAXSATInstance, MAXSATSolution
+
 import os
-
-
-# for testing
-from .pymhlib.demos.maxsat import MAXSATInstance, MAXSATSolution
-########
-
-
 from typing import List, Callable, Any
 import time
-from .pymhlib.scheduler import Method, Scheduler
-from .pymhlib.settings import get_settings_parser, settings
-from .pymhlib.solution import Solution
 import random as rd
 
 

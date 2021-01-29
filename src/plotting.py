@@ -1,4 +1,7 @@
-
+import sys
+sys.path.append("C:/Users/Eva/Desktop/BakkArbeit/pymhlib")
+from pymhlib.demos.maxsat import MAXSATInstance
+from pymhlib.demos.misp import MISPInstance
 
 import matplotlib.image as mpimg
 import os
@@ -6,8 +9,7 @@ import networkx as nx
 import numpy as np
 import matplotlib.pyplot as plt
 import statistics
-from .pymhlib.demos.maxsat import MAXSATInstance
-from .pymhlib.demos.misp import MISPInstance
+
 from .problems import Problem, Algorithm, Option
 from abc import ABC, abstractmethod
 from .logdata import read_from_logfile

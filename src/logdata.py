@@ -1,14 +1,17 @@
+import sys
+sys.path.append("C:/Users/Eva/Desktop/BakkArbeit/pymhlib")
+from pymhlib.demos.misp import MISPInstance
+from pymhlib.demos.maxsat import MAXSATInstance
+
 
 import ast
 import re
 import os
-import sys
+
 
 import enum
 import time
 from .problems import Configuration, Problem, Algorithm, Option
-from .pymhlib.demos.misp import MISPInstance
-from .pymhlib.demos.maxsat import MAXSATInstance
 
 class Log(enum.Enum):
         StepInter = 'step-by-step (intermediate steps)' # start-frame and end-frame for each step
@@ -20,6 +23,7 @@ class Log(enum.Enum):
 # global variables
 len_start = 7
 len_end = 8
+step_log_path = 'logs'+ os.path.sep + 'step.log'
 
 
 class LogData():
@@ -60,9 +64,8 @@ class LogData():
 
 def get_log_data(prob: str, alg: str):
 
-    filepath = 'logs'+ os.path.sep + 'step.log'
     data = list()
-    with open(filepath, 'r') as logfile:
+    with open(step_log_path, 'r') as logfile:
         for line in logfile:
             data.append(cast_line(line.strip()))
         logfile.close()

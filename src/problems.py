@@ -1,11 +1,16 @@
+import sys
+sys.path.append("C:/Users/Eva/Desktop/BakkArbeit/pymhlib")
+from pymhlib.demos.maxsat import MAXSATInstance, MAXSATSolution
+from pymhlib.demos.misp import MISPInstance, MISPSolution
+from pymhlib.scheduler import Method
+from pymhlib import demos
+
+
 import enum
 import os
 from abc import ABC, abstractmethod
 
-from .pymhlib.demos.maxsat import MAXSATInstance, MAXSATSolution
-from .pymhlib.demos.misp import MISPInstance, MISPSolution
-from .pymhlib.scheduler import Method
-from .pymhlib import demos
+
 
 
 demo_data_path = os.path.dirname(demos.__file__) + os.path.sep + 'data' + os.path.sep
@@ -19,6 +24,7 @@ class Problem(enum.Enum):
 class Algorithm(enum.Enum):
     GVNS = 'GVNS'
     GRASP = 'GRASP'
+    TS = 'Tabu Search'
 
 class Option(enum.Enum):
     CH = 'Initial Solution'
@@ -52,6 +58,8 @@ class Parameters():
 
     def get_method(self, opt: Option, par=None):
         param = par if par != None else self.value
+        if self.callback == None:
+            return None
         return Method(f'{opt.name.lower()}{param if param != None else ""}', self.callback, param)
 
 
@@ -145,6 +153,13 @@ class MAXSAT(ProblemDefinition):
                                 Option.LI: [Parameters('k-flip neighborhood search', MAXSATSolution.local_improve, param_type=int)],
                                 Option.RGC: [Parameters('k-best', MAXSATSolution.greedy_randomized_construction, param_type=int),
                                                 Parameters('alpha', MAXSATSolution.greedy_randomized_construction, param_type=float)]
+                                },
+                    Algorithm.TS: {
+                                    Option.CH: [Parameters(InitSolution.random.name, MAXSATSolution.construct),
+                                            Parameters(InitSolution.greedy.name, MAXSATSolution.construct_greedy, value=InitSolution.greedy.value)
+                                            ],
+                                Option.LI: [Parameters('k-flip neighborhood search', MAXSATSolution.local_improve, param_type=int)],
+                                Option.TL: [Parameters('min length',None,int),Parameters('max length',None,int),Parameters('change (iteration)', None,int)]
                                 }
                     }
 

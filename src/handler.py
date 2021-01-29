@@ -2,6 +2,8 @@
 handler module which provides information for widgets in interface module and uses widget input
 to issue pymhlib calls
 """
+import sys
+sys.path.append("C:/Users/Eva/Desktop/BakkArbeit/pymhlib")
 
 import os
 import logging
@@ -9,10 +11,10 @@ import numpy as np
 import pandas as pd
 
 # pymhlib imports
-from .pymhlib.settings import settings, parse_settings, seed_random_generators
-from .pymhlib.log import init_logger
-from .pymhlib import demos
-from .pymhlib.gvns import GVNS
+from pymhlib.settings import settings, parse_settings, seed_random_generators
+from pymhlib.log import init_logger
+from pymhlib import demos
+from pymhlib.gvns import GVNS
 
 # module imports
 from .problems import Problem, Algorithm, Option, MAXSAT, MISP, Configuration, ProblemDefinition
@@ -79,13 +81,13 @@ def run_algorithm_comparison(config: Configuration):
 
 def read_sum_log():
     idx = []
-    with open('logs' + os.path.sep + 'summary.log') as f: 
+    with open(settings.mh_out) as f: 
         for i, line in enumerate(f):
             if not line.startswith('S '):
                 idx.append(i)
         f.close()
         
-    df = pd.read_csv('logs' + os.path.sep + 'summary.log',sep=r'\s+',skiprows=idx)
+    df = pd.read_csv(settings.mh_out, sep=r'\s+',skiprows=idx)
     df.drop(labels=['S'], axis=1,inplace=True)
     idx = df[ df['method'] == 'method' ].index
     df.drop(idx , inplace=True)
@@ -99,7 +101,7 @@ def read_sum_log():
 
 def read_iter_log(name):
 
-        df = pd.read_csv('logs' + os.path.sep + 'iter.log', sep=r'\s+', header=None)
+        df = pd.read_csv(settings.mh_log, sep=r'\s+', header=None)
 
         df.drop(df[ df[1] == '0' ].index , inplace=True) #drop initialisation line
         df = df[4].reset_index().drop(columns='index') #extract 'obj_new'
