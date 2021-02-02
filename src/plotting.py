@@ -392,8 +392,8 @@ class MAXSATDraw(Draw):
                                         fulfilled.add(n)
                                         self.graph.nodes[n]['color'] = 'green'
                                         break
-                                #  else:
-                                #         self.graph.nodes[n]['color'] = 'lightgray'
+                                else:
+                                        self.graph.nodes[n]['color'] = 'lightgray'
 
                 if literals:
                         num_literals = dict.fromkeys(clauses,0)
