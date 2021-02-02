@@ -190,7 +190,8 @@ class InterfaceVisualisation():
                         params.options[Option.SH] = [(name.split(',')[0], int(name.split('=')[1])) for name in list(self.optionsHandles.get(Option.SH).options)]
                 if Option.RGC in self.optionsHandles:
                         params.options[Option.RGC] = [(self.optionsHandles[Option.RGC].children[0].value,self.optionsHandles[Option.RGC].children[1].value)]
-
+                if Option.TL in self.optionsHandles:
+                        params.options[Option.TL] = [(o.description,o.value) for o in self.optionsHandles[Option.TL].children[1:]]
                 # add settings params
                 params.iterations = self.settingsWidget.children[0].children[0].value
                 params.seed = self.settingsWidget.children[0].children[1].value
@@ -244,6 +245,7 @@ class InterfaceVisualisation():
                 self.algoWidget.observe(self.on_change_algo, names='value')
                 self.optionsWidget.children = self.get_options(Algorithm(self.algoWidget.value))
 
+
                 self.save_button = widgets.Button(description='Save Visualisation', disabled=True)
                 self.save_button.on_click(self.on_click_save)
                 optionsBox = widgets.VBox([self.settingsWidget, self.problemWidget,self.instanceBox,self.algoWidget,self.optionsWidget])
@@ -273,6 +275,8 @@ class InterfaceVisualisation():
                         return self.get_gvns_options(options)
                 if algo == Algorithm.GRASP:
                         return self.get_grasp_options(options)
+                if algo == Algorithm.TS:
+                        return self.get_ts_options(options)
                 return ()
 
 
@@ -317,6 +321,45 @@ class InterfaceVisualisation():
 
                 return (li_box,rcl_box)
 
+        def get_ts_options(self, options: dict):
+
+                ch = widgets.Dropdown( options = [m[0] for m in options[Option.CH]],
+                        description = Option.CH.value)
+                self.optionsHandles[Option.CH] = ch
+                ch_box = widgets.VBox([ch])
+                li_box = self.get_neighborhood_options(options, Option.LI)
+                min_ll = widgets.IntText(value=5,description='min length', layout=widgets.Layout(width='150px'), disabled=True)
+                max_ll = widgets.IntText(value=5,description='max length', layout=widgets.Layout(width='150px'))
+                change_ll = widgets.IntText(value=0,description='change (iteration)', layout=widgets.Layout(width='150px'))
+                
+                def on_change_list_options(change):
+                        if change.owner.description.startswith('min'):
+                                if change.new > max_ll.value:
+                                        min_ll.value = max_ll.value
+                                if change.new <= 0:
+                                        min_ll.value = 1
+                        if change.owner.description.startswith('max'):
+                                if change.new < min_ll.value:
+                                        max_ll.value = min_ll.value
+                                if change.new <= 0:
+                                        max_ll.value = 1
+                        if change.owner.description.startswith('change'):
+                                if change.new < 0:
+                                        change_ll.value = 0
+                                if change.new > 0:
+                                        min_ll.disabled = False
+                                if change.new == 0:
+                                        min_ll.disabled = True
+                
+
+                min_ll.observe(on_change_list_options, names='value')
+                max_ll.observe(on_change_list_options, names='value')
+                change_ll.observe(on_change_list_options, names='value')
+                label = widgets.Label(value='Tabu List')
+                ll_box = widgets.HBox([label,min_ll,max_ll,change_ll])
+                self.optionsHandles[Option.TL] = ll_box
+
+                return (ch_box,li_box,ll_box)
 
         # helper functions to create widget box for li/sh neighborhoods
         def get_neighborhood_options(self, options: dict, phase: Option):

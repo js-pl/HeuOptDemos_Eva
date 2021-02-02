@@ -158,7 +158,7 @@ class MAXSAT(ProblemDefinition):
                                     Option.CH: [Parameters(InitSolution.random.name, MAXSATSolution.construct),
                                             Parameters(InitSolution.greedy.name, MAXSATSolution.construct_greedy, value=InitSolution.greedy.value)
                                             ],
-                                Option.LI: [Parameters('k-flip neighborhood search', MAXSATSolution.local_improve, param_type=int)],
+                                Option.LI: [Parameters('k-flip neighborhood search', MAXSATSolution.k_flip_neighborhood_search, param_type=int)],
                                 Option.TL: [Parameters('min length',None,int),Parameters('max length',None,int),Parameters('change (iteration)', None,int)]
                                 }
                     }

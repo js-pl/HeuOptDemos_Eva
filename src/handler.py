@@ -15,6 +15,7 @@ from pymhlib.settings import settings, parse_settings, seed_random_generators
 from pymhlib.log import init_logger
 from pymhlib import demos
 from pymhlib.gvns import GVNS
+from pymhlib.ts import TS
 
 # module imports
 from .problems import Problem, Algorithm, Option, MAXSAT, MISP, Configuration, ProblemDefinition
@@ -136,6 +137,9 @@ def run_algorithm(config: Configuration, visualisation: bool=False):
 
     if config.algorithm == Algorithm.GRASP:
         run_grasp(solution, config)
+
+    if config.algorithm == Algorithm.TS:
+        run_ts(solution, config)
         
     return solution
 
@@ -165,6 +169,20 @@ def run_grasp(solution, config: Configuration):
     rgc = [ prob.get_method(Algorithm.GRASP, Option.RGC, m[0], m[1]) for m in config.options[Option.RGC] ]
 
     alg = GVNS(solution,ch,li,rgc,consider_initial_sol=True)
+    alg.run()
+    alg.method_statistics()
+    alg.main_results()
+    logging.getLogger("pymhlib_iter").handlers[0].flush()
+
+
+def run_ts(solution, config: Configuration):
+
+    prob = problems[config.problem]
+    ch = [ prob.get_method(Algorithm.TS, Option.CH, m[0], m[1]) for m in config.options[Option.CH] ]
+    li = [ prob.get_method(Algorithm.TS, Option.LI, m[0], m[1]) for m in config.options[Option.LI] ]
+    mini, maxi, change = config.options[Option.TL][0][1], config.options[Option.TL][1][1], config.options[Option.TL][2][1]
+
+    alg = TS(solution, ch, li, mini, maxi, change)
     alg.run()
     alg.method_statistics()
     alg.main_results()
