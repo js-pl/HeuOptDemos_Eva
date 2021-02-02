@@ -330,33 +330,35 @@ class InterfaceVisualisation():
                 li_box = self.get_neighborhood_options(options, Option.LI)
                 min_ll = widgets.IntText(value=5,description='min length', layout=widgets.Layout(width='150px'), disabled=True)
                 max_ll = widgets.IntText(value=5,description='max length', layout=widgets.Layout(width='150px'))
-                change_ll = widgets.IntText(value=0,description='change (iteration)', layout=widgets.Layout(width='150px'))
+                iter_ll = widgets.IntText(value=0,description='change (iteration)', layout=widgets.Layout(width='150px'))
                 
-                def on_change_list_options(change):
-                        if change.owner.description.startswith('min'):
-                                if change.new > max_ll.value:
-                                        min_ll.value = max_ll.value
-                                if change.new <= 0:
-                                        min_ll.value = 1
-                        if change.owner.description.startswith('max'):
-                                if change.new < min_ll.value:
-                                        max_ll.value = min_ll.value
-                                if change.new <= 0:
-                                        max_ll.value = 1
-                        if change.owner.description.startswith('change'):
-                                if change.new < 0:
-                                        change_ll.value = 0
-                                if change.new > 0:
-                                        min_ll.disabled = False
-                                if change.new == 0:
-                                        min_ll.disabled = True
+                def on_change_min(change):
+                        if change.new > max_ll.value:
+                                min_ll.value = max_ll.value
+                        if change.new <= 0:
+                                min_ll.value = 1
+                def on_change_max(change):
+                        if change.new < min_ll.value and iter_ll.value > 0:
+                                max_ll.value = min_ll.value
+                        if change.new <= 0:
+                                max_ll.value = 1
+                        if iter_ll.value == 0:
+                                min_ll.value = max_ll.value
+                def on_change_iter(change):
+                        if change.new < 0:
+                                iter_ll.value = 0
+                        if change.new > 0:
+                                min_ll.disabled = False
+                        if change.new == 0:
+                                min_ll.value = max_ll.value
+                                min_ll.disabled = True
                 
 
-                min_ll.observe(on_change_list_options, names='value')
-                max_ll.observe(on_change_list_options, names='value')
-                change_ll.observe(on_change_list_options, names='value')
+                min_ll.observe(on_change_min, names='value')
+                max_ll.observe(on_change_max, names='value')
+                iter_ll.observe(on_change_iter, names='value')
                 label = widgets.Label(value='Tabu List')
-                ll_box = widgets.HBox([label,min_ll,max_ll,change_ll])
+                ll_box = widgets.HBox([label,min_ll,max_ll,iter_ll])
                 self.optionsHandles[Option.TL] = ll_box
 
                 return (ch_box,li_box,ll_box)
