@@ -151,7 +151,8 @@ class InterfaceVisualisation():
                 log_data = list()
                 if self.mainSelection.value == 'load from log file':
                         log_data, instance = read_from_logfile(self.logfileWidget.value)
-                        params = Configuration(Problem[log_data[0].upper()].value, Algorithm[log_data[1].upper()].value, '')
+                        params = Configuration(Problem[log_data[0]].value, Algorithm[log_data[1]].value, '')
+                        log_data = log_data[2:]
                         
                 else:
                         params = self.prepare_parameters()
@@ -167,7 +168,7 @@ class InterfaceVisualisation():
                         widgets.interaction.show_inline_matplotlib_plots()
 
                 self.controls.children[1].value = 0
-                self.controls.children[0].max = self.controls.children[1].max = len(self.log_data.log_data) - 3
+                self.controls.children[0].max = self.controls.children[1].max = len(self.log_data.log_data) -1
                 self.controls.children[4].value = Log.StepInter.value
 
                 # start drawing

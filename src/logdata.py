@@ -36,7 +36,7 @@ class LogData():
 
     def init_levels(self):
         levels = dict()
-        levels[Log.StepInter] = list(range(2, len(self.full_data)))
+        levels[Log.StepInter] = list(range(len(self.full_data)))
         levels[Log.StepNoInter] = [i for i in levels[Log.StepInter] if self.full_data[i].get('status') != 'start']
         levels[Log.NewInc] = [i for i in levels[Log.StepNoInter] if self.full_data[i].get('better',False)]
         update = list()
@@ -69,54 +69,60 @@ def get_log_data(prob: str, alg: str):
         for line in logfile:
             data.append(cast_line(line.strip()))
         logfile.close()
-    
+
     return create_log_data(data)
 
 
 def create_log_data(data: list()):
 
-    vis_data = data[:2]
-    i = 2
+    vis_data = []
+    i = 0
     while i < len(data):
-        # find slice from start to end
-        if data[i] == 'end_iter':
-            vis_data[-1]['end'] = True
-            i += 1
-            if i >= len(data):
-                break
+
         start = i
         while not data[start] == 'start':
             start += 1
         end = start
         while not data[end] == 'end':
             end +=1
+        len_end = end
+        while not data[len_end] == 'start':
+            len_end += 1
+            if len_end >= len(data):
+                break
 
         method = data[start+3]['m']
 
         # create data from start-end-slices according to method
         if method in ['ch','li', 'sh']:
             vis_data.append(create_gvns_data(data[start:end]))
-            vis_data.append(create_gvns_data(data[end:end+len_end]))
+            vis_data.append(create_gvns_data(data[end:len_end]))
         if method in ['rgc']:
-            vis_data += create_grasp_data(data[start:end+len_end])
+            vis_data += create_grasp_data(data[start:len_end])
 
-        i = end + len_end
+        i = len_end
 
     return vis_data
 
 
 def create_gvns_data(data: list()):
 
-    entries = {list(d.keys())[0]: list(d.values())[0] for d in data[1:]}
-    entries['status'] = data[0] 
+    entries = {k:v for x in data if type(x) == dict for k,v in x.items() if k!='ta'}
+    tabu_attr = [v for x in data if type(x) == dict for k,v in x.items() if k=='ta']
+    if len(tabu_attr) > 0 :
+        entries['tabu'] = tabu_attr
+    entries['status'] = data[0]
+    if 'end_iter' in data:
+        entries['end'] = True
     return entries
 
 
 def create_grasp_data(data: list()):
 
     entries = [create_gvns_data(data[:len_start])]
+    end_i = data.index('end')
 
-    greedy_data = data[len_start:-len_end]
+    greedy_data = data[len_start:end_i]
 
     for i in range(0, len(greedy_data),5):
         rcl_data = {list(d.keys())[0]:list(d.values())[0] for d in greedy_data[i:i+5]}
@@ -126,7 +132,7 @@ def create_grasp_data(data: list()):
         sol =  data[-7]['sol']  if i == len(greedy_data) -5 else greedy_data[i+5]['sol']
         entries.append({'status':'sel', 'cl':rcl_data['cl'], 'rcl':rcl_data['rcl'], 'sol':sol, 'sel':rcl_data['sel']})
 
-    entries.append(create_gvns_data(data[-len_end:]))
+    entries.append(create_gvns_data(data[end_i:]))
     return entries
 
         
@@ -147,8 +153,13 @@ def cast_line(line: str):
     if data in ['False', 'True']:
         return {name: False if data=='False' else True}
 
+    x = re.search(r'(?<=\()(.*?)(?=\))', data)
+    if x: #tuple
+        y = '(' + x.group()+')'
+        return {name: ast.literal_eval(y)}
+
     x = re.search(r'(?<=\[)(.*?)(?=\])', data)
-    if x: #list
+    if x: #string representation of numpy array
         x = x.group()
         x = ' '.join(x.split())
         x = "[" + x.replace(" ",",") + "]"
@@ -186,6 +197,7 @@ def save_visualisation(params: Configuration, graph=None):
         with open(os.path.sep.join(['logs','saved',params.problem.name.lower()+ '_' + params.algorithm.name.lower() + timestamp + '.log']), 'w') as destination:
             data = source.read()
             # prepend description block to log file (instance filename, options)
+            destination.write(f'P: {params.problem.name}\nA: {params.algorithm.name}\n')
             destination.write('I: ' + inst_filename + '\n')
             for k,v in params.options.items():
                 if type(k) == Option:
@@ -209,24 +221,32 @@ def save_misp_instance(graph):
 def read_from_logfile(filename: str):
     data = list()
     instance_file = ''
+    probl = ''
+    algo = ''
     with open('logs' + os.path.sep + 'saved' + os.path.sep + filename, 'r') as logfile:
         for line in logfile:
             if line.startswith('I:'):
-                instance_file = line.split(' ')[1].strip()
+                instance_file = line.split(':')[1].strip()
                 continue
             if line.startswith('O:'):
                 continue
+            if line.startswith('P:'):
+                probl = line.split(':')[1].strip()
+                continue
+            if line.startswith('A:'):
+                algo = line.split(':')[1].strip()
             data.append(cast_line(line.strip()))
         logfile.close()
     
     instance_path = 'instances' + os.path.sep + instance_file
     inst = None
-    if data[0] == 'misp':
+    if probl == Problem.MISP.name:
         inst = MISPInstance(instance_path)
-    if data[0] == 'maxsat':
+    if probl == Problem.MAXSAT.name:
         inst = MAXSATInstance(instance_path)
-
-    return create_log_data(data), inst
+    vis_data = create_log_data(data)
+    vis_data = [probl] + [algo] + vis_data
+    return vis_data, inst
 
 def get_log_description(filename: str):
     if not filename:
@@ -236,7 +256,7 @@ def get_log_description(filename: str):
         for line in logfile:
             if line.startswith('I:'):
                 description.append('Instance: ' + line[2:].strip())
-            elif line.startswith('O:'):
+            elif line.startswith('O:') or line.startswith('P:') or line.startswith('A:'):
                 description.append(line[2:].strip())
             else:
                 break

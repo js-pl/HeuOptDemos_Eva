@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import statistics
 
-from .problems import Problem, Algorithm, Option
+from .problems import InitSolution, Problem, Algorithm, Option
 from abc import ABC, abstractmethod
 from .logdata import read_from_logfile
 from matplotlib.patches import Patch,Rectangle
@@ -57,10 +57,15 @@ class Draw(ABC):
                 return None
 
         def get_animation(self, i: int, log_data: list):
-                if log_data[i+2].get('m','').startswith('rgc') or log_data[i+2].get('status','') in ['cl', 'rcl', 'sel']:
-                        self.get_grasp_animation(i,log_data[2:])
-                else:
-                        self.get_gvns_animation(i,log_data[2:])
+                if self.algorithm == Algorithm.TS:
+                        self.get_ts_animation(i,log_data)
+                if self.algorithm == Algorithm.GVNS:
+                        self.get_gvns_animation(i,log_data)
+                if self.algorithm == Algorithm.GRASP:
+                        if log_data[i].get('m','').startswith('rgc') or log_data[i].get('status','') in ['cl', 'rcl', 'sel']:
+                                self.get_grasp_animation(i,log_data)
+                        else:
+                                self.get_gvns_animation(i,log_data)
 
         @abstractmethod
         def get_grasp_animation(self, i: int, log_data: list):
@@ -68,6 +73,10 @@ class Draw(ABC):
 
         @abstractmethod
         def get_gvns_animation(self, i:int, log_data:list):
+                pass
+
+        @abstractmethod
+        def get_ts_animation(self, i:int, log_data:list):
                 pass
 
         def add_description(self, log_info: dict):
@@ -301,9 +310,9 @@ class MAXSATDraw(Draw):
                 pos.update({c:[-1+ i*step,-0.4] for i,c in enumerate(clauses_sorted, start=1)})
 
                 # create nodes with data
-                v = [(x, {'type':'variable', 'nr':x-m, 'color':'lightgray', 'pos':pos[x], 'label':f'x{x-m}','usage':clause}) for x,clause in enumerate(instance.variable_usage, start=m+1)]  #[m+1,...,m+n]
+                v = [(x, {'type':'variable', 'nr':x-m, 'color':'lightgray', 'pos':pos[x], 'label':f'x{x-m}','usage':clause,'alpha':1.}) for x,clause in enumerate(instance.variable_usage, start=m+1)]  #[m+1,...,m+n]
                 c = [(x, {'type':'clause', 'nr':x, 'color': 'lightgray', 'pos':pos[x], 'label':f'c{x}', 'clause':clause}) for x,clause in enumerate(instance.clauses, start=1)]   #[1,..,m]
-                i = [(x, {'type':'incumbent', 'nr':x-m-n, 'color':'white', 'pos':pos[x], 'label':f'i{x-m-n}'}) for x in incumbent]               #[1+m+n,...,2n+m]
+                i = [(x, {'type':'incumbent', 'nr':x-m-n, 'color':'white', 'pos':pos[x], 'label':f'i{x-m-n}','alpha':1.}) for x in incumbent]               #[1+m+n,...,2n+m]
 
                 # create graph by adding nodes and edges
                 graph = nx.Graph()
@@ -476,6 +485,51 @@ class MAXSATDraw(Draw):
                 self.write_cl_info(cl, rcl, sel)
                 self.add_description(info)
 
+        def get_ts_animation(self, i:int, log_data:list):
+                self.reset_graph()
+
+                data = log_data[i]
+                incumbent = [i for i,t in self.graph.nodes(data='type') if t=='incumbent']
+                variables = [i for i,t in self.graph.nodes(data='type') if t=='variable']
+                clauses = [i for i,t in self.graph.nodes(data='type') if t=='clause']
+
+                if data.get('m','').startswith('ch'):
+                        if data.get('status','') == 'start':
+                                self.plot_description['phase'] = f'MAX-SAT Instance'
+                                self.plot_description['comment'] = [f'{len(variables)} variables, {len(clauses)} clauses']
+                                self.draw_graph([])
+                                self.add_description(log_data[i])
+                                return
+                        if data.get('status','') == 'end':
+                                self.plot_description['phase'] = self.phases['ch']
+                                self.plot_description['comment'] = [InitSolution(data.get('par',0)).name, 'new incumbent']
+                                log_data[0]['sol'] = [-1 for _ in data['sol']]
+
+
+                nx.set_node_attributes(self.graph, {k: 'r' if data['inc'][self.graph.nodes[k]['nr']-1] == 0 else 'b' for k in incumbent}, name='color')
+                nx.set_node_attributes(self.graph, {k: 'r' if data['sol'][self.graph.nodes[k]['nr']-1] == 0 else 'b' for k in variables}, name='color')
+                
+                added, removed, pos_literals = self.color_and_get_changed_clauses(i, log_data, data['status'] == 'start')
+                tabu_list = data.get('tabu',[])
+                pos_x = []
+                pos_y = []
+                for ta in tabu_list:
+                        tabu_var = list(map(abs,ta[0]))
+                        life = ta[1]
+                        nodes = [n for n in variables if self.graph.nodes[n]['nr'] in tabu_var]
+                        nx.set_node_attributes(self.graph, {n: 0.5 for n in nodes}, name='alpha')
+                        nx.set_node_attributes(self.graph, {n: str(life) for n in nodes}, name='label')
+                        pos_x += [self.graph.nodes[n]['pos'][0] for n in nodes]
+                        pos_y += [self.graph.nodes[n]['pos'][1] for n in nodes]
+                        
+
+                
+                self.draw_graph(list(added.union(removed)))
+                self.add_description(log_data[i])
+                self.write_literal_info(pos_literals)
+                self.ax.scatter(pos_x,pos_y,s=700,marker='X',c='gray')
+
+
         def write_cl_info(self, cl: dict(), rcl: list(), sel: int):
 
                 cl_positions = {n:pos for n,pos in nx.get_node_attributes(self.graph, 'pos').items() if self.graph.nodes[n]['type'] == 'variable'}
@@ -512,6 +566,8 @@ class MAXSATDraw(Draw):
         def reset_graph(self):
                 nx.set_node_attributes(self.graph, {n: 'lightgray' if self.graph.nodes[n]['type'] != 'incumbent' else 'white' for n in self.graph.nodes()}, name='color')
                 nx.set_edge_attributes(self.graph, 'lightgray', name='color')
+                nx.set_node_attributes(self.graph, 1., name='alpha')
+                nx.set_node_attributes(self.graph, {n: f'x{self.graph.nodes[n]["nr"]}' for n in self.graph.nodes() if self.graph.nodes[n]['type']=='variable'}, name='label')
 
         def draw_graph(self, pos_change):
                 self.ax.clear()
@@ -522,6 +578,7 @@ class MAXSATDraw(Draw):
                 var_inc_color = [self.graph.nodes[n]['color'] for n in var_inc_nodes]
                 var_inc_lcol = ['black' if self.graph.nodes[n]['type'] == 'variable' else 'gold' for n in var_inc_nodes if n in pos_change]
                 var_inc_lw = [4 if n in pos_change else 0 for n in var_inc_nodes]
+                var_inc_alpha = [self.graph.nodes[n]['alpha'] for n in var_inc_nodes]
 
                 cl_nodes = [n for n,t in nx.get_node_attributes(self.graph, 'type').items() if  t =='clause']
                 cl_color = [self.graph.nodes[n]['color'] for n in cl_nodes]
@@ -536,15 +593,19 @@ class MAXSATDraw(Draw):
                 e_list_black = [e for i,e in enumerate(edges) if self.graph.edges[e]['color'] =='black']
                 e_style_black = [self.graph.edges[e]['style'] for e in e_list_black]
 
-                var_labels = {v:self.graph.nodes[v]['label'] for v in self.graph.nodes() if self.graph.nodes[v]['type'] == 'variable'}
+                var_labels = {v:l for v,l in nx.get_node_attributes(self.graph,'label').items() if l.startswith('x')}
+                var_labels_tabu = {v:l for v,l in nx.get_node_attributes(self.graph,'label').items() if not l[0] in ['i','c','x']}
+
 
                 pos = nx.get_node_attributes(self.graph, 'pos')
 
-                nx.draw_networkx_nodes(self.graph, pos, nodelist=var_inc_nodes, node_color=var_inc_color, edgecolors=var_inc_lcol, linewidths=var_inc_lw, node_shape='s', node_size=500,ax=self.ax)
+                nx.draw_networkx_nodes(self.graph, pos, nodelist=var_inc_nodes, node_color=var_inc_color, edgecolors=var_inc_lcol, 
+                                        alpha=var_inc_alpha, linewidths=var_inc_lw, node_shape='s', node_size=500,ax=self.ax)
                 nx.draw_networkx_nodes(self.graph, pos, nodelist=cl_nodes, node_color=cl_color, edgecolors=cl_lcol, linewidths=cl_lw, node_shape='o',node_size=150,ax=self.ax)
                 nx.draw_networkx_edges(self.graph, pos, edgelist=e_list_gray, style=e_style_gray,ax=self.ax, edge_color='lightgray')
                 nx.draw_networkx_edges(self.graph, pos, edgelist=e_list_black, style=e_style_black,ax=self.ax, edge_color='black')
                 nx.draw_networkx_labels(self.graph, pos, labels=var_labels,ax=self.ax)
+                nx.draw_networkx_labels(self.graph, pos, labels=var_labels_tabu, ax=self.ax, font_size=16, font_weight='bold')
 
 
 
@@ -552,8 +613,8 @@ class MAXSATDraw(Draw):
 
 def get_visualisation(prob: Problem, alg: Algorithm, instance):
     prob_class = globals()[prob.name + 'Draw']
-    prob = prob_class(prob, alg, instance)
-    return prob
+    prob_instance = prob_class(prob, alg, instance)
+    return prob_instance
 
 
 
