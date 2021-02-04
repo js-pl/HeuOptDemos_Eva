@@ -129,7 +129,7 @@ def create_grasp_data(data: list()):
 
         entries.append({'status':'cl', 'cl':rcl_data['cl'], 'sol':rcl_data['sol']})
         entries.append({'status':'rcl', 'cl':rcl_data['cl'], 'rcl':rcl_data['rcl'], 'sol':rcl_data['sol'], 'par':rcl_data['par']})
-        sol =  data[-7]['sol']  if i == len(greedy_data) -5 else greedy_data[i+5]['sol']
+        sol =  data[end_i+1]['sol']  if i == len(greedy_data) -5 else greedy_data[i+5]['sol']
         entries.append({'status':'sel', 'cl':rcl_data['cl'], 'rcl':rcl_data['rcl'], 'sol':sol, 'sel':rcl_data['sel']})
 
     entries.append(create_gvns_data(data[end_i:]))

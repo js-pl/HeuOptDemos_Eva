@@ -38,6 +38,12 @@ class Draw(ABC):
                                 'best': 0,
                                 'obj': 0,
                                 }
+        grey = 'lightgrey'
+        white = 'white'
+        blue = 'royalblue'
+        red = 'tomato'
+        green = 'limegreen'
+        yellow = 'gold'
 
         def __init__(self, prob: Problem, alg: Algorithm, instance):
                 self.problem = prob
@@ -50,6 +56,7 @@ class Draw(ABC):
                         num = f'Solving {prob.value} with {alg.value}')
                 self.img_ax.axis('off')
                 self.ax.axis('off')
+
 
 
         @abstractmethod
@@ -219,6 +226,9 @@ class MISPDraw(Draw):
                 self.draw_graph(info.get('rcl',[]), sel_color='black')
                 self.add_description(log_data[i])
 
+        def get_ts_animation(self, i:int, log_data: list):
+                pass
+
         def add_legend(self):
 
                 legend_elements = tuple()
@@ -285,6 +295,7 @@ class MAXSATDraw(Draw):
         def __init__(self, prob: Problem, alg: Algorithm, instance):
                 super().__init__(prob,alg,instance)
 
+
         def init_graph(self, instance):
 
                 n = instance.n #variables
@@ -310,9 +321,9 @@ class MAXSATDraw(Draw):
                 pos.update({c:[-1+ i*step,-0.4] for i,c in enumerate(clauses_sorted, start=1)})
 
                 # create nodes with data
-                v = [(x, {'type':'variable', 'nr':x-m, 'color':'lightgray', 'pos':pos[x], 'label':f'x{x-m}','usage':clause,'alpha':1.}) for x,clause in enumerate(instance.variable_usage, start=m+1)]  #[m+1,...,m+n]
-                c = [(x, {'type':'clause', 'nr':x, 'color': 'lightgray', 'pos':pos[x], 'label':f'c{x}', 'clause':clause}) for x,clause in enumerate(instance.clauses, start=1)]   #[1,..,m]
-                i = [(x, {'type':'incumbent', 'nr':x-m-n, 'color':'white', 'pos':pos[x], 'label':f'i{x-m-n}','alpha':1.}) for x in incumbent]               #[1+m+n,...,2n+m]
+                v = [(x, {'type':'variable', 'nr':x-m, 'color':self.grey, 'pos':pos[x], 'label':f'x{x-m}','usage':clause,'alpha':1.}) for x,clause in enumerate(instance.variable_usage, start=m+1)]  #[m+1,...,m+n]
+                c = [(x, {'type':'clause', 'nr':x, 'color': self.grey, 'pos':pos[x], 'label':f'c{x}', 'clause':clause}) for x,clause in enumerate(instance.clauses, start=1)]   #[1,..,m]
+                i = [(x, {'type':'incumbent', 'nr':x-m-n, 'color':self.white, 'pos':pos[x], 'label':f'i{x-m-n}','alpha':1.}) for x in incumbent]               #[1+m+n,...,2n+m]
 
                 # create graph by adding nodes and edges
                 graph = nx.Graph()
@@ -321,7 +332,7 @@ class MAXSATDraw(Draw):
                 graph.add_nodes_from(i)
 
                 for i,cl in enumerate(instance.clauses, start=1):
-                        graph.add_edges_from([(i,abs(x)+ m,{'style':'dashed' if x < 0 else 'solid', 'color':'lightgray'}) for x in cl])
+                        graph.add_edges_from([(i,abs(x)+ m,{'style':'dashed' if x < 0 else 'solid', 'color':self.grey}) for x in cl])
 
                 return graph
 
@@ -346,28 +357,13 @@ class MAXSATDraw(Draw):
                         self.plot_description['comment'].append('random') # TODO make generic to be able to used with other methods than random
                 flipped_nodes = []
 
-                nx.set_node_attributes(self.graph, {k: 'r' if info['inc'][self.graph.nodes[k]['nr']-1] == 0 else 'b' for k in incumbent}, name='color')
-                nx.set_node_attributes(self.graph, {k: 'r' if info['sol'][self.graph.nodes[k]['nr']-1] == 0 else 'b' for k in variables}, name='color')
+                nx.set_node_attributes(self.graph, {k: self.red if info['inc'][self.graph.nodes[k]['nr']-1] == 0 else self.blue for k in incumbent}, name='color')
+                nx.set_node_attributes(self.graph, {k: self.red if info['sol'][self.graph.nodes[k]['nr']-1] == 0 else self.blue for k in variables}, name='color')
                 
                 added, removed, pos_literals = self.color_and_get_changed_clauses(i, log_data, info['status'] == 'start')
 
                 if i > 1:
-                        comp = i + (info['status'] == 'start') - (info['status'] == 'end')
-                        flipped_nodes = [i+1 for i in range(len(variables)) if info['sol'][i]!=log_data[comp]['sol'][i] ]
-                        flipped_nodes = [n for n in variables if self.graph.nodes[n]['nr'] in flipped_nodes]
-
-                        if info['status'] == 'start':
-                                self.plot_description['comment'].append(f'k={info.get("par")}')
-                                self.plot_description['comment'].append(f'flipping {len(flipped_nodes)} variable(s)')          
-                        else:
-                                
-                                nx.set_edge_attributes(self.graph, {edge: 'black' for edge in self.graph.edges() if set(edge) & set(flipped_nodes)}, 'color')
-                                prev = log_data[i-1]['obj'] if i > 1 else 0
-                                self.plot_description['comment'].append(f"objective gain: {info['obj'] - prev}")
-                                if len(flipped_nodes) == 0 and info['m'] == 'li':
-                                        self.plot_description['comment'].append('no improvement - reached local optimum')
-                                flipped_nodes = []
-
+                        flipped_nodes = self.get_flipped_variables(i,log_data)
 
                 if info.get('better', False):
                         flipped_nodes += [n for n in incumbent]
@@ -376,6 +372,24 @@ class MAXSATDraw(Draw):
                 self.draw_graph(flipped_nodes + list(added.union(removed)))
                 self.write_literal_info(pos_literals)
                 self.add_description(info)
+
+        def get_flipped_variables(self, i: int, log_data: list):
+                info = log_data[i]
+                comp = i + (info['status'] == 'start') - (info['status'] == 'end')
+                flipped_variables = [n for n,v in enumerate(info['sol'],start=1) if v != log_data[comp]['sol'][n-1]]
+                flipped_variables = [n for n, data in self.graph.nodes(data=True) if data['nr'] in flipped_variables and data['type']=='variable']
+
+                if info['status'] == 'start':
+                        self.plot_description['comment'].append(f'k={info.get("par")}')
+                        self.plot_description['comment'].append(f'flipping {len(flipped_variables)} variable(s)')          
+                else:
+                        nx.set_edge_attributes(self.graph, {edge: 'black' for edge in self.graph.edges() if set(edge) & set(flipped_variables)}, 'color')
+                        prev = log_data[i-1]['obj'] if i > 1 else 0
+                        self.plot_description['comment'].append(f"objective gain: {info['obj'] - prev}")
+                        if len(flipped_variables) == 0 and info['m'] == 'li':
+                                self.plot_description['comment'].append('no improvement - reached local optimum')
+                        flipped_variables = []
+                return flipped_variables
 
         def color_and_get_changed_clauses(self,value,log_data, start=True):
 
@@ -399,10 +413,10 @@ class MAXSATDraw(Draw):
                         for v in clause:
                                 if log_data['sol'][abs(v)-1] == (1 if v > 0 else 0):
                                         fulfilled.add(n)
-                                        self.graph.nodes[n]['color'] = 'green'
+                                        self.graph.nodes[n]['color'] = self.green
                                         break
                                 else:
-                                        self.graph.nodes[n]['color'] = 'lightgray'
+                                        self.graph.nodes[n]['color'] = self.grey
 
                 if literals:
                         num_literals = dict.fromkeys(clauses,0)
@@ -438,8 +452,8 @@ class MAXSATDraw(Draw):
 
                 if log_data[i]['status'] == 'end':
                         self.plot_description['comment'].append(f'constructed complete solution' + (', found new incumbent' if info['better'] else ''))
-                        nx.set_node_attributes(self.graph, {k: 'r' if info['inc'][self.graph.nodes[k]['nr']-1] == 0 else 'b' for k in incumbent}, name='color')
-                        nx.set_node_attributes(self.graph, {k: 'r' if info['sol'][self.graph.nodes[k]['nr']-1] == 0 else 'b' for k in variables}, name='color')
+                        nx.set_node_attributes(self.graph, {k: self.red if info['inc'][self.graph.nodes[k]['nr']-1] == 0 else self.blue for k in incumbent}, name='color')
+                        nx.set_node_attributes(self.graph, {k: self.red if info['sol'][self.graph.nodes[k]['nr']-1] == 0 else self.blue for k in variables}, name='color')
                         _,_,pos_literals = self.color_and_get_changed_clauses(i,log_data)
                         self.draw_graph(incumbent if info['better'] else [])
                         self.write_literal_info(pos_literals)
@@ -459,7 +473,7 @@ class MAXSATDraw(Draw):
 
                 #set colors for edges and variables
                 nx.set_edge_attributes(self.graph, {edge: 'black' for edge in self.graph.edges() if abs(sel) in edge}, 'color')
-                nx.set_node_attributes(self.graph, {n: 'r' if info['sol'][self.graph.nodes[n]['nr']-1] == 0 else 'b' for n in selected if n != 0}, name='color')
+                nx.set_node_attributes(self.graph, {n: self.red if info['sol'][self.graph.nodes[n]['nr']-1] == 0 else self.blue for n in selected if n != 0}, name='color')
                 #set colors for clauses
                 added,_,pos_literals = self.color_and_get_changed_clauses(i,log_data,start=not (info['status'] == 'sel'))
 
@@ -506,10 +520,14 @@ class MAXSATDraw(Draw):
                                 log_data[0]['sol'] = [-1 for _ in data['sol']]
 
 
-                nx.set_node_attributes(self.graph, {k: 'r' if data['inc'][self.graph.nodes[k]['nr']-1] == 0 else 'b' for k in incumbent}, name='color')
-                nx.set_node_attributes(self.graph, {k: 'r' if data['sol'][self.graph.nodes[k]['nr']-1] == 0 else 'b' for k in variables}, name='color')
+                nx.set_node_attributes(self.graph, {k: self.red if data['inc'][self.graph.nodes[k]['nr']-1] == 0 else self.blue for k in incumbent}, name='color')
+                nx.set_node_attributes(self.graph, {k: self.red if data['sol'][self.graph.nodes[k]['nr']-1] == 0 else self.blue for k in variables}, name='color')
                 
                 added, removed, pos_literals = self.color_and_get_changed_clauses(i, log_data, data['status'] == 'start')
+                flipped_variables = []
+                if data.get('m','') != 'ch':
+                        flipped_variables = self.get_flipped_variables(i,log_data)
+
                 tabu_list = data.get('tabu',[])
                 pos_x = []
                 pos_y = []
@@ -517,24 +535,29 @@ class MAXSATDraw(Draw):
                         tabu_var = list(map(abs,ta[0]))
                         life = ta[1]
                         nodes = [n for n in variables if self.graph.nodes[n]['nr'] in tabu_var]
-                        nx.set_node_attributes(self.graph, {n: 0.5 for n in nodes}, name='alpha')
-                        nx.set_node_attributes(self.graph, {n: str(life) for n in nodes}, name='label')
+                        nx.set_node_attributes(self.graph, {n: {'alpha':1,'label':str(life)} for n in nodes})
+                        #nx.set_node_attributes(self.graph, {n: str(life) for n in nodes}, name='label')
                         pos_x += [self.graph.nodes[n]['pos'][0] for n in nodes]
                         pos_y += [self.graph.nodes[n]['pos'][1] for n in nodes]
+                        if set(nodes).issubset(set(flipped_variables)):
+                                self.plot_description['comment'] += ['deploy aspiration criterion']
                         
-
+                if data.get('better', False):
+                        flipped_variables += incumbent
+                        self.plot_description['comment'] += ['found new best solution']
+                if data.get('ta_del', False):
+                        self.plot_description['comment'] += ['delete tabu status of variable']
                 
-                self.draw_graph(list(added.union(removed)))
+                self.draw_graph(flipped_variables + list(added.union(removed)))
                 self.add_description(log_data[i])
                 self.write_literal_info(pos_literals)
-                self.ax.scatter(pos_x,pos_y,s=700,marker='X',c='gray')
 
 
         def write_cl_info(self, cl: dict(), rcl: list(), sel: int):
 
                 cl_positions = {n:pos for n,pos in nx.get_node_attributes(self.graph, 'pos').items() if self.graph.nodes[n]['type'] == 'variable'}
 
-                col = {1:'b',-1:'r',0:'lightgray'}
+                col = {1:self.blue,-1:self.red,0:self.grey}
 
                 for k,v in cl.items():
                         pos = cl_positions[abs(k)]
@@ -546,26 +569,26 @@ class MAXSATDraw(Draw):
                 legend_elements = (
                                         #Line2D([0], [0],linestyle='none'),
                                         Line2D([0], [0], marker='s', linestyle='none', markeredgewidth=0,
-                                                markerfacecolor='b', markersize=11),
+                                                markerfacecolor=self.blue, markersize=11),
                                         Line2D([0], [0], marker='o', color='w',
-                                                markerfacecolor='lightgray', markersize=13),
+                                                markerfacecolor=self.grey, markersize=13),
                                         #Line2D([0], [0],linestyle='none'),      
                                         Line2D([0], [0], marker='o', linestyle='none',
-                                                markerfacecolor='w',markeredgecolor="gold",markeredgewidth=2, markersize=11),
+                                                markerfacecolor='w',markeredgecolor=self.yellow,markeredgewidth=2, markersize=11),
 
                                         Line2D([0], [0], marker='s', linestyle='none', markeredgewidth=0,
-                                                markerfacecolor='r', markersize=11),
+                                                markerfacecolor=self.red, markersize=11),
                                         Line2D([0], [0], marker='o', color='w',
-                                                markerfacecolor='green', markersize=13),
+                                                markerfacecolor=self.green, markersize=13),
                                         Line2D([0], [0], marker='s', linestyle='none',
-                                                markerfacecolor='w',markeredgecolor="gold",markeredgewidth=2, markersize=11),
+                                                markerfacecolor='w',markeredgecolor=self.yellow,markeredgewidth=2, markersize=11),
                                         )
                 self.ax.legend(legend_elements, ('','','','true/false variable','unfullfilled/fullfilled clause','change in clauses/solution'),  ncol=2, handlelength=1, borderpad=0.7, columnspacing=0, loc='lower left')
 
 
         def reset_graph(self):
-                nx.set_node_attributes(self.graph, {n: 'lightgray' if self.graph.nodes[n]['type'] != 'incumbent' else 'white' for n in self.graph.nodes()}, name='color')
-                nx.set_edge_attributes(self.graph, 'lightgray', name='color')
+                nx.set_node_attributes(self.graph, {n: self.grey if self.graph.nodes[n]['type'] != 'incumbent' else self.white for n in self.graph.nodes()}, name='color')
+                nx.set_edge_attributes(self.graph, self.grey, name='color')
                 nx.set_node_attributes(self.graph, 1., name='alpha')
                 nx.set_node_attributes(self.graph, {n: f'x{self.graph.nodes[n]["nr"]}' for n in self.graph.nodes() if self.graph.nodes[n]['type']=='variable'}, name='label')
 
@@ -576,13 +599,13 @@ class MAXSATDraw(Draw):
 
                 var_inc_nodes = [n for n,t in nx.get_node_attributes(self.graph, 'type').items() if  t in ['variable', 'incumbent']]
                 var_inc_color = [self.graph.nodes[n]['color'] for n in var_inc_nodes]
-                var_inc_lcol = ['black' if self.graph.nodes[n]['type'] == 'variable' else 'gold' for n in var_inc_nodes if n in pos_change]
+                var_inc_lcol = ['black' if self.graph.nodes[n]['type'] == 'variable' else self.yellow for n in var_inc_nodes if n in pos_change]
                 var_inc_lw = [4 if n in pos_change else 0 for n in var_inc_nodes]
                 var_inc_alpha = [self.graph.nodes[n]['alpha'] for n in var_inc_nodes]
 
                 cl_nodes = [n for n,t in nx.get_node_attributes(self.graph, 'type').items() if  t =='clause']
                 cl_color = [self.graph.nodes[n]['color'] for n in cl_nodes]
-                cl_lcol = ['gold' for n in cl_nodes]
+                cl_lcol = [self.yellow for n in cl_nodes]
                 cl_lw = [3 if n in pos_change else 0 for n in cl_nodes]
 
                 edges = list(self.graph.edges())
@@ -594,18 +617,23 @@ class MAXSATDraw(Draw):
                 e_style_black = [self.graph.edges[e]['style'] for e in e_list_black]
 
                 var_labels = {v:l for v,l in nx.get_node_attributes(self.graph,'label').items() if l.startswith('x')}
-                var_labels_tabu = {v:l for v,l in nx.get_node_attributes(self.graph,'label').items() if not l[0] in ['i','c','x']}
-
 
                 pos = nx.get_node_attributes(self.graph, 'pos')
 
                 nx.draw_networkx_nodes(self.graph, pos, nodelist=var_inc_nodes, node_color=var_inc_color, edgecolors=var_inc_lcol, 
                                         alpha=var_inc_alpha, linewidths=var_inc_lw, node_shape='s', node_size=500,ax=self.ax)
                 nx.draw_networkx_nodes(self.graph, pos, nodelist=cl_nodes, node_color=cl_color, edgecolors=cl_lcol, linewidths=cl_lw, node_shape='o',node_size=150,ax=self.ax)
-                nx.draw_networkx_edges(self.graph, pos, edgelist=e_list_gray, style=e_style_gray,ax=self.ax, edge_color='lightgray')
+                nx.draw_networkx_edges(self.graph, pos, edgelist=e_list_gray, style=e_style_gray,ax=self.ax, edge_color=self.grey)
                 nx.draw_networkx_edges(self.graph, pos, edgelist=e_list_black, style=e_style_black,ax=self.ax, edge_color='black')
                 nx.draw_networkx_labels(self.graph, pos, labels=var_labels,ax=self.ax)
-                nx.draw_networkx_labels(self.graph, pos, labels=var_labels_tabu, ax=self.ax, font_size=16, font_weight='bold')
+
+                # drawings for tabu search
+                var_labels_tabu = {v:l for v,l in nx.get_node_attributes(self.graph,'label').items() if not l[0] in ['i','c','x']}
+                tabu_nodes = list(var_labels_tabu.keys())
+                x_pos = {k:[v[0]-0.04,v[1]-0.04] for k,v in pos.items()}
+                nx.draw_networkx_nodes(self.graph, x_pos, nodelist=tabu_nodes,node_color='black', node_shape='X', node_size=200,ax=self.ax)
+                nx.draw_networkx_labels(self.graph, pos, labels=var_labels_tabu, ax=self.ax, font_size=14, font_weight='bold', 
+                                        font_color='black',horizontalalignment='left',verticalalignment='baseline')
 
 
 

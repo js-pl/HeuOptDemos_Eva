@@ -26,13 +26,17 @@ if not settings.__dict__: parse_settings(args='')
 
 # pymhlib settings
 settings.mh_lfreq = 1
-settings.mh_out = "logs" + os.path.sep + "summary.log"
-settings.mh_log = "logs" + os.path.sep + "iter.log"
-settings.mh_log_step = 'None'
+#settings.mh_out = "logs" + os.path.sep + "summary.log"
+#settings.mh_log = "logs" + os.path.sep + "iter.log"
+#settings.mh_log_step = 'None'
 
 vis_instance_path = "instances" + os.path.sep
 demo_data_path = os.path.dirname(demos.__file__) + os.path.sep + 'data'
 step_log_path = "logs" + os.path.sep + "step.log"
+iter_log_vis_path = "logs" + os.path.sep + "iter_vis.log"
+sum_log_vis_path = "logs" + os.path.sep + "summary_vis.log"
+iter_log_path = "logs" + os.path.sep + "iter.log"
+sum_log_path = "logs" + os.path.sep + "summary.log"
 
 
 # get available problems
@@ -53,7 +57,8 @@ def get_options(prob: Problem, algo: Algorithm):
 
 
 def run_algorithm_visualisation(config: Configuration):
-
+    settings.mh_out = sum_log_vis_path
+    settings.mh_log = iter_log_vis_path
     settings.mh_log_step = step_log_path 
     init_logger()
 
@@ -66,7 +71,8 @@ def run_algorithm_visualisation(config: Configuration):
 
 
 def run_algorithm_comparison(config: Configuration):
-
+    settings.mh_out = sum_log_path
+    settings.mh_log = iter_log_path
     settings.mh_log_step = 'None'
     init_logger()
     settings.seed =  config.seed
@@ -82,13 +88,13 @@ def run_algorithm_comparison(config: Configuration):
 
 def read_sum_log():
     idx = []
-    with open(settings.mh_out) as f: 
+    with open(sum_log_path) as f: 
         for i, line in enumerate(f):
             if not line.startswith('S '):
                 idx.append(i)
         f.close()
         
-    df = pd.read_csv(settings.mh_out, sep=r'\s+',skiprows=idx)
+    df = pd.read_csv(sum_log_path, sep=r'\s+',skiprows=idx)
     df.drop(labels=['S'], axis=1,inplace=True)
     idx = df[ df['method'] == 'method' ].index
     df.drop(idx , inplace=True)
@@ -102,7 +108,7 @@ def read_sum_log():
 
 def read_iter_log(name):
 
-        df = pd.read_csv(settings.mh_log, sep=r'\s+', header=None)
+        df = pd.read_csv(iter_log_path, sep=r'\s+', header=None)
 
         df.drop(df[ df[1] == '0' ].index , inplace=True) #drop initialisation line
         df = df[4].reset_index().drop(columns='index') #extract 'obj_new'
