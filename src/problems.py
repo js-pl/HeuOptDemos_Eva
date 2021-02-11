@@ -101,7 +101,7 @@ class Configuration():
 
 
 class ProblemDefinition(ABC):
-    """A base class for problem definition to store and retrieve available algorithms and options and problem specific solution instances.
+    """A base class for problem definition to store and retrieve available algorithms, options and problem specific solution instances.
 
     Attributes
         - name: name of the problem, instance of Problem enum
@@ -190,7 +190,16 @@ class MISP(ProblemDefinition):
                                 Option.LI: [Parameters('two-exchange random fill neighborhood search', MISPSolution.local_improve, value=2)],
                                 Option.RGC: [Parameters('k-best', MISPSolution.greedy_randomized_construction, param_type=int),
                                                 Parameters('alpha', MISPSolution.greedy_randomized_construction, param_type=float)]
-                              }
+                              },
+                    Algorithm.TS: {
+                                    Option.CH: [Parameters(InitSolution.random.name, MISPSolution.construct)
+                                            ,Parameters(InitSolution.greedy.name, MISPSolution.construct_greedy, value=InitSolution.greedy.value)
+                                            ],
+                                    Option.LI: [Parameters('two-exchange random fill neighborhood search', MISPSolution.two_exchange_random_fill_neighborhood_search, value=2)],
+                                    Option.TL: [Parameters('min length',None,int),Parameters('max length',None,int),Parameters('change (iteration)', None,int)]
+                                
+                    }
+                    
                     }
 
         super().__init__(Problem.MISP, options)

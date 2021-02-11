@@ -815,7 +815,6 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
 
         def plot_comparison(self, i):
                 with self.out:
-
                         fig = plt.figure(num=f'{self.problemWidget.value}',clear=True)
                         g = gs.GridSpec(3,2)
                         ax = fig.add_subplot(g[0:2,:])
@@ -877,7 +876,6 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                         fig.suptitle('')
                         ax_bb.set_xlabel('')
                         ax_bb.set_ylabel('objective value')
-
 
                         widgets.interaction.show_inline_matplotlib_plots()
                 
