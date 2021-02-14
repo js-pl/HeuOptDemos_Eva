@@ -155,34 +155,38 @@ class CommentParameters:
 
 
 class MISPDraw(Draw):
-        def create_comment(self, option: Option, status: str, params: CommentParameters):
-                comments = {
+
+        comments = {
                         Option.CH:{
-                                'start': lambda n,m: f'{params.n} nodes, {params.m} edges',
-                                'end': lambda par: f'initial solution={InitSolution(params.par).name}'
+                                'start': lambda params: f'{params.n} nodes, {params.m} edges',
+                                'end': lambda params: f'initial solution={InitSolution(params.par).name}'
                         },
                         Option.LI: {
-                                'start': lambda par,rem,add: f'k={params.par}, remove {params.rem} node(s), add {params.add} node(s)',
-                                'end': lambda gain,no_impr,better: f'objective gain={params.gain}{", no improvement - reached local optimum" if params.no_impr else ""}{", found new best solution" if params.better else ""}'
+                                'start': lambda params: f'k={params.par}, remove {params.remove} node(s), add {params.add} node(s)',
+                                'end': lambda params: f'objective gain={params.gain}{", no improvement - reached local optimum" if params.no_change else ""}{", found new best solution" if params.better else ""}'
                         },
                         Option.SH: {
-                                'start': lambda par,rem,add: f'k={params.par}, remove {params.rem} node(s), add {params.add} node(s)',
-                                'end': lambda gain,better: f'objective gain={params.gain}{", found new best solution" if params.better else ""}'
+                                'start': lambda params: f'k={params.par}, remove {params.remove} node(s), add {params.add} node(s)',
+                                'end': lambda params: f'objective gain={params.gain}{", found new best solution" if params.better else ""}'
                         },
                         Option.RGC:{
-                                'start':'start with empty solution',
-                                'end': lambda better: f'created complete solution{", found new best solution" if params.better else ""}',
-                                'cl': lambda par,thr,gain: 'remaining degree (number of unblocked neigbors)',
-                                'rcl': lambda par,thr,gain: f'{params.k}-best' if params.k else f'alpha: {params.alpha}, threshold: {params.thres}',
-                                'sel': lambda par,thr,gain: f'random, objective gain={params.gain}'
+                                'start': lambda params: 'start with empty solution',
+                                'end': lambda params: f'created complete solution{", found new best solution" if params.better else ""}',
+                                'cl': lambda params: 'remaining degree (number of unblocked neigbors)',
+                                'rcl': lambda params: f'{params.k}-best' if params.k else f'alpha: {params.alpha}, threshold: {params.thres}',
+                                'sel': lambda params: f'random, objective gain={params.gain}'
                         },
                         Option.TL:{
-                                'start': lambda ll,rem,add,asp: f'size of tabu list={params.ll}, remove {params.rem} node(s), add {params.add} node(s){", apply aspiration criterion" if params.asp else ""}',
-                                'end': lambda gain,no_change,better: f'objective gain={params.gain}{", all possible exchanges are tabu" if params.no_change else ""}{", found new best solution" if params.better else ""}'
+                                'start': lambda params: f'size of tabu list={params.ll}, remove {params.remove} node(s), add {params.add} node(s){", apply aspiration criterion" if params.asp else ""}',
+                                'end': lambda params: f'objective gain={params.gain}{", all possible exchanges are tabu" if params.no_change else ""}{", found new best solution" if params.better else ""}'
                         }
                         
                         }
 
+        def create_comment(self, option: Option, status: str, params: CommentParameters):
+                # TODO create comments according to log granularity
+
+                return self.comments[option][status](params)
 
 
 
@@ -214,34 +218,34 @@ class MISPDraw(Draw):
 
         def get_gvns_animation(self, i:int, log_data: list):
 
+                comment_params = CommentParameters()
                 data = log_data[i]
                 status = data.get('status','')
                 sol = data.get('sol',[])
-                comment = self.comments[Option[data.get('m','ch').upper()]][status]
 
-                if status == 'start' and data.get('m') == 'ch':
-                        self.plot_description['comment'] = comment(len(self.graph.nodes()),len(self.graph.edges()))
+                if status == 'start' and (data.get('m') == 'ch' or i==0):
+                        comment_params.n = len(self.graph.nodes())
+                        comment_params.m = len(self.graph.edges())
+                        self.plot_description['comment'] = self.create_comment(Option.CH,status,comment_params)
                         log_data[i]['best'] = log_data[i]['obj'] = 0
                         self.draw_graph()
                         return
-                #set color of current solution
-                nx.set_node_attributes(self.graph, {n:self.blue for n in sol}, 'color')
+                #set color of nodes and edges
                 remove,add = self.get_removed_and_added_nodes(i,log_data)
-                if status== 'start':
+                nx.set_node_attributes(self.graph, {n:self.blue for n in sol}, 'color')
+                nx.set_node_attributes(self.graph, {n:{'label':'+','color':self.green if status == 'start' else self.blue} for n in add})
+                nx.set_node_attributes(self.graph, {n:{'label':'-','color':self.red if status == 'start' else self.grey} for n in remove})
+                nx.set_node_attributes(self.graph, {n:self.yellow for n in data.get('inc') if data.get('better',False)}, 'color')
+                nx.set_edge_attributes(self.graph, {e:'black' for n in add for e in self.graph.edges(n)} if status == 'end' else {}, 'color')
 
-                        self.plot_description['comment'] = comment(data.get('par',1),len(remove),len(add))
-                        nx.set_node_attributes(self.graph, {n:{'label':'+','color':self.green} for n in add})
-                        nx.set_node_attributes(self.graph, {n:{'label':'-','color':self.red} for n in remove})
-                if status == 'end':
-                        if data.get('m') == 'ch':
-                                self.plot_description['comment'] = comment(data.get('par',0))
-                        if data.get('m') == 'li':
-                                self.plot_description['comment'] = comment(data["obj"] - log_data[i-1]["obj"],not (add or remove),data.get('better',False))
-                        if data.get('m') == 'sh':
-                                self.plot_description['comment'] = comment(data["obj"] - log_data[i-1]["obj"],data.get('better',False))
-
-                if data.get('better',False):
-                        nx.set_node_attributes(self.graph, {n:self.yellow for n in data.get('inc')}, 'color')
+                # fill parameters for plot description
+                comment_params.remove = len(remove)
+                comment_params.add = len(add)
+                comment_params.par = data.get('par',1)
+                comment_params.gain = data["obj"] - log_data[i-1]["obj"]
+                comment_params.no_change = not (add or remove)
+                comment_params.better = data.get('better',False)
+                self.plot_description['comment'] = self.create_comment(Option[data.get('m','li').upper()],status,comment_params)
 
                 self.draw_graph(data['inc'])
 
@@ -261,45 +265,57 @@ class MISPDraw(Draw):
                         self.get_gvns_animation(i,log_data)
                         return
 
+                comment_params = CommentParameters()
                 data = log_data[i] 
                 status = data.get('status','')
-                comment = self.comments[Option.RGC][status]
 
-                if status == 'start':
-                        self.plot_description['comment'] = comment
-                        self.draw_graph()
+                if status == 'start' or status == 'end':
+                        comment_params.better = data.get('better',False)
+                        self.plot_description['comment'] = self.create_comment(Option.RGC,status,comment_params)
+                        nx.set_node_attributes(self.graph, {n:self.yellow if data.get('better',False) else self.blue for n in data.get('sol') if status == 'end'}, name='color')
+                        self.draw_graph(data.get('inc') if status == 'end' else [])
                         return
-                if status == 'end':
-                        self.plot_description['comment'] = comment(data.get('better',False))
-                        nx.set_node_attributes(self.graph, {n:self.yellow if data.get('better',False) else self.blue for n in data.get('sol')}, name='color')
-                        self.draw_graph(data.get('inc'))
-                        return
+
 
                 nx.set_node_attributes(self.graph, data.get('cl',{}), 'label')
-                nx.set_node_attributes(self.graph, {n: self.blue for n in data.get('sol', [])}, name='color')
-
-                if status == 'sel':
-                        self.graph.nodes[data.get('sel')]['color'] = self.green
-                        n_unsel = set(self.graph.neighbors(data.get('sel'))).intersection(set(data['cl'].keys()))
-                        nx.set_node_attributes(self.graph, {n:self.orange for n in n_unsel},'color')
-                        nx.set_edge_attributes(self.graph, {(data.get('sel'),n):'black' for n in n_unsel}, 'color')
+                nx.set_node_attributes(self.graph, {n: self.green if data.get('sel',-1) == n else self.blue for n in data.get('sol', [])}, name='color')
+                selected = set() if not data.get('sel',False) else set(self.graph.neighbors(data.get('sel')))
+                n_unsel = selected.intersection(set(data['cl'].keys()))
+                nx.set_node_attributes(self.graph, {n:self.orange for n in n_unsel},'color')
+                nx.set_edge_attributes(self.graph, {(data.get('sel',n),n):'black' for n in n_unsel}, 'color')
 
 
                 par = data.get('par',0.)
                 mn = min(data.get('cl').values())
                 mx = max(data.get('cl').values())
-                self.plot_description['comment'] = comment(par, round(mn + par * (mx-mn),2), 1)
+                if type(par) == int:
+                        comment_params.k = par
+                else:
+                        comment_params.alpha = par
+                        comment_params.thres = round(mn + par * (mx-mn),2)
+                comment_params.gain = 1
 
                 j = i
                 while not (log_data[j]['status'] in ['start','end']):
                         j -= 1
+
                 self.plot_description.update({'best': log_data[j]['best'], 'obj':len(data.get('sol'))})
+                self.plot_description['comment'] = self.create_comment(Option.RGC,status,comment_params)
                 self.draw_graph(data.get('rcl',[]), sel_color='black')
 
         def get_ts_animation(self, i:int, log_data: list):
 
                 data = log_data[i]
                 status = data.get('status','')
+                comment_params = CommentParameters()
+
+                if status == 'start' and (data.get('m') == 'ch' or i==0):
+                        comment_params.n = len(self.graph.nodes())
+                        comment_params.m = len(self.graph.edges())
+                        self.plot_description['comment'] = self.create_comment(Option.CH,status,comment_params)
+                        log_data[i]['best'] = log_data[i]['obj'] = 0
+                        self.draw_graph()
+                        return
 
                 if data.get('m','').startswith('ch'):
                         if status == 'start':
