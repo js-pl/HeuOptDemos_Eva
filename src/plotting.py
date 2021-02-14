@@ -12,9 +12,9 @@ import statistics
 
 from .problems import InitSolution, Problem, Algorithm, Option
 from abc import ABC, abstractmethod
-from .logdata import read_from_logfile
-from matplotlib.patches import Patch,Rectangle
+from .logdata import read_from_logfile, Log
 from matplotlib.lines import Line2D
+from dataclasses import dataclass
 
 
 plt.rcParams['figure.figsize'] = (12,6)
@@ -47,7 +47,7 @@ class Draw(ABC):
         yellow = 'gold'
         orange = 'darkorange'
 
-        def __init__(self, prob: Problem, alg: Algorithm, instance):
+        def __init__(self, prob: Problem, alg: Algorithm, instance, log_granularity: Log):
                 self.problem = prob
                 self.algorithm = alg
                 self.graph = self.init_graph(instance)
@@ -58,6 +58,7 @@ class Draw(ABC):
                         num = f'Solving {prob.value} with {alg.value}')
                 self.img_ax.axis('off')
                 self.ax.axis('off')
+                self.log_granularity = log_granularity
 
 
 
@@ -73,10 +74,7 @@ class Draw(ABC):
                 if self.algorithm == Algorithm.GVNS:
                         self.get_gvns_animation(i,log_data)
                 if self.algorithm == Algorithm.GRASP:
-                        if log_data[i].get('m','').startswith('rgc') or log_data[i].get('status','') in ['cl', 'rcl', 'sel']:
-                                self.get_grasp_animation(i,log_data)
-                        else:
-                                self.get_gvns_animation(i,log_data)
+                        self.get_grasp_animation(i,log_data)
 
                 self.add_description(log_data[i])
                 self.add_legend()
@@ -86,6 +84,7 @@ class Draw(ABC):
         @abstractmethod
         def get_grasp_animation(self, i: int, log_data: list):
                 pass
+
 
         @abstractmethod
         def get_gvns_animation(self, i:int, log_data:list):
@@ -135,37 +134,60 @@ class Draw(ABC):
                 pass
 
 
+@dataclass
+class CommentParameters:
+        n: int = 0
+        m: int = 0
+        par: int = 0
+        gain = 0
+        better: bool = False
+        no_change: bool = False
+
+        # algorithm specific parameters
+        remove: int = 0
+        add: int = 0
+        flip: int = 0
+        k: int = None
+        alpha: float = None
+        thres: float = None
+        ll: int = 0
+        asp: bool = False
+
+
 class MISPDraw(Draw):
+        def create_comment(self, option: Option, status: str, params: CommentParameters):
+                comments = {
+                        Option.CH:{
+                                'start': lambda n,m: f'{params.n} nodes, {params.m} edges',
+                                'end': lambda par: f'initial solution={InitSolution(params.par).name}'
+                        },
+                        Option.LI: {
+                                'start': lambda par,rem,add: f'k={params.par}, remove {params.rem} node(s), add {params.add} node(s)',
+                                'end': lambda gain,no_impr,better: f'objective gain={params.gain}{", no improvement - reached local optimum" if params.no_impr else ""}{", found new best solution" if params.better else ""}'
+                        },
+                        Option.SH: {
+                                'start': lambda par,rem,add: f'k={params.par}, remove {params.rem} node(s), add {params.add} node(s)',
+                                'end': lambda gain,better: f'objective gain={params.gain}{", found new best solution" if params.better else ""}'
+                        },
+                        Option.RGC:{
+                                'start':'start with empty solution',
+                                'end': lambda better: f'created complete solution{", found new best solution" if params.better else ""}',
+                                'cl': lambda par,thr,gain: 'remaining degree (number of unblocked neigbors)',
+                                'rcl': lambda par,thr,gain: f'{params.k}-best' if params.k else f'alpha: {params.alpha}, threshold: {params.thres}',
+                                'sel': lambda par,thr,gain: f'random, objective gain={params.gain}'
+                        },
+                        Option.TL:{
+                                'start': lambda ll,rem,add,asp: f'size of tabu list={params.ll}, remove {params.rem} node(s), add {params.add} node(s){", apply aspiration criterion" if params.asp else ""}',
+                                'end': lambda gain,no_change,better: f'objective gain={params.gain}{", all possible exchanges are tabu" if params.no_change else ""}{", found new best solution" if params.better else ""}'
+                        }
+                        
+                        }
 
-        comments = {
-                Option.CH:{
-                        'start': lambda n,m: f'{n} nodes, {m} edges',
-                        'end': lambda par: f'initial solution={InitSolution(par).name}'
-                },
-                Option.LI: {
-                        'start': lambda par,rem,add: f'k={par}, remove {rem} node(s), add {add} node(s)',
-                        'end': lambda gain,no_impr,better: f'objective gain={gain}{", no improvement - reached local optimum" if no_impr else ""}{", found new best solution" if better else ""}'
-                },
-                Option.SH: {
-                        'start': lambda par,rem,add: f'k={par}, remove {rem} node(s), add {add} node(s)',
-                        'end': lambda gain,better: f'objective gain={gain}{", found new best solution" if better else ""}'
-                },
-                Option.RGC:{
-                        'start':'start with empty solution',
-                        'end': lambda better: f'created complete solution{", found new best solution" if better else ""}',
-                        'cl': lambda par,thr,gain: 'remaining degree (number of unblocked neigbors)',
-                        'rcl': lambda par,thr,gain: f'{par}-best' if type(par)==int else f'alpha: {par}, threshold: {thr}',
-                        'sel': lambda par,thr,gain: f'random, objective gain={gain}'
-                },
-                Option.TL:{
-                        'start': lambda ll,rem,add,asp: f'size of tabu list={ll}, remove {rem} node(s), add {add} node(s){", apply aspiration criterion" if asp else ""}',
-                        'end': lambda gain,no_change,better: f'objective gain={gain}{", all possible exchanges are tabu" if no_change else ""}{", found new best solution" if better else ""}'
-                }
-                
-                }
 
-        def __init__(self, prob: Problem, alg: Algorithm, instance):
-                super().__init__(prob,alg,instance)
+
+
+        def __init__(self, prob: Problem, alg: Algorithm, instance, log_granularity: Log):
+                super().__init__(prob,alg,instance,log_granularity)
 
         def init_graph(self, instance):
                 graph = instance.graph
@@ -235,6 +257,9 @@ class MISPDraw(Draw):
 
 
         def get_grasp_animation(self, i:int, log_data: list):
+                if log_data[i].get('m','') in ['ch', 'li', 'sh']:
+                        self.get_gvns_animation(i,log_data)
+                        return
 
                 data = log_data[i] 
                 status = data.get('status','')
@@ -431,8 +456,8 @@ class MAXSATDraw(Draw):
                 
                 }
 
-        def __init__(self, prob: Problem, alg: Algorithm, instance):
-                super().__init__(prob,alg,instance)
+        def __init__(self, prob: Problem, alg: Algorithm, instance, log_granularity: Log):
+                super().__init__(prob,alg,instance,log_granularity)
 
 
         def init_graph(self, instance):
@@ -501,7 +526,7 @@ class MAXSATDraw(Draw):
                 
                 added, removed, pos_literals = self.color_and_get_changed_clauses(i, log_data, status == 'start')
 
-                #if data.get('m','') != 'ch':
+
                 flipped_nodes = self.get_flipped_variables(i,log_data)
                 if status== 'start':
                         self.plot_description['comment'] = comment(data.get('par',1),len(flipped_nodes))
@@ -580,6 +605,9 @@ class MAXSATDraw(Draw):
                         self.ax.text(data[1][0],data[1][1],data[0],{'color': 'black', 'ha': 'center', 'va': 'center', 'fontsize':'small'})
 
         def get_grasp_animation(self, i:int, log_data: list):
+                if log_data[i].get('m','') in ['ch', 'li', 'sh']:
+                        self.get_gvns_animation(i,log_data)
+                        return
 
                 incumbent = [i for i,t in self.graph.nodes(data='type') if t=='incumbent']
                 variables = [i for i,t in self.graph.nodes(data='type') if t=='variable']
@@ -680,7 +708,7 @@ class MAXSATDraw(Draw):
                         if set(nodes).issubset(set(flipped_variables)):
                                 asp = True
                 
-                if data.get('m','') != 'ch':
+                if not data.get('m','').startswith('ch'):
                         if status == 'start':
                                 self.plot_description['comment'] = comment(data.get('par',0),len(flipped_variables), asp)
                         if status == 'end':
@@ -791,9 +819,9 @@ class MAXSATDraw(Draw):
 
 
 
-def get_visualisation(prob: Problem, alg: Algorithm, instance):
+def get_visualisation(prob: Problem, alg: Algorithm, instance, log_granularity: Log):
     prob_class = globals()[prob.name + 'Draw']
-    prob_instance = prob_class(prob, alg, instance)
+    prob_instance = prob_class(prob, alg, instance, log_granularity)
     return prob_instance
 
 

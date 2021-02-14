@@ -117,8 +117,9 @@ class InterfaceVisualisation():
 
         def on_change_log_granularity(self, change):
                 next_iter = self.log_data.change_granularity(self.controls.children[1].value, Log(self.controls.children[4].value))
+                self.plot_instance.log_granularity = self.log_data.current_level
                 #set max,min,value of slider and controls to appropriate iteration number
-                self.controls.children[0].max = self.controls.children[1].max = len(self.log_data.log_data) - 3
+                self.controls.children[0].max = self.controls.children[1].max = len(self.log_data.log_data) - 1
                 self.controls.children[1].value = next_iter
                 self.animate(None)
 
@@ -164,7 +165,7 @@ class InterfaceVisualisation():
                 # initialize graph from instance
                 with self.out:
                         self.out.clear_output()
-                        self.plot_instance = p.get_visualisation(params.problem,params.algorithm, instance)
+                        self.plot_instance = p.get_visualisation(params.problem,params.algorithm, instance, self.log_data.current_level)
                         widgets.interaction.show_inline_matplotlib_plots()
 
                 self.controls.children[1].value = 0

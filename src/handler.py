@@ -157,7 +157,7 @@ def run_gvns(solution, config: Configuration):
     li = [ prob.get_method(Algorithm.GVNS, Option.LI, m[0], m[1]) for m in config.options[Option.LI] ]
     sh = [ prob.get_method(Algorithm.GVNS, Option.SH, m[0], m[1]) for m in config.options[Option.SH] ]
     
-    alg = GVNS(solution, ch, li, sh, consider_initial_sol=True)
+    alg = GVNS(solution, ch, li, sh, consider_initial_sol=False)
 
     alg.run()
     alg.method_statistics()

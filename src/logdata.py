@@ -16,9 +16,9 @@ from .problems import Configuration, Problem, Algorithm, Option
 class Log(enum.Enum):
         StepInter = 'step-by-step (intermediate steps)' # start-frame and end-frame for each step
         StepNoInter = 'step-by-step (no intermediate steps)' # start and end combined in one frame
-        NewInc = 'new incumbents' # like StepNoInter, but only if new incumbent was found
+        NewInc = 'new incumbents' # only frames where new best solution was found
         Update = 'updated solutions' # result of a phase e.g. li(vnd)-cycle, complete rgc in one frame
-        Cycle = 'major cycles' # one entire cycle of algorithm, e.g. sh+li, rgc+li, per frame
+        Cycle = 'major cycles' # result of one entire cycle of an algorithm, e.g. sh+li (gvns), rgc+li (grasp), per frame
 
 # global variables
 len_start = 7
@@ -35,26 +35,28 @@ class LogData():
         self.log_data = log_data # holds logdata for currently active log level
 
     def init_levels(self):
+        # for each level the relevant indices are stored
         levels = dict()
         levels[Log.StepInter] = list(range(len(self.full_data)))
-        levels[Log.StepNoInter] = [i for i in levels[Log.StepInter] if self.full_data[i].get('status') != 'start']
-        levels[Log.NewInc] = [i for i in levels[Log.StepNoInter] if self.full_data[i].get('better',False)]
+        levels[Log.StepNoInter] = [0] +[i for i in levels[Log.StepInter] if not self.full_data[i].get('status') in  ['start','cl','rcl']]
+        levels[Log.NewInc] =[0] + [i for i in levels[Log.StepNoInter] if self.full_data[i].get('better',False)]
         update = list()
         for i in levels[Log.StepNoInter][:-1]:
-            if self.full_data[i].get('m', False) and (self.full_data[i].get('m') != self.full_data[i+1].get('m')):
+            if self.full_data[i].get('m', False) and (self.full_data[i].get('m') != self.full_data[i+1].get('m')) or self.full_data[i].get('end', False):
                 update.append(i)
         else:
+            update = [0] + update
             update.append(levels[Log.StepNoInter][-1])
 
         levels[Log.Update] = update
-        levels[Log.Cycle] = [ i for i in levels[Log.StepNoInter] if self.full_data[i].get('end', False)]
+        levels[Log.Cycle] =[ i for i in levels[Log.StepNoInter] if self.full_data[i].get('end', False) or self.full_data[i].get('m','').startswith('ch')]
 
         return levels
 
 
     def change_granularity(self, i: int, granularity: Log):
         # sets self.log_data to requested granularity and returns the number of iteration to show next
-        self.log_data = self.full_data[:2] + [self.full_data[i] for i in self.levels[granularity]]
+        self.log_data = [self.full_data[i] for i in self.levels[granularity]]
         current_iter = self.levels[self.current_level][i]
         next_iter = len(self.levels[granularity]) -1  if current_iter > self.levels[granularity][-1] else next(i for i,val in enumerate(self.levels[granularity]) if val >= current_iter) 
         self.current_level = granularity
