@@ -424,30 +424,35 @@ class MAXSATDraw(Draw):
 
         comments = {
                 Option.CH:{
-                        'start': lambda n,m: f'{n} variables, {m} clauses',
-                        'end': lambda par: f'initial solution={InitSolution(par).name}'
+                        'start': lambda params: f'{params.n} variables, {params.m} clauses',
+                        'end': lambda params: f'initial solution={InitSolution(params.par).name}'
                 },
                 Option.LI: {
-                        'start': lambda par,flip: f'k={par}, flipping {flip} variable(s)',
-                        'end': lambda gain,no_impr,better: f'objective gain={gain}{", no improvement - reached local optimum" if no_impr else ""}{", found new best solution" if better else ""}'
+                        'start': lambda params: f'k={params.par}, flipping {len(params.flip)} variable(s)',
+                        'end': lambda params: f'objective gain={params.gain}{", no improvement - reached local optimum" if params.no_change else ""}{", found new best solution" if params.better else ""}'
                 },
                 Option.SH: {
-                        'start': lambda par,flip: f'k={par}, flipping {flip} variable(s)',
-                        'end': lambda gain,better: f'objective gain={gain}{", found new best solution" if better else ""}'
+                        'start': lambda params: f'k={params.par}, flipping {len(params.flip)} variable(s)',
+                        'end': lambda params: f'objective gain={params.gain}{", found new best solution" if params.better else ""}'
                 },
                 Option.RGC:{
-                        'start':'start with empty solution',
-                        'end': lambda better: f'created complete solution{", found new best solution" if better else ""}',
-                        'cl': lambda par,thr,gain: 'number of additionally fulfilled clauses',
-                        'rcl': lambda par,thr,gain: f'{par}-best' if type(par)==int else f'alpha: {par}, threshold: {thr}',
-                        'sel': lambda par,thr,gain: f'random, objective gain={gain}'
+                        'start': lambda params: 'start with empty solution',
+                        'end': lambda params: f'created complete solution{", found new best solution" if params.better else ""}',
+                        'cl': lambda params: 'number of additionally fulfilled clauses',
+                        'rcl': lambda params: f'{params.k}-best' if params.k else f'alpha: {params.alpha}, threshold: {params.thres}',
+                        'sel': lambda params: f'random, objective gain={params.gain}'
                 },
                 Option.TL:{
-                        'start': lambda ll,flip,asp: f'size of tabu list={ll}, flipping {flip} variable(s){", apply aspiration criterion" if asp else ""}',
-                        'end': lambda gain,no_change,better: f'objective gain={gain}{", all possible flips are tabu" if no_change else ""}{", found new best solution" if better else ""}'
+                        'start': lambda params: f'size of tabu list={params.ll}, flipping {len(params.flip)} variable(s){", apply aspiration criterion" if params.asp else ""}',
+                        'end': lambda params: f'objective gain={params.gain}{", all possible flips are tabu" if params.no_change else ""}{", found new best solution" if params.better else ""}'
                 }
                 
                 }
+
+        def create_comment(self, option: Option, status: str, params: CommentParameters):
+                # TODO create comments according to log granularity
+
+                return self.comments[option][status](params)
 
         def __init__(self, prob: Problem, alg: Algorithm, instance, log_granularity: Log):
                 super().__init__(prob,alg,instance,log_granularity)
@@ -494,45 +499,55 @@ class MAXSATDraw(Draw):
 
                 return graph
 
-        def get_gvns_animation(self, i:int, log_data: list):
+        def get_gvns_animation(self, i:int, log_data:list):
+                data = log_data[i]
+                status = data.get('status','')
+                comment_params = CommentParameters()
+                done, lit_info = self.get_gvns_and_ts_animation(i,log_data,comment_params)
+                if done:
+                        return
+                
+                self.plot_description['comment'] = self.create_comment(Option[data.get('m','li').upper()],status,comment_params)
+                flipped_nodes = [] if status == 'end' else comment_params.flip
+                flipped_nodes += [n for n,t in self.graph.nodes(data='type') if t=='incumbent'] if data.get('better',False) else []
+                self.draw_graph(flipped_nodes + list(comment_params.add.union(comment_params.remove)))
+                self.write_literal_info(lit_info)
+
+        def get_gvns_and_ts_animation(self, i:int, log_data: list, comment_params: CommentParameters):
 
                 incumbent = [i for i,t in self.graph.nodes(data='type') if t=='incumbent']
                 variables = [i for i,t in self.graph.nodes(data='type') if t=='variable']
                 clauses = [i for i,t in self.graph.nodes(data='type') if t=='clause']
                 data = log_data[i]
                 status = data.get('status','')
-                comment = self.comments[Option[data.get('m','ch').upper()]][status]
 
-                if status == 'start' and data.get('m') == 'ch':
-                        self.plot_description['comment'] = comment(len(variables),len(clauses))
+                if status == 'start' and (data.get('m') == 'ch' or i==0):
+                        comment_params.n = len(variables)
+                        comment_params.m = len(clauses)
+                        self.plot_description['comment'] = self.create_comment(Option.CH,status, comment_params)
                         log_data[i]['best'] = log_data[i]['obj'] = 0
                         nx.set_node_attributes(self.graph,{n:'' for n,t in self.graph.nodes(data='type') if t=='incumbent'}, name='label')
                         self.draw_graph([])
-                        return
+                        return True, {}
                 if data.get('m') == 'ch' and status=='end':
                         log_data[0]['sol'] = [-1 for _ in data['sol']]
-                        self.plot_description['comment'] = comment(data.get('par',0))
-                flipped_nodes = []
 
                 nx.set_node_attributes(self.graph, {k: self.red if data['inc'][self.graph.nodes[k]['nr']-1] == 0 else self.blue for k in incumbent}, name='color')
                 nx.set_node_attributes(self.graph, {k: self.red if data['sol'][self.graph.nodes[k]['nr']-1] == 0 else self.blue for k in variables}, name='color')
-                
                 added, removed, pos_literals = self.color_and_get_changed_clauses(i, log_data, status == 'start')
-
-
                 flipped_nodes = self.get_flipped_variables(i,log_data)
-                if status== 'start':
-                        self.plot_description['comment'] = comment(data.get('par',1),len(flipped_nodes))
-                if status == 'end':
-                        if data.get('m') == 'li':
-                                self.plot_description['comment'] = comment(data["obj"] - log_data[i-1]["obj"],len(flipped_nodes) == 0, data.get('better',False))
-                        if data.get('m') == 'sh':
-                                self.plot_description['comment'] = comment(data["obj"] - log_data[i-1]["obj"],data.get('better',False))
-                        flipped_nodes = []
-                        flipped_nodes += [n for n in incumbent] if data.get('better',False) else []
 
-                self.draw_graph(flipped_nodes + list(added.union(removed)))
-                self.write_literal_info(pos_literals)
+                comment_params.flip = flipped_nodes
+                comment_params.add = added
+                comment_params.remove = removed
+                comment_params.par = data.get('par',1)
+                comment_params.gain = data["obj"] - log_data[i-1]["obj"]
+                comment_params.better = data.get('better',False)
+                comment_params.no_change = len(flipped_nodes) == 0
+
+                return False, pos_literals
+                
+
 
 
         def get_flipped_variables(self, i: int, log_data: list):
@@ -607,10 +622,11 @@ class MAXSATDraw(Draw):
                 clauses = [i for i,t in self.graph.nodes(data='type') if t=='clause']
                 data = log_data[i]
                 status = data.get('status','')
-                comment = self.comments[Option.RGC][status]
-
+                #comment = self.comments[Option.RGC][status]
+                comment_params = CommentParameters()
+                comment_params.better = data.get('better',False)
                 if status == 'end':
-                        self.plot_description['comment'] = comment(data.get('better',False))
+                        self.plot_description['comment'] = self.create_comment(Option.RGC,status,comment_params)
                         nx.set_node_attributes(self.graph, {k: self.red if data['inc'][self.graph.nodes[k]['nr']-1] == 0 else self.blue for k in incumbent}, name='color')
                         nx.set_node_attributes(self.graph, {k: self.red if data['sol'][self.graph.nodes[k]['nr']-1] == 0 else self.blue for k in variables}, name='color')
                         _,_,pos_literals = self.color_and_get_changed_clauses(i,log_data)
@@ -622,9 +638,8 @@ class MAXSATDraw(Draw):
                 nx.set_node_attributes(self.graph,{n:'' for n,t in self.graph.nodes(data='type') if t=='incumbent'}, name='label')
 
                 if status == 'start':
-                        self.plot_description['comment'] = comment
+                        self.plot_description['comment'] = self.create_comment(Option.RGC,status,comment_params)
                         log_data[i]['obj'] = 0
-
                         self.draw_graph([])
                         self.write_literal_info(dict.fromkeys(clauses,0))
                         return
@@ -649,7 +664,12 @@ class MAXSATDraw(Draw):
 
                 mx = max(data['cl'].values())
                 par = data.get('par', 0)
-                self.plot_description['comment'] = comment(par, round(mx*par,2), len(added))
+                if type(par) == int:
+                        comment_params.k = par
+                else:
+                        comment_params.alpha = par
+                        comment_params.thres = round(mx*par,2)
+                comment_params.gain = len(added)
 
                 j = i
                 while not log_data[j]['status'] in ['start','end']:
@@ -660,6 +680,7 @@ class MAXSATDraw(Draw):
                         })
 
                 # draw graph and print textual information
+                self.plot_description['comment'] = self.create_comment(Option.RGC,status, comment_params)
                 self.draw_graph(([abs(sel)] if sel != 0 else []) + list(added))
                 self.write_literal_info(pos_literals)
                 self.write_cl_info(cl, rcl, sel)
@@ -669,48 +690,31 @@ class MAXSATDraw(Draw):
 
                 data = log_data[i]
                 status = data.get('status','start')
-                comment = self.comments[Option.TL][status]
-                incumbent = [i for i,t in self.graph.nodes(data='type') if t=='incumbent']
-                variables = [i for i,t in self.graph.nodes(data='type') if t=='variable']
-                clauses = [i for i,t in self.graph.nodes(data='type') if t=='clause']
-
-                if data.get('m','').startswith('ch'):
-                        if status == 'start':
-                                self.plot_description['comment'] = self.comments[Option.CH][status](len(variables), len(clauses))
-                                nx.set_node_attributes(self.graph,{n:'' for n,t in self.graph.nodes(data='type') if t=='incumbent'}, name='label')
-                                self.draw_graph([])
-                                return
-                        if status == 'end':
-                                self.plot_description['comment'] = self.comments[Option.CH][status](InitSolution(data.get('par',0)))
-                                log_data[0]['sol'] = [-1 for _ in data['sol']]
-
-
-                nx.set_node_attributes(self.graph, {k: self.red if data['inc'][self.graph.nodes[k]['nr']-1] == 0 else self.blue for k in incumbent}, name='color')
-                nx.set_node_attributes(self.graph, {k: self.red if data['sol'][self.graph.nodes[k]['nr']-1] == 0 else self.blue for k in variables}, name='color')
-                
-                added, removed, pos_literals = self.color_and_get_changed_clauses(i, log_data, status == 'start')
-                flipped_variables = self.get_flipped_variables(i,log_data)
+                comment_params = CommentParameters()
+                done, lit_info = self.get_gvns_and_ts_animation(i,log_data,comment_params)
+                if done:
+                        return 
+                        
+                flipped_nodes = comment_params.flip 
                 
                 tabu_list = data.get('tabu',[])
                 asp = False
                 for ta in tabu_list:
                         tabu_var = list(map(abs,ta[0]))
                         life = ta[1]
-                        nodes = [n for n in variables if self.graph.nodes[n]['nr'] in tabu_var]
+                        nodes = [n for n,t in self.graph.nodes(data='type') if t=='variable' and self.graph.nodes[n]['nr'] in tabu_var]
                         nx.set_node_attributes(self.graph, {n: {'tabu':True,'label':str(life)} for n in nodes})
-                        if set(nodes).issubset(set(flipped_variables)):
+                        if set(nodes).issubset(set(flipped_nodes)):
                                 asp = True
                 
-                if not data.get('m','').startswith('ch'):
-                        if status == 'start':
-                                self.plot_description['comment'] = comment(data.get('par',0),len(flipped_variables), asp)
-                        if status == 'end':
-                                self.plot_description['comment'] = comment(data["obj"] - log_data[i-1]["obj"],len(flipped_variables) == 0, data.get('better', False))
-                flipped_variables = [] if status == 'end' else flipped_variables
-                flipped_variables += incumbent if data.get('better', False) else []
-
-                self.draw_graph(flipped_variables + list(added.union(removed)))
-                self.write_literal_info(pos_literals)
+                comment_params.asp = asp
+                comment_params.ll = data.get('par',0)
+                
+                self.plot_description['comment'] = self.create_comment(Option.CH if data.get('m').startswith('ch') else Option.TL,status,comment_params)
+                flipped_nodes = [] if status == 'end' else comment_params.flip
+                flipped_nodes += [n for n,t in self.graph.nodes(data='type') if t=='incumbent'] if data.get('better',False) else []
+                self.draw_graph(flipped_nodes + list(comment_params.add.union(comment_params.remove)))
+                self.write_literal_info(lit_info)
 
 
         def write_cl_info(self, cl: dict(), rcl: list(), sel: int):
