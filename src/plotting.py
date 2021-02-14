@@ -162,11 +162,11 @@ class MISPDraw(Draw):
                                 'end': lambda params: f'initial solution={InitSolution(params.par).name}'
                         },
                         Option.LI: {
-                                'start': lambda params: f'k={params.par}, remove {params.remove} node(s), add {params.add} node(s)',
+                                'start': lambda params: f'k={params.par}, remove {len(params.remove)} node(s), add {len(params.add)} node(s)',
                                 'end': lambda params: f'objective gain={params.gain}{", no improvement - reached local optimum" if params.no_change else ""}{", found new best solution" if params.better else ""}'
                         },
                         Option.SH: {
-                                'start': lambda params: f'k={params.par}, remove {params.remove} node(s), add {params.add} node(s)',
+                                'start': lambda params: f'k={params.par}, remove {len(params.remove)} node(s), add {len(params.add)} node(s)',
                                 'end': lambda params: f'objective gain={params.gain}{", found new best solution" if params.better else ""}'
                         },
                         Option.RGC:{
@@ -177,7 +177,7 @@ class MISPDraw(Draw):
                                 'sel': lambda params: f'random, objective gain={params.gain}'
                         },
                         Option.TL:{
-                                'start': lambda params: f'size of tabu list={params.ll}, remove {params.remove} node(s), add {params.add} node(s){", apply aspiration criterion" if params.asp else ""}',
+                                'start': lambda params: f'size of tabu list={params.ll}, remove {len(params.remove)} node(s), add {len(params.add)} node(s){", apply aspiration criterion" if params.asp else ""}',
                                 'end': lambda params: f'objective gain={params.gain}{", all possible exchanges are tabu" if params.no_change else ""}{", found new best solution" if params.better else ""}'
                         }
                         
@@ -217,8 +217,18 @@ class MISPDraw(Draw):
                 return graph
 
         def get_gvns_animation(self, i:int, log_data: list):
-
+                data = log_data[i]
+                status = data.get('status','start')
                 comment_params = CommentParameters()
+                done = self.get_gvns_and_ts_animation(i,log_data,comment_params)
+                if done:
+                        return
+
+                self.plot_description['comment'] = self.create_comment(Option[data.get('m','li').upper()],status,comment_params)
+                self.draw_graph(data['inc'])
+
+        def get_gvns_and_ts_animation(self, i:int, log_data: list, comment_params: CommentParameters):
+
                 data = log_data[i]
                 status = data.get('status','')
                 sol = data.get('sol',[])
@@ -229,9 +239,10 @@ class MISPDraw(Draw):
                         self.plot_description['comment'] = self.create_comment(Option.CH,status,comment_params)
                         log_data[i]['best'] = log_data[i]['obj'] = 0
                         self.draw_graph()
-                        return
+                        return True
                 #set color of nodes and edges
                 remove,add = self.get_removed_and_added_nodes(i,log_data)
+                #self.color_nodes_and_edges(data,remove,add)
                 nx.set_node_attributes(self.graph, {n:self.blue for n in sol}, 'color')
                 nx.set_node_attributes(self.graph, {n:{'label':'+','color':self.green if status == 'start' else self.blue} for n in add})
                 nx.set_node_attributes(self.graph, {n:{'label':'-','color':self.red if status == 'start' else self.grey} for n in remove})
@@ -239,15 +250,13 @@ class MISPDraw(Draw):
                 nx.set_edge_attributes(self.graph, {e:'black' for n in add for e in self.graph.edges(n)} if status == 'end' else {}, 'color')
 
                 # fill parameters for plot description
-                comment_params.remove = len(remove)
-                comment_params.add = len(add)
+                comment_params.remove = remove
+                comment_params.add = add
                 comment_params.par = data.get('par',1)
                 comment_params.gain = data["obj"] - log_data[i-1]["obj"]
                 comment_params.no_change = not (add or remove)
                 comment_params.better = data.get('better',False)
-                self.plot_description['comment'] = self.create_comment(Option[data.get('m','li').upper()],status,comment_params)
-
-                self.draw_graph(data['inc'])
+                return False
 
 
         def get_removed_and_added_nodes(self, i, log_data):
@@ -276,14 +285,12 @@ class MISPDraw(Draw):
                         self.draw_graph(data.get('inc') if status == 'end' else [])
                         return
 
-
                 nx.set_node_attributes(self.graph, data.get('cl',{}), 'label')
                 nx.set_node_attributes(self.graph, {n: self.green if data.get('sel',-1) == n else self.blue for n in data.get('sol', [])}, name='color')
                 selected = set() if not data.get('sel',False) else set(self.graph.neighbors(data.get('sel')))
                 n_unsel = selected.intersection(set(data['cl'].keys()))
                 nx.set_node_attributes(self.graph, {n:self.orange for n in n_unsel},'color')
                 nx.set_edge_attributes(self.graph, {(data.get('sel',n),n):'black' for n in n_unsel}, 'color')
-
 
                 par = data.get('par',0.)
                 mn = min(data.get('cl').values())
@@ -308,35 +315,9 @@ class MISPDraw(Draw):
                 data = log_data[i]
                 status = data.get('status','')
                 comment_params = CommentParameters()
-
-                if status == 'start' and (data.get('m') == 'ch' or i==0):
-                        comment_params.n = len(self.graph.nodes())
-                        comment_params.m = len(self.graph.edges())
-                        self.plot_description['comment'] = self.create_comment(Option.CH,status,comment_params)
-                        log_data[i]['best'] = log_data[i]['obj'] = 0
-                        self.draw_graph()
+                done = self.get_gvns_and_ts_animation(i,log_data,comment_params)
+                if done:
                         return
-
-                if data.get('m','').startswith('ch'):
-                        if status == 'start':
-                                self.plot_description['comment'] = self.comments[Option.CH][status](len(self.graph.nodes()), len(self.graph.edges()))
-                                self.draw_graph([])
-                                return
-                        if status == 'end':
-                                self.plot_description['comment'] = self.comments[Option.CH][status](data.get('par',0))
-                                nx.set_node_attributes(self.graph, {n:self.blue for n in data.get('sol')}, 'color')
-                                self.draw_graph(data.get('inc',[]))
-                                return
-
-                comment = self.comments[Option.TL][status]
-
-                remove, add = self.get_removed_and_added_nodes(i,log_data)
-
-                nx.set_node_attributes(self.graph, {n:self.blue for n in data.get('sol')}, 'color')
-
-                if status == 'start':
-                        nx.set_node_attributes(self.graph, {n:{'label':'+','color':self.green} for n in add})
-                        nx.set_node_attributes(self.graph, {n:{'label':'-','color':self.red} for n in remove})
 
                 tabu_list = data.get('tabu',[])
                 asp_nodes = set()
@@ -344,17 +325,13 @@ class MISPDraw(Draw):
                         tabu_nodes = list(ta[0])
                         life = ta[1]
                         nx.set_node_attributes(self.graph, {n: {'label':life,'tabu':True} for n in tabu_nodes})
-                        if data.get('status','') == 'start' and set(tabu_nodes).issubset(add):
-                                asp_nodes = asp_nodes.union(set(tabu_nodes).intersection(add))
+                        if data.get('status','') == 'start' and set(tabu_nodes).issubset(comment_params.add):
+                                asp_nodes = asp_nodes.union(set(tabu_nodes).intersection(comment_params.add))
 
-                if status == 'start':
-                        self.plot_description['comment'] = comment(data.get("par"),len(remove),len(add),len(asp_nodes)>0)
-                if status == 'end':
-                        self.plot_description['comment'] = comment(data["obj"] - log_data[i-1]["obj"],not (add or remove),data.get('better',False))
+                comment_params.asp = len(asp_nodes) > 0
+                comment_params.ll = data.get('par')
 
-                if data.get('better',False):
-                        nx.set_node_attributes(self.graph, {n:self.yellow for n in data.get('inc')}, 'color')
-
+                self.plot_description['comment'] = self.create_comment(Option.CH if data.get('m').startswith('ch') else Option.TL,status,comment_params)
                 self.draw_graph(data.get('inc',[]))
 
 
