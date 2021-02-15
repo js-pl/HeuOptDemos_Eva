@@ -103,9 +103,17 @@ class Draw(ABC):
                 else:
                         self.plot_description['phase'] = self.phases.get(log_info['status'],'') + self.phases.get(log_info.get('m',''),'')
 
+                phase = self.plot_description['phase']
+                
+                if self.log_granularity == Log.Cycle and not log_info.get('m','').startswith('ch'):
+                        if self.algorithm == Algorithm.GVNS:
+                                phase = 'Shaking + Local Search'
+                        if self.algorithm == Algorithm.GRASP:
+                                phase = 'Randomized Greedy Construction + Local Search'
+
 
                 self.ax.text(0,1, '\n'.join((
-                '%s: %s' % (self.plot_description['phase'], self.plot_description['comment'] ),
+                '%s: %s' % (phase, self.plot_description['comment'] ),
                 'Best Objective: %d' % (log_info.get('best',self.plot_description['best']), ),
                 'Current Objective: %d' % (log_info.get('obj',self.plot_description['obj']),))), horizontalalignment='left', verticalalignment='top', transform=self.ax.transAxes)
 
@@ -185,8 +193,26 @@ class MISPDraw(Draw):
 
         def create_comment(self, option: Option, status: str, params: CommentParameters):
                 # TODO create comments according to log granularity
-
                 return self.comments[option][status](params)
+                '''
+                if self.log_granularity == Log.StepInter:
+                        return self.comments[option][status](params)
+                if (self.log_granularity == Log.StepNoInter and  option != Option.CH) or self.log_granularity == Log.NewInc:
+                        option = self.comments[option]
+                        return ','.join([option['start'](params),
+                                #option.get('cl','')(params), option.get('rcl','')(params), option.get('sel','')(params),
+                                option['end'](params)])
+                if self.log_granularity == Log.Update:
+                        start = self.comments[option]['start'](params) if option != Option.LI else f'remove {len(params.remove)} node(s), add {len(params.add)} node(s)'
+                        option = self.comments[option]
+                        return ','.join([start,
+                                option['end'](params)])
+                if self.log_granularity == Log.Cycle:
+                        if self.algorithm == Algorithm.GVNS:
+                                return self.comments[option]['end'](params)
+                        else:
+                                return self.comments[option]['end'](params)
+                '''
 
 
 
