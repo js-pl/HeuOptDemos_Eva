@@ -11,6 +11,7 @@ import os
 
 import enum
 import time
+import pandas as pd
 from .problems import Configuration, Problem, Algorithm, Option
 
 class Log(enum.Enum):
@@ -265,6 +266,98 @@ def get_log_description(filename: str):
     
     return '\n'.join(description)
 
+
+class RunData():
+
+    def __init__(self):
+        self.summaries = dict()
+        self.iteration_df = pd.DataFrame()
+
+    def reset(self):
+        self.summaries = dict()
+        self.iteration_df = pd.DataFrame()
+
+    def save_to_logfile(self, config: Configuration, filepath: str, description: str=None, append: bool=False):
+        mode = 'w' if description else 'r+'
+        f = open(filepath, mode)
+
+        if description:
+                f.write(description+'\n')
+                df = self.iteration_df[config.name].T
+                df.to_csv(f,sep=' ',na_rep='NaN', mode='a', line_terminator='\n')
+                f.write('S summary\n')
+                self.summaries[config.name].to_csv(f,na_rep='NaN', sep=' ',mode='a',line_terminator='\n')
+                f.close()
+        else:
+                saved_runs = set(config.saved_runs)
+                runs = set(range(1,config.runs+1))
+                to_save = list(runs - saved_runs)
+                to_save.sort()
+                if len(to_save) == 0:
+                        f.close()
+                        return
+                data = f.readlines()
+                df = self.iteration_df[config.name][to_save].T
+                sm = self.summaries[config.name].loc[to_save]
+                existing_runs =int(data[0].split('=')[1].strip())
+                if append: #seed==0
+
+                        idx = next((i for i,v in enumerate(data) if v.startswith('S ')), 0)
+                        df.index = pd.Index(range(existing_runs+1,existing_runs+1+len(to_save)))
+                        sm.index = pd.MultiIndex.from_tuples(zip(df.index.repeat(len(sm)/len(to_save)),sm.index.get_level_values(1)),names=sm.index.names)
+                        sm.reset_index(inplace=True)
+                        data.insert(idx, df.to_csv(sep=' ',line_terminator='\n',header=False))
+                        data += [sm.to_csv(sep=' ',line_terminator='\n', index=False,header=False)]
+                        data[0] = f'R runs={df.index[-1]}\n'
+                        f.seek(0)
+                        f.writelines(data)
+                        f.truncate()
+                        f.close()
+                        
+                        os.rename(filepath,filepath.replace(f'r{existing_runs}',f'r{existing_runs+len(to_save)}',1))
+                    
+                else: # seed!= 0
+                        if len(runs) <= existing_runs:
+                                f.close()
+                                return
+                        data[0] = f"R runs={config.runs}\n"
+                        idx = next((i for i,v in enumerate(data) if not v[0] in ['R','D']), 0)
+                        data = data[:idx]
+                        data += [df.to_csv(sep=' ',line_terminator='\n')]
+                        data += ['S summary\n']
+                        data += [sm.to_csv(sep=' ',line_terminator='\n')]
+                        f.seek(0)
+                        f.writelines(data)
+                        f.truncate()
+                        f.close()
+
+                        os.rename(filepath,filepath.replace(f'r{existing_runs}',f'r{len(to_save)}',1))
+
+
+    def load_datafile(self,filename,runs: int):
+            f = open(filename, 'r')
+            pos = 0
+            while True:
+                    l = f.readline()
+                    if not l[0] in ['D','R']:
+                            break
+                    pos = f.tell()
+            f.seek(pos)
+            data = pd.read_csv(f, sep=r'\s+', nrows=runs).T
+            data.reset_index(drop=True, inplace=True)
+            data.index += 1
+            f.seek(pos)
+            
+            while True:
+                    l = f.readline()
+                    if l[0] == 'S':
+                            break
+            sm = pd.read_csv(f,sep=r'\s+',index_col=['run','method'])
+            sm = sm[sm.index.get_level_values('run') <= runs]
+            f.close()
+
+            return data,sm     
+      
 
 
 # only used for debugging
