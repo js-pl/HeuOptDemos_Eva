@@ -17,18 +17,17 @@ from matplotlib.lines import Line2D
 from dataclasses import dataclass
 
 
+
 plt.rcParams['figure.figsize'] = (12,6)
 plt.rcParams['figure.dpi'] = 80
 plt.rcParams['figure.autolayout'] = True
 plt.rcParams['axes.facecolor'] = 'w'
-plt.rcParams['axes.spines.left'] = False
-plt.rcParams['axes.spines.right'] = False
-plt.rcParams['axes.spines.top'] = False
-plt.rcParams['axes.spines.bottom'] = False
-
 pc_dir = 'pseudocode'
 
 class Draw(ABC):
+
+
+
 
         phases = {'ch':'Construction', 'li': 'Local Search', 'sh': 'Shaking', 'rgc': 'Randomized Greedy Construction', 
                         'cl':'Candidate List', 'rcl': 'Restricted Candidate List', 'sel':'Selection from RCL'}
@@ -185,8 +184,8 @@ class MISPDraw(Draw):
                                 'sel': lambda params: f'random, objective gain={params.gain}'
                         },
                         Option.TL:{
-                                'start': lambda params: f'size of tabu list={params.ll}, remove {len(params.remove)} node(s), add {len(params.add)} node(s){", apply aspiration criterion" if params.asp else ""}',
-                                'end': lambda params: f'objective gain={params.gain}{", all possible exchanges are tabu" if params.no_change else ""}{", found new best solution" if params.better else ""}'
+                                'start': lambda params: f'k={params.par} remove {len(params.remove)} node(s), add {len(params.add)} node(s){", apply aspiration criterion" if params.asp else ""}',
+                                'end': lambda params: f'size of tabu list={params.ll}, objective gain={params.gain}{", all possible exchanges are tabu" if params.no_change else ""}{", found new best solution" if params.better else ""}'
                         }
                         
                         }
@@ -355,7 +354,7 @@ class MISPDraw(Draw):
                                 asp_nodes = asp_nodes.union(set(tabu_nodes).intersection(comment_params.add))
 
                 comment_params.asp = len(asp_nodes) > 0
-                comment_params.ll = data.get('par')
+                comment_params.ll = data.get('ll',0)
 
                 self.plot_description['comment'] = self.create_comment(Option.CH if data.get('m').startswith('ch') else Option.TL,status,comment_params)
                 self.draw_graph(data.get('inc',[]))
@@ -416,6 +415,8 @@ class MISPDraw(Draw):
                 self.ax.clear()
                 self.ax.set_ylim(bottom=-1.5,top=1.3)
                 self.ax.set_xlim(left=-1.1,right=1.1)
+                for pos in ['right', 'top', 'bottom', 'left']: 
+                        self.ax.spines[pos].set_visible(False) 
 
                 nodelist = self.graph.nodes()
 
@@ -469,8 +470,8 @@ class MAXSATDraw(Draw):
                         'sel': lambda params: f'random, objective gain={params.gain}'
                 },
                 Option.TL:{
-                        'start': lambda params: f'size of tabu list={params.ll}, flipping {len(params.flip)} variable(s){", apply aspiration criterion" if params.asp else ""}',
-                        'end': lambda params: f'objective gain={params.gain}{", all possible flips are tabu" if params.no_change else ""}{", found new best solution" if params.better else ""}'
+                        'start': lambda params: f'k={params.par} flipping {len(params.flip)} variable(s){", apply aspiration criterion" if params.asp else ""}',
+                        'end': lambda params: f'size of tabu list={params.ll}, objective gain={params.gain}{", all possible flips are tabu" if params.no_change else ""}{", found new best solution" if params.better else ""}'
                 }
                 
                 }
@@ -734,7 +735,7 @@ class MAXSATDraw(Draw):
                                 asp = True
                 
                 comment_params.asp = asp
-                comment_params.ll = data.get('par',0)
+                comment_params.ll = data.get('ll',0)
                 
                 self.plot_description['comment'] = self.create_comment(Option.CH if data.get('m').startswith('ch') else Option.TL,status,comment_params)
                 flipped_nodes = [] if status == 'end' else comment_params.flip
@@ -798,6 +799,8 @@ class MAXSATDraw(Draw):
                 self.ax.clear()
                 self.ax.set_ylim(bottom=-1,top=1.2)
                 self.ax.set_xlim(left=-1,right=1)
+                for pos in ['right', 'top', 'bottom', 'left']: 
+                        self.ax.spines[pos].set_visible(False) 
 
                 var_inc_nodes = [n for n,t in nx.get_node_attributes(self.graph, 'type').items() if  t in ['variable', 'incumbent']]
                 var_inc_color = [self.graph.nodes[n]['color'] for n in var_inc_nodes]

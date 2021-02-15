@@ -160,7 +160,7 @@ class MAXSAT(ProblemDefinition):
                                     Option.CH: [Parameters(InitSolution.random.name, MAXSATSolution.construct),
                                             Parameters(InitSolution.greedy.name, MAXSATSolution.construct_greedy, value=InitSolution.greedy.value)
                                             ],
-                                Option.LI: [Parameters('k-flip neighborhood search', MAXSATSolution.k_flip_neighborhood_search, param_type=int)],
+                                Option.LI: [Parameters('k-flip neighborhood search', MAXSATSolution.local_improve_restricted, param_type=int)],
                                 Option.TL: [Parameters('min length',None,int),Parameters('max length',None,int),Parameters('change (iteration)', None,int)]
                                 }
                     }
@@ -197,7 +197,7 @@ class MISP(ProblemDefinition):
                                     Option.CH: [Parameters(InitSolution.random.name, MISPSolution.construct)
                                             ,Parameters(InitSolution.greedy.name, MISPSolution.construct_greedy, value=InitSolution.greedy.value)
                                             ],
-                                    Option.LI: [Parameters('two-exchange random fill neighborhood search', MISPSolution.two_exchange_random_fill_neighborhood_search, value=2)],
+                                    Option.LI: [Parameters('two-exchange random fill neighborhood search', MISPSolution.local_improve_restricted, value=2)],
                                     Option.TL: [Parameters('min length',None,int),Parameters('max length',None,int),Parameters('change (iteration)', None,int)]
                                 
                     }
