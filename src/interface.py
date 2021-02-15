@@ -474,17 +474,10 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                 super().__init__(visualisation=False)
                 self.configurations = {}
                 self.out = widgets.Output()
-                
                 self.line_checkboxes = widgets.VBox()
                 self.run_button.description = 'Run configuration'
                 self.iter_slider = widgets.IntSlider(layout=widgets.Layout(padding="2em 0 0 0"),description='iteration', value=1, min=1)
                 self.plot_options = None
-                #plt.rcParams['axes.spines.left'] = True
-                #plt.rcParams['axes.spines.right'] = True
-                #plt.rcParams['axes.spines.top'] = True
-                #plt.rcParams['axes.spines.bottom'] = True
-                #plt.rcParams['figure.figsize'] = (12,7)
-                #plt.rcParams['figure.autolayout'] = True
                 self.plot_instance = PlotRuntime()
                 self.run_data = RunData()
 
@@ -528,28 +521,33 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                 checkboxes = []
                 for o in ['max','min','polygon','median','mean','best']:
                         checkboxes.append(self.init_checkbox(o))
+                        checkboxes[-1].value = True if o in ['median', 'polygon'] else False
                         checkboxes[-1].layout = widgets.Layout(width='auto', grid_area=o)
                         checkboxes[-1].indent= False
+
+                sum_radiobuttons = widgets.RadioButtons(options=['succ', 'succ-rate%', 'tot-obj-gain', 'avg-obj-gain', 'rel-succ%',  'net-time',  'net-time%',  'brut-time',  'brut-time%'],
+                                                                layout=widgets.Layout(width='auto', grid_area='sum'))
 
                 def on_change_plotoptions(change):
                         self.plot_comparison(self.iter_slider.value)
 
                 solutions.observe(on_change_plotoptions,names='value')
+                sum_radiobuttons.observe(on_change_plotoptions,names='value')
                 self.iter_slider.layout.grid_area='iter'
                 self.iter_slider.indent = False
-                self.plot_options = widgets.GridBox(children=[solutions, self.iter_slider] + checkboxes, 
+                self.plot_options = widgets.GridBox(children=[solutions, self.iter_slider, sum_radiobuttons] + checkboxes, 
                                         layout=widgets.Layout(
                                                 padding='1em',
                                                 border='solid black 1px',
                                                 visibility='hidden',
-                                                width='30%',
+                                                width='40%',
                                                 grid_template_rows='auto auto auto auto',
-                                                grid_template_columns='40% 30% 30%',
+                                                grid_template_columns='30% 20% 30% 20%',
                                                 grid_template_areas='''
-                                                "sol max median"
-                                                "sol min mean"
-                                                ". polygon best"
-                                                " iter iter iter"
+                                                "sol max median sum"
+                                                "sol min mean sum"
+                                                ". polygon best sum"
+                                                " iter iter iter sum"
                                                 '''))
 
 
@@ -563,6 +561,127 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                 display(self.out)
                 on_reset(None)
 
+                
+        def init_checkbox(self,name: str):
+                def on_change(change):
+                        self.iter_slider.value = self.get_best_idx()
+                        self.plot_comparison(self.iter_slider.value)
+                        
+                cb = widgets.Checkbox(description=name, value=True)
+                cb.observe(on_change,names='value')
+                return cb
+
+
+        def run(self, event):
+                text = widgets.Label(value='running...')
+                display(text)
+                # disable prob + inst + iteration + run button
+                self.problemWidget.disabled = self.instanceWidget.disabled = True
+                self.settingsWidget.children[0].children[0].disabled = True
+                self.run_button.disabled = True
+
+                # prepare params and name, save params in dict of configurations
+                params = self.prepare_parameters()
+
+                # run algorithm with params or load data from file
+                log_df,summary = self.load_datafile_or_run_algorithm(params)
+
+                text.layout.display = 'None'
+                self.run_button.disabled = False
+
+                self.run_data.iteration_df = pd.concat([self.run_data.iteration_df,log_df], axis=1)
+                self.run_data.summaries[params.name] = summary
+                self.plot_instance.problem = Problem(self.problemWidget.value)
+
+                # add name to checkbox list
+                self.line_checkboxes.children +=(self.init_checkbox(params.name),)
+                self.plot_options.layout.visibility = 'visible'
+
+                # plot checked data
+                self.iter_slider.value = self.get_best_idx()
+                self.iter_slider.max = len(self.run_data.iteration_df)
+                self.plot_comparison(self.iter_slider.value)
+
+
+        def get_best_idx(self):
+                checked = [c.description for c in self.line_checkboxes.children if c.value]
+                if checked == []:
+                        return 1
+                df = self.run_data.iteration_df[checked]
+                m = 1
+                if Problem(self.problemWidget.value) in [Problem.MAXSAT,Problem.MISP]:
+                        m = df.max().max()
+                else:
+                        m = df.min().min()
+                return df.loc[df.isin([m]).any(axis=1)].index.min()
+
+
+        def prepare_parameters(self):
+                params = super().prepare_parameters()
+                params.runs = self.settingsWidget.children[0].children[2].value
+                params.use_runs = self.settingsWidget.children[0].children[3].value
+                name = [f'{params.algorithm.name.lower()}']
+                for k,v in params.options.items():
+                        if not type(k) == Option or len(v) == 0:
+                                continue
+                        o = k.name.lower()+ '-' + '-'.join([str(p[1]) for p in v])
+                        o = o.replace('.','')
+                        name += [o]
+
+                count = len(self.line_checkboxes.children) + 1
+                params.name = str(count) + '. ' + '_'.join(name)
+                self.configurations[params.name] = params
+                return params
+
+
+        def plot_comparison(self, i):
+                with self.out:
+                        checked = [c.description for c in self.line_checkboxes.children if c.value]
+                        if checked == []:
+                                self.out.clear_output()
+                                plt.close()
+                                return
+                        selected_iter_data = self.run_data.iteration_df[checked]
+                        lines = [o.description for o in self.plot_options.children[3:] if o.value]
+                        lines += ['best_sol' if self.plot_options.children[0].value.startswith('best') else 'current_sol']
+                        sum_option = self.plot_options.children[2].value
+                        selected_sum_data = {name:df[sum_option] for name,df in self.run_data.summaries.items() if name in checked}
+                        self.plot_instance.plot(i, lines, sum_option, selected_iter_data, selected_sum_data)
+
+                        widgets.interaction.show_inline_matplotlib_plots()
+
+
+        def load_datafile_or_run_algorithm(self,params: Configuration):
+
+                if params.use_runs:
+                        name = f'i{params.iterations}_s{params.seed}_' + params.name[params.name.find('.')+1:].strip()
+                        description = self.create_configuration_description(params)
+                        file_name = self.configuration_exists_in_saved(name,description)
+                        if file_name:
+                                f = open(file_name, 'r')
+                                ex_runs = int(f.readline().split('=')[1].strip())
+                                if params.runs <= ex_runs:
+                                        data, sm = self.run_data.load_datafile(file_name,params.runs)
+                                        data.columns = pd.MultiIndex.from_tuples(zip([params.name]*len(data.columns), data.columns))
+                                        self.configurations[params.name].saved_runs = list(data.columns.get_level_values(1))
+                                        return data, sm
+                                if params.seed == 0:
+                                        runs = params.runs
+                                        # load existing runs
+                                        data, sm = self.run_data.load_datafile(file_name,ex_runs)
+                                        data.columns = pd.MultiIndex.from_tuples(zip([params.name]*len(data.columns), data.columns))
+                                        # generate runs-ex_runs new ones and set correct run numbers
+                                        params.runs = runs-ex_runs
+                                        new_data, new_sm = handler.run_algorithm_comparison(params)
+                                        params.runs = runs
+                                        new_data.columns = pd.MultiIndex.from_tuples([(n,int(r)+ex_runs) for (n,r) in new_data.columns])
+                                        new_sm.index = pd.MultiIndex.from_tuples([(int(r)+ex_runs,m) for (r,m) in new_sm.index])
+
+                                        self.configurations[params.name].saved_runs = list(data.columns.get_level_values(1))
+                                        # concatenate them
+                                        return pd.concat([data,new_data],axis=1),pd.concat([sm,new_sm])
+                                
+                return handler.run_algorithm_comparison(params)
 
 
         def save_runs(self,event):
@@ -630,128 +749,9 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                                 s += f'D {o.name}{i}\n'
 
                 return s.strip()
-                
-                
-        def init_checkbox(self,name: str):
-                def on_change(change):
-                        self.iter_slider.value = self.get_best_idx()
-                        self.plot_comparison(self.iter_slider.value)
-                        
-                cb = widgets.Checkbox(description=name, value=True)
-                cb.observe(on_change,names='value')
-                return cb
-        
-
-        def run(self, event):
-                text = widgets.Label(value='running...')
-                display(text)
-                # disable prob + inst + iteration + run button
-                self.problemWidget.disabled = self.instanceWidget.disabled = True
-                self.settingsWidget.children[0].children[0].disabled = True
-                self.run_button.disabled = True
-
-                # prepare params and name, save params in dict of configurations
-                params = self.prepare_parameters()
-
-                # run algorithm with params or load data from file
-                log_df,summary = self.load_datafile_or_run_algorithm(params)
-
-                text.layout.display = 'None'
-                self.run_button.disabled = False
-
-                self.run_data.iteration_df = pd.concat([self.run_data.iteration_df,log_df], axis=1)
-                self.run_data.summaries[params.name] = summary
-                self.plot_instance.problem = Problem(self.problemWidget.value)
-
-                # add name to checkbox list
-                self.line_checkboxes.children +=(self.init_checkbox(params.name),)
-                self.plot_options.layout.visibility = 'visible'
-
-                # plot checked data
-                self.iter_slider.value = self.get_best_idx()
-                self.iter_slider.max = len(self.run_data.iteration_df)
-                self.plot_comparison(self.iter_slider.value)
 
 
-        def load_datafile_or_run_algorithm(self,params: Configuration):
 
-                if params.use_runs:
-                        name = f'i{params.iterations}_s{params.seed}_' + params.name[params.name.find('.')+1:].strip()
-                        description = self.create_configuration_description(params)
-                        file_name = self.configuration_exists_in_saved(name,description)
-                        if file_name:
-                                f = open(file_name, 'r')
-                                ex_runs = int(f.readline().split('=')[1].strip())
-                                if params.runs <= ex_runs:
-                                        data, sm = self.run_data.load_datafile(file_name,params.runs)
-                                        data.columns = pd.MultiIndex.from_tuples(zip([params.name]*len(data.columns), data.columns))
-                                        self.configurations[params.name].saved_runs = list(data.columns.get_level_values(1))
-                                        return data, sm
-                                if params.seed == 0:
-                                        runs = params.runs
-                                        # load existing runs
-                                        data, sm = self.run_data.load_datafile(file_name,ex_runs)
-                                        data.columns = pd.MultiIndex.from_tuples(zip([params.name]*len(data.columns), data.columns))
-                                        # generate runs-ex_runs new ones and set correct run numbers
-                                        params.runs = runs-ex_runs
-                                        new_data, new_sm = handler.run_algorithm_comparison(params)
-                                        params.runs = runs
-                                        new_data.columns = pd.MultiIndex.from_tuples([(n,int(r)+ex_runs) for (n,r) in new_data.columns])
-                                        new_sm.index = pd.MultiIndex.from_tuples([(int(r)+ex_runs,m) for (r,m) in new_sm.index])
-
-                                        self.configurations[params.name].saved_runs = list(data.columns.get_level_values(1))
-                                        # concatenate them
-                                        return pd.concat([data,new_data],axis=1),pd.concat([sm,new_sm])
-                                
-                return handler.run_algorithm_comparison(params)
-
-
-        def get_best_idx(self):
-                checked = [c.description for c in self.line_checkboxes.children if c.value]
-                if checked == []:
-                        return 1
-                df = self.run_data.iteration_df[checked]
-                m = 1
-                if Problem(self.problemWidget.value) in [Problem.MAXSAT,Problem.MISP]:
-                        m = df.max().max()
-                else:
-                        m = df.min().min()
-                return df.loc[df.isin([m]).any(axis=1)].index.min()
-
-
-        def prepare_parameters(self):
-                params = super().prepare_parameters()
-                params.runs = self.settingsWidget.children[0].children[2].value
-                params.use_runs = self.settingsWidget.children[0].children[3].value
-                name = [f'{params.algorithm.name.lower()}']
-                for k,v in params.options.items():
-                        if not type(k) == Option or len(v) == 0:
-                                continue
-                        o = k.name.lower()+ '-' + '-'.join([str(p[1]) for p in v])
-                        o = o.replace('.','')
-                        name += [o]
-
-                count = len(self.line_checkboxes.children) + 1
-                params.name = str(count) + '. ' + '_'.join(name)
-                self.configurations[params.name] = params
-                return params
-
-
-        def plot_comparison(self, i):
-                with self.out:
-                        checked = [c.description for c in self.line_checkboxes.children if c.value]
-                        if checked == []:
-                                self.out.clear_output()
-                                plt.close()
-                                return
-                        selected_iter_data = self.run_data.iteration_df[checked]
-                        lines = [o.description for o in self.plot_options.children[1:] if o.value]
-                        lines += ['best_sol' if self.plot_options.children[0].value.startswith('best') else 'current_sol']
-                        sum_options = None
-                        selected_sum_data = {name:df for name,df in self.run_data.summaries.items() if name in checked}
-                        self.plot_instance.plot(i, lines, sum_options, selected_iter_data, selected_sum_data)
-
-                        widgets.interaction.show_inline_matplotlib_plots()
 
 
 
