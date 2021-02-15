@@ -28,8 +28,8 @@ class PlotRuntime():
         self.ax_bp = fig.add_subplot(self.g[2,0])
         self.ax_sum = fig.add_subplot(self.g[2,1])
         
-        self.plot_obj(i, lines, iter_data)
-        self.plot_bp(i, iter_data)
+        sol_data = self.plot_obj(i, lines, iter_data)
+        self.plot_bp(i, sol_data)
         self.plot_sum(sum_data)
         fig.suptitle('')
 
@@ -83,8 +83,10 @@ class PlotRuntime():
         self.ax.axvline(x=iter)
         self.ax.set_ylabel('objective value')
         self.ax.set_xlabel('iterations')
+        return iter_data
 
     def plot_bp(self, iter, iter_data):
+            # TODO plot either best or current solutions!
         bp_data = iter_data
         bp_data = bp_data.loc[iter].reset_index(level=1, drop=True).reset_index()
         bp_data = bp_data.rename(columns={iter:f'iteration={iter}'})
