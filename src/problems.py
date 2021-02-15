@@ -107,9 +107,11 @@ class ProblemDefinition(ABC):
         - name: name of the problem, instance of Problem enum
         - options: dict of dicts of available algorithms and their corresponding available options/methodes
     """
-    def __init__(self, name: Problem, options: dict):
+    def __init__(self, name: Problem, options: dict, to_maximize: bool = True):
         self.name = name
         self.options = options
+        self.to_maximize = to_maximize
+    
 
     def get_algorithms(self):
         return [k.value for k,_ in self.options.items()]

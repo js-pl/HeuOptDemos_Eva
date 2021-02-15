@@ -2,6 +2,7 @@
 module which builds all necessary widgets for visualisation and runtime analysis based on information received from handler/logdata module
 
 """
+
 import sys
 sys.path.append("C:/Users/Eva/Desktop/BakkArbeit/pymhlib")
 
@@ -16,6 +17,7 @@ import ipywidgets as widgets
 from . import handler
 from .problems import Problem, Algorithm, Option, InitSolution, Configuration
 from . import plotting as p
+from .plotting_runtime import PlotRuntime
 from .logdata import Log, LogData, RunData, save_visualisation, read_from_logfile, get_log_description
 from IPython.display import clear_output
 import os
@@ -472,20 +474,18 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                 super().__init__(visualisation=False)
                 self.configurations = {}
                 self.out = widgets.Output()
-
+                
                 self.line_checkboxes = widgets.VBox()
                 self.run_button.description = 'Run configuration'
                 self.iter_slider = widgets.IntSlider(layout=widgets.Layout(padding="2em 0 0 0"),description='iteration', value=1, min=1)
                 self.plot_options = None
-                plt.rcParams['axes.spines.left'] = True
-                plt.rcParams['axes.spines.right'] = True
-                plt.rcParams['axes.spines.top'] = True
-                plt.rcParams['axes.spines.bottom'] = True
-                plt.rcParams['figure.figsize'] = (12,7)
-                plt.rcParams['figure.autolayout'] = True
-
-                #self.iteration_df = pd.DataFrame()
-                #self.summaries = {}
+                #plt.rcParams['axes.spines.left'] = True
+                #plt.rcParams['axes.spines.right'] = True
+                #plt.rcParams['axes.spines.top'] = True
+                #plt.rcParams['axes.spines.bottom'] = True
+                #plt.rcParams['figure.figsize'] = (12,7)
+                #plt.rcParams['figure.autolayout'] = True
+                self.plot_instance = PlotRuntime()
                 self.run_data = RunData()
 
 
@@ -515,9 +515,8 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                         plt.close()
                         self.line_checkboxes.children = []
                         self.plot_options.layout.visibility = 'hidden'
-                        #self.iteration_df = pd.DataFrame()
-                        #self.summaries = {}
                         self.run_data.reset()
+                        self.plot_instance.problem = None
 
                 def on_change_iter(change):
                         i = change.new if change.new > 0 else 1
@@ -597,67 +596,6 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                         self.run_data.save_to_logfile(config,filepath,description=description)
                         self.configurations[config.name].saved_runs = list(range(1,config.runs+1))
 
-                                        
-        '''                              
-        def save_to_logfile(self, config: Configuration, filepath: str, description: str=None, append: bool=False):
-
-                mode = 'w' if description else 'r+'
-                f = open(filepath, mode)
-
-                if description:
-                        f.write(description+'\n')
-                        df = self.iteration_df[config.name].T
-                        df.to_csv(f,sep=' ',na_rep='NaN', mode='a', line_terminator='\n')
-                        f.write('S summary\n')
-                        self.summaries[config.name].to_csv(f,na_rep='NaN', sep=' ',mode='a',line_terminator='\n')
-                        f.close()
-                else:
-                        saved_runs = set(config.saved_runs)
-                        runs = set(range(1,config.runs+1))
-                        to_save = list(runs - saved_runs)
-                        to_save.sort()
-                        if len(to_save) == 0:
-                                f.close()
-                                return
-                        data = f.readlines()
-                        df = self.iteration_df[config.name][to_save].T
-                        sm = self.summaries[config.name].loc[to_save]
-                        existing_runs =int(data[0].split('=')[1].strip())
-                        if append: #seed==0
-
-                                idx = next((i for i,v in enumerate(data) if v.startswith('S ')), 0)
-                                df.index = pd.Index(range(existing_runs+1,existing_runs+1+len(to_save)))
-                                sm.index = pd.MultiIndex.from_tuples(zip(df.index.repeat(len(sm)/len(to_save)),sm.index.get_level_values(1)),names=sm.index.names)
-                                sm.reset_index(inplace=True)
-                                data.insert(idx, df.to_csv(sep=' ',line_terminator='\n',header=False))
-                                data += [sm.to_csv(sep=' ',line_terminator='\n', index=False,header=False)]
-                                data[0] = f'R runs={df.index[-1]}\n'
-                                f.seek(0)
-                                f.writelines(data)
-                                f.truncate()
-                                f.close()
-                                
-                                os.rename(filepath,filepath.replace(f'r{existing_runs}',f'r{existing_runs+len(to_save)}',1))
-                           
-                        else: # seed!= 0
-                                if len(runs) <= existing_runs:
-                                        f.close()
-                                        return
-                                data[0] = f"R runs={config.runs}\n"
-                                idx = next((i for i,v in enumerate(data) if not v[0] in ['R','D']), 0)
-                                data = data[:idx]
-                                data += [df.to_csv(sep=' ',line_terminator='\n')]
-                                data += ['S summary\n']
-                                data += [sm.to_csv(sep=' ',line_terminator='\n')]
-                                f.seek(0)
-                                f.writelines(data)
-                                f.truncate()
-                                f.close()
-
-                                os.rename(filepath,filepath.replace(f'r{existing_runs}',f'r{len(to_save)}',1))
-
-                self.configurations[config.name].saved_runs = list(range(1,config.runs+1))
-                       '''
 
         def configuration_exists_in_saved(self, name: str, description: str):
                 description = description[description.find('D '):]
@@ -723,10 +661,10 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
 
                 self.run_data.iteration_df = pd.concat([self.run_data.iteration_df,log_df], axis=1)
                 self.run_data.summaries[params.name] = summary
+                self.plot_instance.problem = Problem(self.problemWidget.value)
 
                 # add name to checkbox list
                 self.line_checkboxes.children +=(self.init_checkbox(params.name),)
-                #self.iter_slider.layout.visibility = 'visible'
                 self.plot_options.layout.visibility = 'visible'
 
                 # plot checked data
@@ -736,7 +674,7 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
 
 
         def load_datafile_or_run_algorithm(self,params: Configuration):
-                #settings = params['settings']
+
                 if params.use_runs:
                         name = f'i{params.iterations}_s{params.seed}_' + params.name[params.name.find('.')+1:].strip()
                         description = self.create_configuration_description(params)
@@ -766,31 +704,7 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                                         return pd.concat([data,new_data],axis=1),pd.concat([sm,new_sm])
                                 
                 return handler.run_algorithm_comparison(params)
-        '''
-        def load_datafile(self,filename,runs: int):
-                f = open(filename, 'r')
-                pos = 0
-                while True:
-                        l = f.readline()
-                        if not l[0] in ['D','R']:
-                                break
-                        pos = f.tell()
-                f.seek(pos)
-                data = pd.read_csv(f, sep=r'\s+', nrows=runs).T
-                data.reset_index(drop=True, inplace=True)
-                data.index += 1
-                f.seek(pos)
-                
-                while True:
-                        l = f.readline()
-                        if l[0] == 'S':
-                                break
-                sm = pd.read_csv(f,sep=r'\s+',index_col=['run','method'])
-                sm = sm[sm.index.get_level_values('run') <= runs]
-                f.close()
 
-                return data,sm
-        '''
 
         def get_best_idx(self):
                 checked = [c.description for c in self.line_checkboxes.children if c.value]
@@ -825,69 +739,23 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
 
         def plot_comparison(self, i):
                 with self.out:
-                        fig = plt.figure(num=f'{self.problemWidget.value}',clear=True)
-                        g = gs.GridSpec(3,2)
-                        ax = fig.add_subplot(g[0:2,:])
-                        ax_bb = fig.add_subplot(g[2,0])
-                        ax_sum = fig.add_subplot(g[2,1])
-                        
-                        legend_handles=[]
                         checked = [c.description for c in self.line_checkboxes.children if c.value]
                         if checked == []:
+                                self.out.clear_output()
+                                plt.close()
                                 return
-                        sol = 'best' if self.plot_options.children[0].value.startswith('best') else 'current'
+                        selected_iter_data = self.run_data.iteration_df[checked]
                         lines = [o.description for o in self.plot_options.children[1:] if o.value]
-                        selected_data = self.run_data.iteration_df[checked]
-
-                        if sol == 'best':
-                                selected_data = selected_data.cummax(axis=0) if Problem(self.problemWidget.value) in [Problem.MAXSAT,Problem.MISP] \
-                                                else selected_data.cummin(axis=0)
-                                
-                        for i,c in enumerate(checked):
-
-                                col = f'C{int(c.split(".")[0]) % 10}'
-                                df = selected_data[c]
-
-                                maxi = df.max(axis=1)
-                                mini = df.min(axis=1)
-                                if 'max' in lines:
-                                        maxi.plot(color=col, ax=ax)
-                                if 'min' in lines:
-                                        mini.plot(color=col, ax=ax)
-                                if 'polygon' in lines:
-                                        ax.fill_between(df.index, maxi, mini, where=maxi > mini , facecolor=col, alpha=0.2, interpolate=True)
-                                if 'mean' in lines:
-                                        m = df.mean(axis=1)
-                                        m.plot(color=col, ax=ax, linestyle='dotted')
-                                if 'median' in lines:
-                                        m = df.median(axis=1)
-                                        m.plot(color=col, ax=ax,linestyle='dashed')
-                                legend_handles += [Line2D([0],[0],color=col,label=c + f' (n={len(self.run_data.iteration_df[c].columns)},s={self.configurations[c].seed})')]
-                        loc = ''
-                        best = None
-
-                        if Problem(self.problemWidget.value) in [Problem.MAXSAT,Problem.MISP]:
-                                best = selected_data.cummax(axis=0).cummax(axis=1).iloc[:,-1:]
-                                loc = 'lower right'
-                        else:
-                                best = selected_data.cummin(axis=0).cummin(axis=1).iloc[:,-1:]
-                                loc = 'upper right'
-                        if 'best' in lines:
-                                best.plot(color='black',ax=ax)
-                                legend_handles += [Line2D([0],[0],color='black',label='best')]
-                        ax.legend(handles=legend_handles,loc=loc)
-
-                        ax.axvline(x=self.iter_slider.value)
-
-                        bb_data = selected_data
-                        bb_data = bb_data.loc[self.iter_slider.value].reset_index(level=1, drop=True).reset_index()
-                        bb_data = bb_data.rename(columns={self.iter_slider.value:f'iteration={self.iter_slider.value}'})
-                        bb_data.boxplot(by='index',rot=25,ax=ax_bb)
-                        fig.suptitle('')
-                        ax_bb.set_xlabel('')
-                        ax_bb.set_ylabel('objective value')
+                        lines += ['best_sol' if self.plot_options.children[0].value.startswith('best') else 'current_sol']
+                        sum_options = None
+                        selected_sum_data = {name:df for name,df in self.run_data.summaries.items() if name in checked}
+                        self.plot_instance.plot(i, lines, sum_options, selected_iter_data, selected_sum_data)
 
                         widgets.interaction.show_inline_matplotlib_plots()
+
+
+
+
                 
 
 
