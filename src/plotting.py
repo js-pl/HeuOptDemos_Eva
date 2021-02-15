@@ -152,9 +152,9 @@ class CommentParameters:
         no_change: bool = False
 
         # algorithm specific parameters
-        remove: int = 0
-        add: int = 0
-        flip: int = 0
+        remove: set = set()
+        add: set = set()
+        flip: list = list()
         k: int = None
         alpha: float = None
         thres: float = None
