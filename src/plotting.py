@@ -95,7 +95,7 @@ class Draw(ABC):
                 if self.algorithm == Algorithm.GRASP:
                         comment = self.get_grasp_animation(i,log_data)
 
-                self.add_description(log_data[i])
+                self.add_description(i, log_data)
                 self.add_legend()
                 self.load_pc_img(log_data[i], comment)
 
@@ -113,18 +113,19 @@ class Draw(ABC):
         def get_ts_animation(self, i:int, log_data:list):
                 pass
 
-        def add_description(self, log_info: dict):
+        def add_description(self, i, log_info: list):
+                data = log_info[i]
 
-                if log_info.get('status') == 'start' and log_info.get('m').startswith('ch'):
-                        log_info['best'] = 0
-                        log_info['obj'] = 0
+                if data.get('status') == 'start' and i == 0:
+                        data['best'] = 0
+                        data['obj'] = 0
                         self.plot_description['phase'] = f'{self.problem.value} Instance'
                 else:
-                        self.plot_description['phase'] = self.phases.get(log_info['status'],'') + self.phases.get(log_info.get('m',''),'')
+                        self.plot_description['phase'] = self.phases.get(data.get('m',''),'')
 
                 phase = self.plot_description['phase']
                 
-                if self.log_granularity == Log.Cycle and not log_info.get('m','').startswith('ch'):
+                if self.log_granularity == Log.Cycle and not data.get('m','').startswith('ch'):
                         if self.algorithm == Algorithm.GVNS:
                                 phase = 'Shaking + Local Search'
                         if self.algorithm == Algorithm.GRASP:
@@ -133,8 +134,8 @@ class Draw(ABC):
 
                 self.ax.text(0,1, '\n'.join((
                 '%s: %s' % (phase, self.plot_description['comment'] ),
-                'Best Objective: %d' % (log_info.get('best',self.plot_description['best']), ),
-                'Current Objective: %d' % (log_info.get('obj',self.plot_description['obj']),))), horizontalalignment='left', verticalalignment='top', transform=self.ax.transAxes)
+                'Best Objective: %d' % (data.get('best',self.plot_description['best']), ),
+                'Current Objective: %d' % (data.get('obj',self.plot_description['obj']),))), horizontalalignment='left', verticalalignment='top', transform=self.ax.transAxes)
 
 
                 self.plot_description.update({'phase': '', 'comment': [], 'best':0, 'obj':0}) #reset description
@@ -145,14 +146,12 @@ class Draw(ABC):
                 pass
 
         def load_pc_img(self, log_info: dict, comment: CommentParameters):
-                if not self.algorithm == Algorithm.GVNS:
-                        return
                 # TODO: load correct image according to current step
                 #level = self.log_granularity.name.lower()
                 level = Log.StepInter.name.lower()
                 m = log_info.get('m','')
                 status = log_info.get('status','') if not log_info.get('end',False) else 'enditer'
-                better = 'better' if m == 'li' and not comment.no_change else 'notbetter'
+                better = 'better' if m == 'li' and not comment.no_change else ''
                 better = better if m == 'li' and status == 'end' else ''
                 path = lambda level,m,status,better: f'{level}{"_" + m if m != "" else ""}{"_" + status}{"_" + better if better != "" else ""}'
                 img_path = (os.path.sep).join( [pc_dir, self.algorithm.name.lower(), path(level,m,status,better) + '.PNG'] )
@@ -257,7 +256,7 @@ class MISPDraw(Draw):
                 comment_params = CommentParameters()
                 done = self.get_gvns_and_ts_animation(i,log_data,comment_params)
                 if done:
-                        return
+                        return comment_params
 
                 self.plot_description['comment'] = self.create_comment(Option[data.get('m','li').upper()],status,comment_params)
                 self.draw_graph(data['inc'])
@@ -306,9 +305,9 @@ class MISPDraw(Draw):
 
 
         def get_grasp_animation(self, i:int, log_data: list):
-                if log_data[i].get('m','') in ['ch', 'li', 'sh']:
-                        self.get_gvns_animation(i,log_data)
-                        return
+                if log_data[i].get('m','') in ['ch', 'li']:
+                        comment = self.get_gvns_animation(i,log_data)
+                        return comment
 
                 comment_params = CommentParameters()
                 data = log_data[i] 
@@ -319,7 +318,7 @@ class MISPDraw(Draw):
                         self.plot_description['comment'] = self.create_comment(Option.RGC,status,comment_params)
                         nx.set_node_attributes(self.graph, {n:self.yellow if data.get('better',False) else self.blue for n in data.get('sol') if status == 'end'}, name='color')
                         self.draw_graph(data.get('inc') if status == 'end' else [])
-                        return
+                        return comment_params
 
                 nx.set_node_attributes(self.graph, data.get('cl',{}), 'label')
                 nx.set_node_attributes(self.graph, {n: self.green if data.get('sel',-1) == n else self.blue for n in data.get('sol', [])}, name='color')
@@ -328,7 +327,7 @@ class MISPDraw(Draw):
                 nx.set_node_attributes(self.graph, {n:self.orange for n in n_unsel},'color')
                 nx.set_edge_attributes(self.graph, {(data.get('sel',n),n):'black' for n in n_unsel}, 'color')
 
-                par = data.get('par',0.)
+                par = data.get('par',1)
                 mn = min(data.get('cl').values())
                 mx = max(data.get('cl').values())
                 if type(par) == int:
@@ -354,7 +353,7 @@ class MISPDraw(Draw):
                 comment_params = CommentParameters()
                 done = self.get_gvns_and_ts_animation(i,log_data,comment_params)
                 if done:
-                        return
+                        return comment_params
 
                 tabu_list = data.get('tabu',[])
                 asp_nodes = set()
@@ -478,9 +477,9 @@ class MAXSATDraw(Draw):
                 Option.RGC:{
                         'start': lambda params: 'start with empty solution',
                         'end': lambda params: f'created complete solution{", found new best solution" if params.better else ""}',
-                        'cl': lambda params: 'number of additionally fulfilled clauses',
-                        'rcl': lambda params: f'{params.k}-best' if params.k else f'alpha: {params.alpha}, threshold: {params.thres}',
-                        'sel': lambda params: f'random, objective gain={params.gain}'
+                        'cl': lambda params: 'candidate list=number of additionally fulfilled clauses',
+                        'rcl': lambda params: f'restricted candidate list={params.k}-best' if params.k else f'alpha: {params.alpha}, threshold: {params.thres}',
+                        'sel': lambda params: f'selection=random, objective gain={params.gain}'
                 },
                 Option.TL:{
                         'start': lambda params: f'k={params.par} flipping {len(params.flip)} variable(s){", apply aspiration criterion" if params.asp else ""}',
@@ -545,7 +544,7 @@ class MAXSATDraw(Draw):
                 comment_params = CommentParameters()
                 done, lit_info = self.get_gvns_and_ts_animation(i,log_data,comment_params)
                 if done:
-                        return
+                        return comment_params
                 
                 self.plot_description['comment'] = self.create_comment(Option[data.get('m','li').upper()],status,comment_params)
                 flipped_nodes = [] if status == 'end' else comment_params.flip
@@ -654,9 +653,9 @@ class MAXSATDraw(Draw):
                         self.ax.text(data[1][0],data[1][1],data[0],{'color': 'black', 'ha': 'center', 'va': 'center', 'fontsize':'small'})
 
         def get_grasp_animation(self, i:int, log_data: list):
-                if log_data[i].get('m','') in ['ch', 'li', 'sh']:
-                        self.get_gvns_animation(i,log_data)
-                        return
+                if log_data[i].get('m','') in ['ch', 'li']:
+                        comment = self.get_gvns_animation(i,log_data)
+                        return comment
 
                 incumbent = [i for i,t in self.graph.nodes(data='type') if t=='incumbent']
                 variables = [i for i,t in self.graph.nodes(data='type') if t=='variable']
@@ -674,7 +673,7 @@ class MAXSATDraw(Draw):
                         self.get_flipped_variables(i,log_data)
                         self.draw_graph(incumbent if data.get('better',False) else [])
                         self.write_literal_info(pos_literals)
-                        return
+                        return comment_params
 
                 nx.set_node_attributes(self.graph,{n:'' for n,t in self.graph.nodes(data='type') if t=='incumbent'}, name='label')
 
@@ -683,7 +682,7 @@ class MAXSATDraw(Draw):
                         log_data[i]['obj'] = 0
                         self.draw_graph([])
                         self.write_literal_info(dict.fromkeys(clauses,0))
-                        return
+                        return comment_params
 
                 #map variable ids to node ids
                 keys = {v:k for k,v in nx.get_node_attributes(self.graph,'nr').items() if self.graph.nodes[k]['type'] == 'variable'}
@@ -736,7 +735,7 @@ class MAXSATDraw(Draw):
                 comment_params = CommentParameters()
                 done, lit_info = self.get_gvns_and_ts_animation(i,log_data,comment_params)
                 if done:
-                        return 
+                        return comment_params
                         
                 flipped_nodes = comment_params.flip 
                 
