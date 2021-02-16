@@ -704,12 +704,13 @@ class MAXSATDraw(Draw):
                 
 
                 mx = max(data['cl'].values())
+                mn = min(data['cl'].values())
                 par = data.get('par', 0)
                 if type(par) == int:
                         comment_params.k = par
                 else:
                         comment_params.alpha = par
-                        comment_params.thres = round(mx*par,2)
+                        comment_params.thres = round(mx - par * (mx-mn),2)
                 comment_params.gain = len(added)
 
                 j = i

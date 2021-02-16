@@ -26,9 +26,7 @@ if not settings.__dict__: parse_settings(args='')
 
 # pymhlib settings
 settings.mh_lfreq = 1
-#settings.mh_out = "logs" + os.path.sep + "summary.log"
-#settings.mh_log = "logs" + os.path.sep + "iter.log"
-#settings.mh_log_step = 'None'
+
 
 vis_instance_path = "instances" + os.path.sep
 demo_data_path = os.path.dirname(demos.__file__) + os.path.sep + 'data'
@@ -167,6 +165,13 @@ def run_gvns(solution, config: Configuration):
 
 
 def run_grasp(solution, config: Configuration):
+    if config.options[Option.RGC][0][0] == 'k-best':
+        settings.mh_grc_par = True
+        settings.mh_grc_k = config.options[Option.RGC][0][1]
+    else:
+        settings.mh_grc_par = False
+        settings.mh_grc_alpha = config.options[Option.RGC][0][1]
+
     
     prob = problems[config.problem]
 
