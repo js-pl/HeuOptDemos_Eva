@@ -24,6 +24,26 @@ plt.rcParams['figure.autolayout'] = True
 plt.rcParams['axes.facecolor'] = 'w'
 pc_dir = 'pseudocode'
 
+
+@dataclass
+class CommentParameters:
+        n: int = 0
+        m: int = 0
+        par: int = 0
+        gain = 0
+        better: bool = False
+        no_change: bool = False
+
+        # algorithm specific parameters
+        remove: set = None
+        add: set = None
+        flip: list = None
+        k: int = None
+        alpha: float = None
+        thres: float = None
+        ll: int = 0
+        asp: bool = False
+
 class Draw(ABC):
 
 
@@ -67,17 +87,17 @@ class Draw(ABC):
 
         def get_animation(self, i: int, log_data: list):
                 self.reset_graph()
-
+                comment = None
                 if self.algorithm == Algorithm.TS:
-                        self.get_ts_animation(i,log_data)
+                        comment = self.get_ts_animation(i,log_data)
                 if self.algorithm == Algorithm.GVNS:
-                        self.get_gvns_animation(i,log_data)
+                        comment = self.get_gvns_animation(i,log_data)
                 if self.algorithm == Algorithm.GRASP:
-                        self.get_grasp_animation(i,log_data)
+                        comment = self.get_grasp_animation(i,log_data)
 
                 self.add_description(log_data[i])
                 self.add_legend()
-                self.load_pc_img(log_data[i])
+                self.load_pc_img(log_data[i], comment)
 
 
         @abstractmethod
@@ -124,11 +144,15 @@ class Draw(ABC):
         def add_legend(self):
                 pass
 
-        def load_pc_img(self, log_info: dict):
+        def load_pc_img(self, log_info: dict, comment: CommentParameters):
                 # TODO: load correct image according to current step
-                m = log_info.get('m',False) if log_info.get('m',False) else log_info.get('status')
-                m = '_'+m
-                img_path = (os.path.sep).join( [pc_dir, self.algorithm.name.lower(), self.algorithm.name.lower() +m+ '.PNG'] )
+                level = self.log_granularity.name.lower()
+                m = log_info.get('m','')
+                status = log_info.get('status','') if not log_info.get('end',False) else 'enditer'
+                better = 'better' if m == 'li' and not comment.no_change else 'notbetter'
+                better = better if m == 'li' and status == 'end' else ''
+                path = lambda level,m,status,better: f'{level}{"_" + m if m != "" else ""}{"_" + status}{"_" + better if better != "" else ""}'
+                img_path = (os.path.sep).join( [pc_dir, self.algorithm.name.lower(), path(level,m,status,better) + '.PNG'] )
                 img = mpimg.imread(img_path)
                 self.img_ax.set_aspect('equal', anchor='E')
                 self.img_ax.imshow(img)#,extent=[0, 1, 0, 1])
@@ -141,24 +165,7 @@ class Draw(ABC):
                 pass
 
 
-@dataclass
-class CommentParameters:
-        n: int = 0
-        m: int = 0
-        par: int = 0
-        gain = 0
-        better: bool = False
-        no_change: bool = False
 
-        # algorithm specific parameters
-        remove: set = None
-        add: set = None
-        flip: list = None
-        k: int = None
-        alpha: float = None
-        thres: float = None
-        ll: int = 0
-        asp: bool = False
 
 
 class MISPDraw(Draw):
@@ -251,6 +258,7 @@ class MISPDraw(Draw):
 
                 self.plot_description['comment'] = self.create_comment(Option[data.get('m','li').upper()],status,comment_params)
                 self.draw_graph(data['inc'])
+                return comment_params
 
         def get_gvns_and_ts_animation(self, i:int, log_data: list, comment_params: CommentParameters):
 
@@ -334,6 +342,7 @@ class MISPDraw(Draw):
                 self.plot_description.update({'best': log_data[j]['best'], 'obj':len(data.get('sol'))})
                 self.plot_description['comment'] = self.create_comment(Option.RGC,status,comment_params)
                 self.draw_graph(data.get('rcl',[]), sel_color='black')
+                return comment_params
 
         def get_ts_animation(self, i:int, log_data: list):
 
@@ -358,6 +367,7 @@ class MISPDraw(Draw):
 
                 self.plot_description['comment'] = self.create_comment(Option.CH if data.get('m').startswith('ch') else Option.TL,status,comment_params)
                 self.draw_graph(data.get('inc',[]))
+                return comment_params
 
 
         def add_legend(self):
@@ -539,6 +549,7 @@ class MAXSATDraw(Draw):
                 flipped_nodes += [n for n,t in self.graph.nodes(data='type') if t=='incumbent'] if data.get('better',False) else []
                 self.draw_graph(flipped_nodes + list(comment_params.add.union(comment_params.remove)))
                 self.write_literal_info(lit_info)
+                return comment_params
 
         def get_gvns_and_ts_animation(self, i:int, log_data: list, comment_params: CommentParameters):
 
@@ -711,6 +722,7 @@ class MAXSATDraw(Draw):
                 self.draw_graph(([abs(sel)] if sel != 0 else []) + list(added))
                 self.write_literal_info(pos_literals)
                 self.write_cl_info(cl, rcl, sel)
+                return comment_params
 
 
         def get_ts_animation(self, i:int, log_data:list):
@@ -742,6 +754,7 @@ class MAXSATDraw(Draw):
                 flipped_nodes += [n for n,t in self.graph.nodes(data='type') if t=='incumbent'] if data.get('better',False) else []
                 self.draw_graph(flipped_nodes + list(comment_params.add.union(comment_params.remove)))
                 self.write_literal_info(lit_info)
+                return comment_params
 
 
         def write_cl_info(self, cl: dict(), rcl: list(), sel: int):
