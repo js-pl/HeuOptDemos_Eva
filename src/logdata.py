@@ -42,17 +42,19 @@ class LogData():
         levels[Log.StepNoInter] = [0] +[i for i in levels[Log.StepInter] if not self.full_data[i].get('status') in  ['start','cl','rcl']]
         levels[Log.NewInc] =[0] + [i for i in levels[Log.StepNoInter] if self.full_data[i].get('better',False)]
         update = list()
-        for i in levels[Log.StepNoInter][:-1]:
-            if self.full_data[i].get('m', False) and (self.full_data[i].get('m') != self.full_data[i+1].get('m')) or self.full_data[i].get('end', False):
-                update.append(i)
-        else:
-            update = [0] + update
-            update.append(levels[Log.StepNoInter][-1])
+
+        update = [i for i in levels[Log.StepNoInter][:-1] if i==0 or (self.full_data[i].get('m','') != 'li' and self.full_data[i].get('status','') == 'end') or 
+                    (self.full_data[i].get('m','') == 'li' and self.full_data[i+1].get('m','') != 'li') or
+                    len({'rgc','sh'}.intersection({data.get('m','') for data in self.full_data})) == 0 ]
+
+        update.append(levels[Log.StepNoInter][-1])
 
         levels[Log.Update] = update
-        levels[Log.Cycle] =[ i for i in levels[Log.StepNoInter] if self.full_data[i].get('end', False) or self.full_data[i].get('m','').startswith('ch')]
+        levels[Log.Cycle] =[ i for i in levels[Log.Update] if self.full_data[i].get('m') in ['ch', 'li'] ]
 
         return levels
+
+
 
 
     def change_granularity(self, i: int, granularity: Log):

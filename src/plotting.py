@@ -188,9 +188,9 @@ class MISPDraw(Draw):
                         Option.RGC:{
                                 'start': lambda params: 'start with empty solution',
                                 'end': lambda params: f'created complete solution{", found new best solution" if params.better else ""}',
-                                'cl': lambda params: 'remaining degree (number of unblocked neigbors)',
-                                'rcl': lambda params: f'{params.k}-best' if params.k else f'alpha: {params.alpha}, threshold: {params.thres}',
-                                'sel': lambda params: f'random, objective gain={params.gain}'
+                                'cl': lambda params: 'candidate list=remaining degree (number of unblocked neigbors)',
+                                'rcl': lambda params: f'restricted candidate list=' + (f'{params.k}-best' if params.k else f'alpha: {params.alpha}, threshold: {params.thres}'),
+                                'sel': lambda params: f'selection=random, objective gain={params.gain}'
                         },
                         Option.TL:{
                                 'start': lambda params: f'k={params.par} remove {len(params.remove)} node(s), add {len(params.add)} node(s){", apply aspiration criterion" if params.asp else ""}',
@@ -478,14 +478,13 @@ class MAXSATDraw(Draw):
                         'start': lambda params: 'start with empty solution',
                         'end': lambda params: f'created complete solution{", found new best solution" if params.better else ""}',
                         'cl': lambda params: 'candidate list=number of additionally fulfilled clauses',
-                        'rcl': lambda params: f'restricted candidate list={params.k}-best' if params.k else f'alpha: {params.alpha}, threshold: {params.thres}',
+                        'rcl': lambda params: f'restricted candidate list=' + (f'{params.k}-best' if params.k else f'alpha: {params.alpha}, threshold: {params.thres}'),
                         'sel': lambda params: f'selection=random, objective gain={params.gain}'
                 },
                 Option.TL:{
                         'start': lambda params: f'k={params.par} flipping {len(params.flip)} variable(s){", apply aspiration criterion" if params.asp else ""}',
                         'end': lambda params: f'size of tabu list={params.ll}, objective gain={params.gain}{", all possible flips are tabu" if params.no_change else ""}{", found new best solution" if params.better else ""}'
                 }
-                
                 }
 
         def create_comment(self, option: Option, status: str, params: CommentParameters):
