@@ -145,8 +145,11 @@ class Draw(ABC):
                 pass
 
         def load_pc_img(self, log_info: dict, comment: CommentParameters):
+                if not self.algorithm == Algorithm.GVNS:
+                        return
                 # TODO: load correct image according to current step
-                level = self.log_granularity.name.lower()
+                #level = self.log_granularity.name.lower()
+                level = Log.StepInter.name.lower()
                 m = log_info.get('m','')
                 status = log_info.get('status','') if not log_info.get('end',False) else 'enditer'
                 better = 'better' if m == 'li' and not comment.no_change else 'notbetter'

@@ -525,7 +525,7 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                         checkboxes[-1].layout = widgets.Layout(width='auto', grid_area=o)
                         checkboxes[-1].indent= False
 
-                sum_radiobuttons = widgets.RadioButtons(options=['succ', 'succ-rate%', 'tot-obj-gain', 'avg-obj-gain', 'rel-succ%',  'net-time',  'net-time%',  'brut-time',  'brut-time%'],
+                sum_radiobuttons = widgets.RadioButtons(options=['iter','succ', 'succ-rate%', 'tot-obj-gain', 'avg-obj-gain', 'rel-succ%',  'net-time',  'net-time%',  'brut-time',  'brut-time%'],
                                                                 layout=widgets.Layout(width='auto', grid_area='sum'))
 
                 def on_change_plotoptions(change):
@@ -646,7 +646,7 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                         lines += ['best_sol' if self.plot_options.children[0].value.startswith('best') else 'current_sol']
                         sum_option = self.plot_options.children[2].value
                         selected_sum_data = {name:df[sum_option] for name,df in self.run_data.summaries.items() if name in checked}
-                        self.plot_instance.plot(i, lines, sum_option, selected_iter_data, selected_sum_data)
+                        self.plot_instance.plot(i, lines, self.configurations, selected_iter_data, selected_sum_data)
 
                         widgets.interaction.show_inline_matplotlib_plots()
 
@@ -711,7 +711,7 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
                                         return
                         # create new file and write to it
                         filepath = 'logs'+ os.path.sep + 'saved_runtime' + os.path.sep + config.problem.name.lower() + os.path.sep +\
-                                          f'r{config.runs}_' + name + '_' + time.strftime('_%Y%m%d_%H%M%S') + '.log'
+                                          f'r{config.runs}_' + name + '_' +config.instance+ '_'+ time.strftime('_%Y%m%d_%H%M%S') + '.log'
                         self.run_data.save_to_logfile(config,filepath,description=description)
                         self.configurations[config.name].saved_runs = list(range(1,config.runs+1))
 

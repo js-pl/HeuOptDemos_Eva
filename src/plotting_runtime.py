@@ -20,7 +20,7 @@ class PlotRuntime():
     ax_bp = None
     ax_sum = None
 
-    def plot(self, i:int, lines, sum_option, iter_data, sum_data):
+    def plot(self, i:int, lines, configurations: dict, iter_data, sum_data: dict):
 
         fig = plt.figure(num=f'{self.problem.value}',clear=True)
 
@@ -28,12 +28,12 @@ class PlotRuntime():
         self.ax_bp = fig.add_subplot(self.g[2,0])
         self.ax_sum = fig.add_subplot(self.g[2,1])
         
-        sol_data = self.plot_obj(i, lines, iter_data)
+        sol_data = self.plot_obj(i, lines, configurations, iter_data)
         self.plot_bp(i, sol_data)
         self.plot_sum(sum_data)
         fig.suptitle('')
 
-    def plot_obj(self, iter: int, lines: list, iter_data):
+    def plot_obj(self, iter: int, lines: list, configurations, iter_data):
         legend_handles=[]
         sol = 'best_sol' if 'best_sol' in lines else 'current_sol'
         if sol == 'best_sol':
@@ -60,7 +60,8 @@ class PlotRuntime():
                         m = df.median(axis=1)
                         m.plot(color=col, ax=self.ax,linestyle='dotted')
                 #legend_handles += [Line2D([0],[0],color=col,label=c + f' (n={len(df.columns)},s=addSeed!)')]#{self.configurations[c].seed})')]
-                legend_handles += [Patch(color=col,label=c + f' (n={len(df.columns)},s=addSeed!)')]#{self.configurations[c].seed})')]
+                seed = configurations.get(c).seed
+                legend_handles += [Patch(color=col,label=c + f' (n={len(df.columns)},s={seed})')]
     
         loc = 'upper right'
         loc2 = 'lower left'
@@ -86,7 +87,6 @@ class PlotRuntime():
         return iter_data
 
     def plot_bp(self, iter, iter_data):
-            # TODO plot either best or current solutions!
         bp_data = iter_data
         bp_data = bp_data.loc[iter].reset_index(level=1, drop=True).reset_index()
         bp_data = bp_data.rename(columns={iter:f'iteration={iter}'})
