@@ -1,5 +1,4 @@
-import sys
-sys.path.append("C:/Users/Eva/Desktop/BakkArbeit/pymhlib")
+
 from pymhlib.demos.misp import MISPInstance
 from pymhlib.demos.maxsat import MAXSATInstance
 
@@ -362,12 +361,3 @@ class RunData():
       
 
 
-# only used for debugging
-if __name__ == '__main__':
-    data = get_log_data('misp', 'grasp')
-    i = 0
-    for d in data:
-        print(d)
-        i += 1
-        if i > 10:
-            break

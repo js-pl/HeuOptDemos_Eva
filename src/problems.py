@@ -1,5 +1,4 @@
-import sys
-sys.path.append("C:/Users/Eva/Desktop/BakkArbeit/pymhlib")
+
 from pymhlib.demos.maxsat import MAXSATInstance, MAXSATSolution
 from pymhlib.demos.misp import MISPInstance, MISPSolution
 from pymhlib.scheduler import Method

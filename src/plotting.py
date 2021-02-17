@@ -1,5 +1,4 @@
-import sys
-sys.path.append("C:/Users/Eva/Desktop/BakkArbeit/pymhlib")
+
 from pymhlib.demos.maxsat import MAXSATInstance
 from pymhlib.demos.misp import MISPInstance
 
@@ -146,8 +145,7 @@ class Draw(ABC):
                 pass
 
         def load_pc_img(self, log_info: dict, comment: CommentParameters):
-                # TODO: load correct image according to current step
-                #level = self.log_granularity.name.lower()
+
                 level = Log.StepInter.name.lower()
                 m = log_info.get('m','')
                 status = log_info.get('status','') if not log_info.get('end',False) else 'enditer'
@@ -202,26 +200,6 @@ class MISPDraw(Draw):
         def create_comment(self, option: Option, status: str, params: CommentParameters):
                 # TODO create comments according to log granularity
                 return self.comments[option][status](params)
-                '''
-                if self.log_granularity == Log.StepInter:
-                        return self.comments[option][status](params)
-                if (self.log_granularity == Log.StepNoInter and  option != Option.CH) or self.log_granularity == Log.NewInc:
-                        option = self.comments[option]
-                        return ','.join([option['start'](params),
-                                #option.get('cl','')(params), option.get('rcl','')(params), option.get('sel','')(params),
-                                option['end'](params)])
-                if self.log_granularity == Log.Update:
-                        start = self.comments[option]['start'](params) if option != Option.LI else f'remove {len(params.remove)} node(s), add {len(params.add)} node(s)'
-                        option = self.comments[option]
-                        return ','.join([start,
-                                option['end'](params)])
-                if self.log_granularity == Log.Cycle:
-                        if self.algorithm == Algorithm.GVNS:
-                                return self.comments[option]['end'](params)
-                        else:
-                                return self.comments[option]['end'](params)
-                '''
-
 
 
         def __init__(self, prob: Problem, alg: Algorithm, instance, log_granularity: Log):
@@ -662,7 +640,6 @@ class MAXSATDraw(Draw):
                 clauses = [i for i,t in self.graph.nodes(data='type') if t=='clause']
                 data = log_data[i]
                 status = data.get('status','')
-                #comment = self.comments[Option.RGC][status]
                 comment_params = CommentParameters()
                 comment_params.better = data.get('better',False)
                 if status == 'end':
@@ -880,10 +857,4 @@ def get_visualisation(prob: Problem, alg: Algorithm, instance, log_granularity: 
 
 
 
-# only used for debugging
-if __name__ == '__main__':
-    log_data, instance = read_from_logfile('maxsat_gvns_20201229_205432.log')
-    draw = get_visualisation(Problem.MAXSAT, Algorithm.GVNS, instance)
-    for i in range(0, 100):
-        draw.get_animation(i,log_data)
     

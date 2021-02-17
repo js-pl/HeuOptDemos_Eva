@@ -3,8 +3,7 @@ module which builds all necessary widgets for visualisation and runtime analysis
 
 """
 
-import sys
-sys.path.append("C:/Users/Eva/Desktop/BakkArbeit/pymhlib")
+
 
 from pymhlib.demos.maxsat import MAXSATInstance, MAXSATSolution
 from pymhlib.demos.misp import MISPInstance, MISPSolution
@@ -256,7 +255,7 @@ class InterfaceVisualisation():
                 return widgets.VBox([optionsBox, self.save_button])
 
         def on_click_save(self,event):
-                #TODO make sure params were not changed!!!!
+
                 save_visualisation(self.prepare_parameters(), self.plot_instance.graph)
                 self.save_button.disabled = True
 

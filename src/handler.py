@@ -2,8 +2,7 @@
 handler module which provides information for widgets in interface module and uses widget input
 to issue pymhlib calls
 """
-import sys
-sys.path.append("C:/Users/Eva/Desktop/BakkArbeit/pymhlib")
+
 
 import os
 import logging
@@ -199,14 +198,7 @@ def run_ts(solution, config: Configuration):
     alg.main_results()
     logging.getLogger("pymhlib_iter").handlers[0].flush()
 
-    
 
-# only used for debugging
-if __name__ == '__main__':
-        filepath = vis_instance_path + 'maxsat' + os.path.sep + 'cnf_7_50.cnf'
-        _ = run_algorithm_visualisation({'prob':Problem.MAXSAT, Option.CH:[('random',0)], 'inst':'cnf_7_50.cnf','algo':Algorithm.GRASP,
-           Option.LI:[('two-exchange random fill neighborhood search',2)],
-          Option.RGC:[('k-best',5)]})
 
 
 

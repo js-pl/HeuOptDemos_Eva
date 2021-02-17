@@ -59,7 +59,7 @@ class PlotRuntime():
                 if 'median' in lines:
                         m = df.median(axis=1)
                         m.plot(color=col, ax=self.ax,linestyle='dotted')
-                #legend_handles += [Line2D([0],[0],color=col,label=c + f' (n={len(df.columns)},s=addSeed!)')]#{self.configurations[c].seed})')]
+
                 seed = configurations.get(c).seed
                 legend_handles += [Patch(color=col,label=c + f' (n={len(df.columns)},s={seed})')]
     
