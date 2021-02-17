@@ -318,6 +318,11 @@ class InterfaceVisualisation():
                                 k_best.layout.display = 'None'
                                 alpha.layout.display = 'flex'
                                 rcl_box.children = (rcl,alpha)
+                def on_change_k(change):
+                        if change.new < 1:
+                                change.owner.value = 1
+
+                k_best.observe(on_change_k, names='value')
 
                 rcl.observe(set_param, names='value')
                 self.optionsHandles[Option.RGC] = rcl_box
@@ -387,6 +392,11 @@ class InterfaceVisualisation():
                         size.value = 1 if opt[1] == None or type(opt[1]) == type else opt[1]
                         size.disabled = type(opt[1]) != type or opt[1] == None
                 on_change_available(None)
+
+                def on_change_size(change):
+                        if change.new < 1:
+                                change.owner.value = 1
+                size.observe(on_change_size, names='value')
 
                 available.observe(on_change_available, names='value')
 
