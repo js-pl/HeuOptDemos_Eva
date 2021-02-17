@@ -661,7 +661,7 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
 
 
         def load_datafile_or_run_algorithm(self,params: Configuration):
-
+                os.makedirs('logs' + os.path.sep + 'saved_runtime' + os.path.sep + Problem(self.problemWidget.value).name.lower(), exist_ok=True)
                 if params.use_runs:
                         name = f'i{params.iterations}_s{params.seed}_' + params.name[params.name.find('.')+1:].strip()
                         description = self.create_configuration_description(params)
@@ -727,7 +727,7 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
 
         def configuration_exists_in_saved(self, name: str, description: str):
                 description = description[description.find('D '):]
-                os.makedirs('logs' + os.path.sep + 'saved_runtime' + os.path.sep + Problem(self.problemWidget.value).name.lower(), exist_ok=True)
+
                 path = 'logs'+ os.path.sep + 'saved_runtime' + os.path.sep + Problem(self.problemWidget.value).name.lower()
                 log_files = os.listdir(path)
                 for l in log_files:
