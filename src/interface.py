@@ -727,6 +727,7 @@ class InterfaceRuntimeAnalysis(InterfaceVisualisation):
 
         def configuration_exists_in_saved(self, name: str, description: str):
                 description = description[description.find('D '):]
+                os.makedirs('logs' + os.path.sep + 'saved_runtime' + os.path.sep + Problem(self.problemWidget.value).name.lower(), exist_ok=True)
                 path = 'logs'+ os.path.sep + 'saved_runtime' + os.path.sep + Problem(self.problemWidget.value).name.lower()
                 log_files = os.listdir(path)
                 for l in log_files:
