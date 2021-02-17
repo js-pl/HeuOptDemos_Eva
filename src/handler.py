@@ -2,172 +2,50 @@
 handler module which provides information for widgets in interface module and uses widget input
 to issue pymhlib calls
 """
+import sys
+sys.path.append("C:/Users/Eva/Desktop/BakkArbeit/pymhlib")
 
-from abc import ABC, abstractmethod
-import enum
 import os
 import logging
-import re
 import numpy as np
-import random
-import ast
+import pandas as pd
 
 # pymhlib imports
-from pymhlib.settings import settings, parse_settings
+from pymhlib.settings import settings, parse_settings, seed_random_generators
 from pymhlib.log import init_logger
-from pymhlib.demos.maxsat import MAXSATInstance, MAXSATSolution
-from pymhlib.demos.misp import MISPInstance, MISPSolution
-from pymhlib.gvns import GVNS, Method
+from pymhlib import demos
+from pymhlib.gvns import GVNS
+from pymhlib.ts import TS
 
-#needed for overwriting gnvs
-from pymhlib.solution import Solution
-from pymhlib.scheduler import Result
-from typing import List
-import time
-
-from src.methods import greedy_randomized_construction
+# module imports
+from .problems import Problem, Algorithm, Option, MAXSAT, MISP, Configuration, ProblemDefinition
+from .logdata import get_log_data
 
 
 if not settings.__dict__: parse_settings(args='')
 
-logger_step = logging.getLogger("step-by-step")
-
-
-
-# TODO: pymhlib settings
-settings.mh_titer = 100
+# pymhlib settings
 settings.mh_lfreq = 1
-settings.mh_tciter = 30
-settings.mh_out = "logs" + os.path.sep + "summary.log"
-settings.mh_log = "logs" + os.path.sep + "iter.log" # TODO logging to file not working
-init_logger()
-
-instance_path = "instances" + os.path.sep
-
-# extend enums as needed, they hold the string values which are used for representation in widgets
-class Problem(enum.Enum):
-    MAXSAT = 'MAX-SAT'
-    MISP = 'MAX-Independent Set'
-
-class Algorithm(enum.Enum):
-    GVNS = 'GVNS'
-    GRASP = 'GRASP'
-
-class Option(enum.Enum):
-    CH = 'Construction'
-    LI = 'Local Improvement'
-    SH = 'Shaking'
-    RCL = 'Restricted Candidate List'
 
 
-
-class ProblemDefinition(ABC):
-    """A base class for problem definition to store and retrieve available algorithms and options and problem specific solution instances.
-
-    Attributes
-        - name: name of the problem, has to correspond to name of directory where logs/instances are stored
-        - options: dict of dicts of available algorithms and their corresponding available options/methodes, which have to be stored as tuples of the form: 
-                    (<name for widget> , <function callback with signature (solution: Solution, par: Any, result: Result) or None>  , <type of additional parameter, fixed default or None>)
-    """
-    def __init__(self, name: str, options: dict):
-        self.name = name
-        self.options = options
-
-    def get_algorithms(self):
-        return [k.value for k,_ in self.options.items()]
-
-    def get_options(self, algo: Algorithm):
-        options = {}
-        for o,m in self.options[algo].items():
-            options[o] = [(t[0],t[2]) for t in m]
-        return options
-
-    @abstractmethod
-    def get_solution(self, instance_path: str):
-        pass
-
-    def get_instances(self):
-        instance_path = "instances" + os.path.sep
-        if os.path.isdir(instance_path + self.name):
-            instances = os.listdir(instance_path + self.name)
-        return instances
-    
-
-    def get_method(self, algo:Algorithm, opt: Option, name: str, par):
-        m = [t for t in self.options[algo][opt] if t[0] == name][0]
-        method = Method(f'{opt.name.lower()[0:2]}{par if type(m[2]) == type else m[2]}', m[1], par)
-        return method
+vis_instance_path = "instances" + os.path.sep
+demo_data_path = os.path.dirname(demos.__file__) + os.path.sep + 'data'
+step_log_path = "logs" + os.path.sep + "step.log"
+iter_log_vis_path = "logs" + os.path.sep + "iter_vis.log"
+sum_log_vis_path = "logs" + os.path.sep + "summary_vis.log"
+iter_log_path = "logs" + os.path.sep + "iter.log"
+sum_log_path = "logs" + os.path.sep + "summary.log"
 
 
-
-class MAXSAT(ProblemDefinition):
-
-    def __init__(self, name: str):
-
-        options = {Algorithm.GVNS: {
-                                Option.CH: [('random', MAXSATSolution.construct, 0)],
-                                Option.LI: [('k-flip neighborhood search', MAXSATSolution.local_improve, int)],
-                                Option.SH: [('k random flip', MAXSATSolution.shaking, int)]
-                                },
-                    Algorithm.GRASP: {
-                                Option.CH: [('random', MAXSATSolution.construct, 0)],   #not needed for grasp
-                                Option.LI: [('k-flip neighborhood search', MAXSATSolution.local_improve, int)],
-                                Option.RCL: [('k-best', greedy_randomized_construction, int),('alpha', greedy_randomized_construction, float)]
-                                }
-                    }
-
-        super().__init__(name, options)
-
-    def get_solution(self, instance_path: str):
-        instance = MAXSATInstance(instance_path)
-        return MAXSATSolution(instance)
-
-
-
-class MISP(ProblemDefinition):
-
-    def __init__(self, name: str):
-
-        options = {Algorithm.GVNS: {
-                                Option.CH: [('random', MISPSolution.construct, 0)],
-                                Option.LI: [('two-exchange random fill neighborhood search', MISPSolution.local_improve, 2)],
-                                Option.SH: [('remove k and random flip', MISPSolution.shaking, int)]
-                                }
-                                ,
-                    Algorithm.GRASP: {
-                                Option.CH: [('random', MISPSolution.construct, 0)],   #not needed for grasp
-                                Option.LI: [('two-exchange random fill neighborhood search', MAXSATSolution.local_improve, 2)],
-                                Option.RCL: [('k-best', None, int),('alpha', None, float)]
-                              }
-                    }
-
-        super().__init__(name, options)
-
-    def get_solution(self, instance_path):
-        instance = MISPInstance(instance_path)
-        return MISPSolution(instance)
-
-    def get_instances(self):
-        inst = super().get_instances()
-        if len(inst) == 0:
-            return ['random']
-        return inst
-
-
-
-# initialize problems (parameter 'name' corresponds to name of directories for instances/logs)
-problems = {
-            Problem.MAXSAT: MAXSAT('maxsat'),
-            Problem.MISP: MISP('misp')
-            }
-
+# get available problems
+problems = {p.name: p for p in [prob() for prob in ProblemDefinition.__subclasses__()]}
 
 # methods used by module interface to extract information for widgets
 def get_problems():
-    return [p.value for p,_ in problems.items()]
+    return [p.value for p in problems.keys()]
 
-def get_instances(prob: Problem):
-    return problems[prob].get_instances()
+def get_instances(prob: Problem,visualisation):
+    return problems[prob].get_instances(visualisation)
 
 def get_algorithms(prob: Problem):
     return problems[prob].get_algorithms()
@@ -176,211 +54,163 @@ def get_options(prob: Problem, algo: Algorithm):
     return problems[prob].get_options(algo)
 
 
-def run_algorithm(options: dict):
+def run_algorithm_visualisation(config: Configuration):
+    settings.mh_out = sum_log_vis_path
+    settings.mh_log = iter_log_vis_path
+    settings.mh_log_step = step_log_path 
+    init_logger()
 
-    fh = logging.FileHandler(f"logs/{options['prob'].name.lower()}/{options['algo'].name.lower()}/{options['algo'].name.lower()}.log", mode="w")
-    logger_step.handlers = []
-    logger_step.addHandler(fh)
-    logger_step.setLevel(logging.INFO)
-    logger_step.info(f"{options['prob'].name}\n{options['algo'].name}")
+    settings.seed =  config.seed
+    seed_random_generators()
 
-    file_path = instance_path + problems[options['prob']].name + os.path.sep + options['inst']
+    solution = run_algorithm(config,True)
+    return get_log_data(config.problem.name.lower(), config.algorithm.name.lower()), solution.inst
 
-    if options['inst'] == 'random': #only available for misp so far
-        file_path = "gnm-30-60"
+
+
+def run_algorithm_comparison(config: Configuration):
+    settings.mh_out = sum_log_path
+    settings.mh_log = iter_log_path
+    settings.mh_log_step = 'None'
+    init_logger()
+    settings.seed =  config.seed
+    seed_random_generators()
+
+    for i in range(config.runs):
+        _ = run_algorithm(config)
+    log_df = read_iter_log(config.name)
+    summary = read_sum_log()
+
+    return log_df, summary
+
+
+def read_sum_log():
+    idx = []
+    with open(sum_log_path) as f: 
+        for i, line in enumerate(f):
+            if not line.startswith('S '):
+                idx.append(i)
+        f.close()
+        
+    df = pd.read_csv(sum_log_path, sep=r'\s+',skiprows=idx)
+    df.drop(labels=['S'], axis=1,inplace=True)
+    idx = df[ df['method'] == 'method' ].index
+    df.drop(idx , inplace=True)
+
+    n = len(df[df['method'] == 'SUM/AVG'])
+    m = int(len(df) / n)
+    df['run'] = (np.array([i for i in range(1,n+1)]).repeat(m))
+    df.set_index(['run','method'], inplace=True)
+    return df
+
+
+def read_iter_log(name):
+
+        df = pd.read_csv(iter_log_path, sep=r'\s+', header=None)
+
+        df.drop(df[ df[1] == '0' ].index , inplace=True) #drop initialisation line
+        df = df[4].reset_index().drop(columns='index') #extract 'obj_new'
+        indices = list((df[df[4] == 'obj_new'].index)) + [len(df)] #get indices of start of each run
+        list_df = []
+        #split data in single dataframes
+        for i in range(len(indices) - 1):
+            j = indices[i+1]-1
+            frame = df.loc[indices[i]:j]
+            frame = frame.reset_index().drop(columns='index')
+            list_df.append(frame)
+        full = pd.concat(list_df,axis=1) #concatenate dataframes
+        full.columns = [i for i in range(1,len(full.columns)+1)] #rename columns to run numbers
+        full.columns = pd.MultiIndex.from_tuples(zip([name]*len(full.columns), full.columns)) # set level of column
+        full = full.drop([0]) #drop line that holds old column names
+        full = full.astype(float)
+       
+        return full
+
+
+
+def run_algorithm(config: Configuration, visualisation: bool=False):
+
+    settings.mh_titer = config.iterations
 
     # initialize solution for problem
-    solution = problems[options['prob']].get_solution(file_path)
+    solution = problems[config.problem].get_solution(config.get_inst_path(visualisation))
 
     # run specified algorithm
-    if options['algo'] == Algorithm.GVNS:
-        run_gvns(solution, options)
-        return get_gvns_log_data(options['prob'], Algorithm.GVNS), solution.inst
-    if options['algo'] == Algorithm.GRASP:
-        run_grasp(solution, options)
-        return get_gvns_log_data(options['prob'], Algorithm.GRASP), solution.inst
-   
-    return [], None
+    if config.algorithm == Algorithm.GVNS:
+        run_gvns(solution, config)
+
+    if config.algorithm == Algorithm.GRASP:
+        run_grasp(solution, config)
+
+    if config.algorithm == Algorithm.TS:
+        run_ts(solution, config)
+        
+    return solution
 
 
-def get_gvns_log_data(prob: Problem, alg: Algorithm):
-    file_path = 'logs' + os.path.sep + prob.name.lower() + os.path.sep + alg.name.lower() + os.path.sep + alg.name.lower() + '.log'
+def run_gvns(solution, config: Configuration):
 
-    data = list()
-    entry_start = {}
-    entry_end = {}
-    entry = {'start': {}, 'end': {}}
-    rcl_data = {}
-    with open(file_path) as logf:
-        status = ''
-        method = ''
-        for i,line in enumerate(logf):
-            if i <2:
-                data.append(line.strip())
-                continue
-
-            if line.startswith('START') or line.startswith('END'):
-                status = line.split(':')[0].lower()
-                current = cast_solution(line)
-                entry[status]['status'] = status
-                entry[status]['current'] = current
-            if line.startswith('OBJ'):
-                obj = int(line.split(':')[1].strip())    #TODO could be necessary to cast to float, depends on problems
-                entry[status]['obj'] = obj
-            if line.startswith('INC'):
-                inc = cast_solution(line)
-                entry[status]['inc'] = inc
-            if line.startswith('M:'):
-                m = line.split(':')[1].strip()
-                entry[status]['m'] = m
-                method = line.split(':')[1].strip()
-            if line.startswith('BETTER'):
-                better = line.split(':')[1].strip()
-                entry[status]['better'] = True if better=='True' else False
-            if line.startswith('BEST'):
-                best = int(line.split(':')[1].strip())    #TODO could be necessary to cast to float, depends on problems
-                entry[status]['best'] = best
-                data.append(entry[status])
-                entry[status] = {}
-
-            ### TODO specific to maxsat, has to be adapted to other problems!!!!
-            if line.startswith('CL'):
-                status = 'rcl'
-                rcl_data['cl'] = cast_solution(line)
-            if line.startswith('X'):
-                rcl_data['x'] = cast_solution(line)
-            if line.startswith('UNFUL'):
-                rcl_data['unful'] = int(line.split(':')[1].strip())
-            if line.startswith('THRESH'):
-                rcl_data['thresh'] = float(line.split(':')[1].strip())
-            if line.startswith('MAX'):
-                rcl_data['max'] = int(line.split(':')[1].strip())
-            if line.startswith('RCL'):
-                rcl_data['rcl'] = cast_solution(line)
-            if line.startswith('SEL'):
-                rcl_data['sel'] = int(line.split(':')[1].strip())
-            if line.startswith('ADDED'):
-                rcl_data['added'] = int(line.split(':')[1].strip())
-                data.append({'status':'cl', 'cl':rcl_data['cl'], 'unful':rcl_data['unful'], 'x':rcl_data['x']})
-                par = method[2:]
-                rcl = {'status':'rcl', 'cl':rcl_data['cl'], 'rcl':rcl_data['rcl'], 'x':rcl_data['x']}
-                if 'max' in rcl_data:
-                    rcl['max'] = rcl_data['max']
-                    rcl['thresh'] = rcl_data['thresh']
-                    rcl['alpha'] = float(par)
-                else:
-                    rcl['k'] = int(par)
-                data.append(rcl)
-                x = rcl_data['x']
-                x[abs(rcl_data['sel'])-1] = 0 if rcl_data['sel'] < 0 else 1
-                data.append({'status':'sel', 'cl':rcl_data['cl'], 'rcl':rcl_data['rcl'], 'x':x, 'sel':rcl_data['sel'], 'added':rcl_data['added']})
-                rcl_data = {}
-
-        logf.close()
-    return data
-
-
-
-def cast_solution(sol: str):
-
-    x = re.search(r'(?<=\[)(.*?)(?=\])', sol.strip())
-
-    if x: #solution is a list
-        x = x.group()
-        x = ' '.join(x.split())
-        x = "[" + x.replace(" ",",") + "]"
-        return ast.literal_eval(x)
-    # string is dict
-    x = re.search(r'(?<=\{)(.*?)(?=\})', sol.strip())
-
-    x = "{" + x.group() + "}"
-    return ast.literal_eval(x)
-
-
-######################### overwrite GVNS to log necessary information 
-
-class MyGVNS(GVNS):
-
-    def __init__(self, logger_step, sol: Solution, meths_ch: List[Method], meths_li: List[Method], meths_sh: List[Method],
-                 own_settings: dict = None, consider_initial_sol=False):
-        super().__init__(sol, meths_ch, meths_li, meths_sh, own_settings, consider_initial_sol)
-        self.logger_step = logger_step
-
-    def perform_method(self, method: Method, sol: Solution, delayed_success=False) -> Result:
-        """Perform method on given solution and returns Results object.
-
-        Also updates incumbent, iteration and the method's statistics in method_stats.
-        Furthermore checks the termination condition and eventually sets terminate in the returned Results object.
-
-        :param method: method to be performed
-        :param sol: solution to which the method is applied
-        :param delayed_success: if set the success is not immediately determined and updated but at some later
-                call of delayed_success_update()
-        :returns: Results object
-        """
-        res = Result()
-        obj_old = sol.obj()
-        t_start = time.process_time()
-        step_info = f'START: {sol}\nOBJ: {obj_old}\nM: {method.name}\nINC: {self.incumbent}\nBEST: {self.incumbent.obj()}'
-        self.logger_step.info(step_info)
-        method.func(sol, method.par, res)
-        t_end = time.process_time()
-        if __debug__ and self.own_settings.mh_checkit:
-            sol.check()
-        ms = self.method_stats[method.name]
-        ms.applications += 1
-        ms.netto_time += t_end - t_start
-        obj_new = sol.obj()
-        if not delayed_success:
-            ms.brutto_time += t_end - t_start
-            if sol.is_better_obj(sol.obj(), obj_old):
-                ms.successes += 1
-                ms.obj_gain += obj_new - obj_old
-        self.iteration += 1
-        new_incumbent = self.update_incumbent(sol, t_end - self.time_start)
-        step_info = f'END: {sol}\nOBJ: {sol.obj()}\nM: {method.name}\nBETTER: {new_incumbent}\nINC: {self.incumbent}\nBEST: {self.incumbent.obj()}'
-        self.logger_step.info(step_info)
-        terminate = self.check_termination()
-        self.log_iteration(method.name, obj_old, sol, new_incumbent, terminate, res.log_info)
-        if terminate:
-            self.run_time = time.process_time() - self.time_start
-            res.terminate = True
-        return res
-
-
-########################################
-
-
-def run_gvns(solution, options: dict):
-
-
-    prob = problems[options['prob']]
-
-    ch = [ prob.get_method(Algorithm.GVNS, Option.CH, m[0], m[1]) for m in options[Option.CH] ]
-    li = [ prob.get_method(Algorithm.GVNS, Option.LI, m[0], m[1]) for m in options[Option.LI] ]
-    sh = [ prob.get_method(Algorithm.GVNS, Option.SH, m[0], m[1]) for m in options[Option.SH] ]
+    prob = problems[config.problem]
+    ch = [ prob.get_method(Algorithm.GVNS, Option.CH, m[0], m[1]) for m in config.options[Option.CH] ]
+    li = [ prob.get_method(Algorithm.GVNS, Option.LI, m[0], m[1]) for m in config.options[Option.LI] ]
+    sh = [ prob.get_method(Algorithm.GVNS, Option.SH, m[0], m[1]) for m in config.options[Option.SH] ]
     
-    ### TODO for now, the overwritten GVNS is called
-    alg = MyGVNS(logger_step, solution, ch, li, sh)
+    alg = GVNS(solution, ch, li, sh, consider_initial_sol=False)
 
     alg.run()
     alg.method_statistics()
     alg.main_results()
+    logging.getLogger("pymhlib_iter").handlers[0].flush()
 
 
-def run_grasp(solution, options: dict):
+
+def run_grasp(solution, config: Configuration):
+    if config.options[Option.RGC][0][0] == 'k-best':
+        settings.mh_grc_par = True
+        settings.mh_grc_k = config.options[Option.RGC][0][1]
+    else:
+        settings.mh_grc_par = False
+        settings.mh_grc_alpha = config.options[Option.RGC][0][1]
+
     
-    prob = problems[options['prob']]
+    prob = problems[config.problem]
 
-    #ch = [ prob.get_method(Algorithm.GRASP, Option.CH, 'random', 0) ]
     ch = []
-    li = [ prob.get_method(Algorithm.GRASP, Option.LI, m[0], m[1]) for m in options[Option.LI] ]
-    rcl = [ prob.get_method(Algorithm.GRASP, Option.RCL, m[0], m[1]) for m in options[Option.RCL] ]
+    li = [ prob.get_method(Algorithm.GRASP, Option.LI, m[0], m[1]) for m in config.options[Option.LI] ]
+    rgc = [ prob.get_method(Algorithm.GRASP, Option.RGC, m[0], m[1]) for m in config.options[Option.RGC] ]
 
-    alg = MyGVNS(logger_step, solution,ch,li,rcl,consider_initial_sol=True)
+    alg = GVNS(solution,ch,li,rgc,consider_initial_sol=True)
     alg.run()
     alg.method_statistics()
     alg.main_results()
+    logging.getLogger("pymhlib_iter").handlers[0].flush()
+
+
+def run_ts(solution, config: Configuration):
+
+    prob = problems[config.problem]
+    ch = [ prob.get_method(Algorithm.TS, Option.CH, m[0], m[1]) for m in config.options[Option.CH] ]
+    li = [ prob.get_method(Algorithm.TS, Option.LI, m[0], m[1]) for m in config.options[Option.LI] ]
+    mini, maxi, change = config.options[Option.TL][0][1], config.options[Option.TL][1][1], config.options[Option.TL][2][1]
+
+    alg = TS(solution, ch, li, mini, maxi, change)
+    alg.run()
+    alg.method_statistics()
+    alg.main_results()
+    logging.getLogger("pymhlib_iter").handlers[0].flush()
+
+    
+
+# only used for debugging
+if __name__ == '__main__':
+        filepath = vis_instance_path + 'maxsat' + os.path.sep + 'cnf_7_50.cnf'
+        _ = run_algorithm_visualisation({'prob':Problem.MAXSAT, Option.CH:[('random',0)], 'inst':'cnf_7_50.cnf','algo':Algorithm.GRASP,
+           Option.LI:[('two-exchange random fill neighborhood search',2)],
+          Option.RGC:[('k-best',5)]})
+
+
+
+
 
 
 
