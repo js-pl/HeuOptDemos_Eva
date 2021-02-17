@@ -550,6 +550,7 @@ class MAXSATDraw(Draw):
                 flipped_nodes += [n for n,t in self.graph.nodes(data='type') if t=='incumbent'] if data.get('better',False) else []
                 self.draw_graph(flipped_nodes + list(comment_params.add.union(comment_params.remove)))
                 self.write_literal_info(lit_info)
+                self.add_sol_description(i,data)
                 return comment_params
 
         def get_gvns_and_ts_animation(self, i:int, log_data: list, comment_params: CommentParameters):
@@ -672,6 +673,7 @@ class MAXSATDraw(Draw):
                         self.get_flipped_variables(i,log_data)
                         self.draw_graph(incumbent if data.get('better',False) else [])
                         self.write_literal_info(pos_literals)
+                        self.add_sol_description(i,data)
                         return comment_params
 
                 nx.set_node_attributes(self.graph,{n:'' for n,t in self.graph.nodes(data='type') if t=='incumbent'}, name='label')
@@ -681,6 +683,7 @@ class MAXSATDraw(Draw):
                         log_data[i]['obj'] = 0
                         self.draw_graph([])
                         self.write_literal_info(dict.fromkeys(clauses,0))
+                        self.add_sol_description(i,data)
                         return comment_params
 
                 #map variable ids to node ids
@@ -724,6 +727,7 @@ class MAXSATDraw(Draw):
                 self.draw_graph(([abs(sel)] if sel != 0 else []) + list(added))
                 self.write_literal_info(pos_literals)
                 self.write_cl_info(cl, rcl, sel)
+                self.add_sol_description(i,data)
                 return comment_params
 
 
@@ -756,6 +760,7 @@ class MAXSATDraw(Draw):
                 flipped_nodes += [n for n,t in self.graph.nodes(data='type') if t=='incumbent'] if data.get('better',False) else []
                 self.draw_graph(flipped_nodes + list(comment_params.add.union(comment_params.remove)))
                 self.write_literal_info(lit_info)
+                self.add_sol_description(i,data)
                 return comment_params
 
 
@@ -855,6 +860,14 @@ class MAXSATDraw(Draw):
                 nx.draw_networkx_nodes(self.graph, x_pos, nodelist=tabu_nodes,node_color='black', node_shape='X', node_size=200,ax=self.ax)
                 nx.draw_networkx_labels(self.graph, pos, labels=var_labels_tabu, ax=self.ax, font_size=14, font_weight='bold', 
                                         font_color='black',horizontalalignment='left',verticalalignment='baseline')
+                
+        def add_sol_description(self, i, data: dict):
+                best = 'best' if i > 0 and data.get('status','') in ['start','end']  else ''
+                inc_pos = [pos for n,pos in nx.get_node_attributes(self.graph, 'pos').items() if self.graph.nodes[n]['type'] == 'incumbent'][0]
+                curr_pos = [pos for n,pos in nx.get_node_attributes(self.graph, 'pos').items() if self.graph.nodes[n]['type'] == 'variable'][0]
+                self.ax.text(-1,inc_pos[1], best)
+                self.ax.text(-1,curr_pos[1], 'current')
+
 
 
 
