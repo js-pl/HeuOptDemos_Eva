@@ -1,6 +1,9 @@
 
 from pymhlib.demos.maxsat import MAXSATInstance, MAXSATSolution
 from pymhlib.demos.misp import MISPInstance, MISPSolution
+from pymhlib.demos.tsp import TSPInstance, TSPSolution
+
+
 from pymhlib.scheduler import Method
 from pymhlib import demos
 
@@ -19,11 +22,15 @@ vis_data_path = 'instances' + os.path.sep
 class Problem(enum.Enum):
     MAXSAT = 'MAX-SAT'
     MISP = 'MAX-Independent Set'
+    TSP = 'Travelling Salesman Problem'
+    GC =  'Graph Coloring'
 
 class Algorithm(enum.Enum):
     GVNS = 'GVNS'
     GRASP = 'GRASP'
+    SA = 'SA'
     TS = 'Tabu Search'
+    
 
 class Option(enum.Enum):
     CH = 'Initial Solution'
@@ -220,3 +227,42 @@ class MISP(ProblemDefinition):
             inst += ['random']
         return inst
 
+class TSP(ProblemDefinition):
+    def __init__(self):
+
+        options = {
+            Algorithm.GVNS: {
+                Option.CH: [Parameters(InitSolution.random.name, TSPSolution.construct),
+                            Parameters(InitSolution.greedy.name, TSPSolution.construct_greedy, value=InitSolution.greedy.value)],
+                Option.LI: [Parameters('k-opt neighborhood search', TSPSolution.local_improve, param_type=int)],
+                Option.SH: [Parameters('random k-opt move', TSPSolution.shaking, param_type=int)]
+            },
+            Algorithm.SA: {}
+        }
+        super().__init__(Problem.TSP, options)
+
+    def get_solution(self, instance_path):
+        instance = TSPInstance(instance_path)
+        return TSPSolution(instance)
+    pass
+
+    def get_instances(self, visualisation):
+        inst = super().get_instances(visualisation)
+        return [i for i in inst if os.path.splitext(i)[1] == '.tsp']
+    pass
+
+class GC(ProblemDefinition):
+    def __init__(self):
+        options = {
+            Algorithm.GVNS: {
+
+            },
+            Algorithm.SA: {}
+        }
+        super().__init__(Problem.GC, options)
+
+    def get_solution(self, instance_path):
+        pass
+
+    def get_instances(self, visualisation):
+        pass

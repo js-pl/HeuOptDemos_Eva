@@ -1,6 +1,7 @@
 
 from pymhlib.demos.misp import MISPInstance
 from pymhlib.demos.maxsat import MAXSATInstance
+from pymhlib.demos.tsp import TSPInstance
 
 
 import ast

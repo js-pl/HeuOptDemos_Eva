@@ -59,6 +59,7 @@ class Draw(ABC):
         grey = str(210/255) #'lightgrey'
         darkgrey = str(125/255)
         white = 'white'
+        black = 'black'
         blue = 'royalblue'
         red = 'tomato'
         green = 'limegreen'
@@ -846,7 +847,123 @@ class MAXSATDraw(Draw):
                 self.ax.text(-1,curr_pos[1], 'current')
 
 
+class TSPDraw(Draw): # TODO: fix this class
+        def init_graph(self, instance):
+                graph = nx.Graph()
+                nodes = [(i, {'pos': instance.coordinates[i]}) for i in list(instance.coordinates.keys())]
+                graph.add_nodes_from(nodes)
+                return graph
 
+        # def get_animation(self, i: int, log_data: list):
+        #         self.reset_graph()
+        #         comment = None
+        #         if self.algorithm == Algorithm.TS:
+        #                 comment = self.get_ts_animation(i,log_data)
+        #         if self.algorithm == Algorithm.GVNS:
+        #                 comment = self.get_gvns_animation(i,log_data)
+        #         if self.algorithm == Algorithm.GRASP:
+        #                 comment = self.get_grasp_animation(i,log_data)
+
+        #         self.add_description(i, log_data)
+        #         self.add_legend()
+        #         self.load_pc_img(log_data[i], comment)
+
+
+
+        def get_grasp_animation(self, i: int, log_data: list):
+                raise NotImplementedError
+                pass
+
+
+        def get_gvns_animation(self, i:int, log_data:list):
+                #print("Logdata: ", log_data[i])
+                data = log_data[i]
+                edges = self.edges_from_tour(data['sol'])
+                added = removed = []
+                if i > 0:
+                        added, removed = self.get_added_removed_edges(data['sol'], log_data[i-1]['sol'])
+
+                #print(f"i = {i}, Solution: {data['sol']}\nPrev Solution: {log_data[i-1]['sol']}")
+                self.draw_graph(edges, added, removed)
+                
+
+                return CommentParameters()
+
+        def edges_from_tour(self, tour):
+                edges = []
+                for j in range(len(tour)):
+                        if tour[j] < tour[(j+1) % len(tour)]: # ensures nodes in edge tuple is ascending, useful for set() manipulation
+                                edges.append((tour[j], tour[(j+1) % len(tour)]))
+                        else:
+                                edges.append((tour[(j+1) % len(tour)],tour[j]))
+                return edges
+
+        def get_added_removed_edges(self, tour, prev_tour):
+                edges = set(self.edges_from_tour(tour))
+                prev_edges = set(self.edges_from_tour(prev_tour))
+        
+                #added = [(edge[0], edge[1], {'style': 'dashed', 'color':self.green}) for edge in edges.difference(prev_edges)]
+                #removed = [(edge[0], edge[1], {'style': 'dashed', 'color':self.red}) for edge in prev_edges.difference(edges)]
+
+                added = edges.difference(prev_edges)
+                removed = prev_edges.difference(edges)
+                return list(added), list(removed)
+
+
+        def get_ts_animation(self, i:int, log_data:list):
+                raise NotImplementedError
+                pass
+
+        def add_description(self, i, log_info: list):
+                data = log_info[i]
+
+                if data.get('status') == 'start' and i == 0:
+                        data['best'] = 0
+                        data['obj'] = 0
+                        self.plot_description['phase'] = f'{self.problem.value} Instance'
+                else:
+                        self.plot_description['phase'] = self.phases.get(data.get('m',''),'')
+
+                phase = self.plot_description['phase']
+                
+                if self.log_granularity == Log.Cycle and not data.get('m','').startswith('ch'):
+                        if self.algorithm == Algorithm.GVNS:
+                                phase = 'Shaking + Local Search'
+                        if self.algorithm == Algorithm.GRASP:
+                                phase = 'Randomized Greedy Construction + Local Search'
+
+
+                self.ax.text(0,1, '\n'.join((
+                '%s: %s' % (phase, self.plot_description['comment'] ),
+                'Best Objective: %d' % (data.get('best',self.plot_description['best']), ),
+                'Current Objective: %d' % (data.get('obj',self.plot_description['obj']),))), horizontalalignment='left', verticalalignment='top', transform=self.ax.transAxes)
+
+
+                self.plot_description.update({'phase': '', 'comment': [], 'best':0, 'obj':0}) #reset description
+
+
+        def add_legend(self):
+                pass
+
+
+
+        def reset_graph(self):
+                self.graph.remove_edges_from(list(self.graph.edges()))
+
+        def draw_graph(self, edges = [], added = [], removed = []):
+                self.ax.clear()
+                self.ax.set_aspect('equal')
+                #self.graph.add_edges_from(added, style = 'dashed', edge_color=self.green)
+                #removed_to_draw = [(edge[0], edge[1], {'style': 'dashed', 'color':self.red, 'weight':8}) for edge in removed]
+                #print(removed_to_draw)
+                # self.graph.add_edges_from(removed_to_draw)
+                pos = nx.get_node_attributes(self.graph, 'pos')
+                nx.draw_networkx_nodes(self.graph, pos, ax = self.ax, node_color = self.black, node_size = 75)
+                nx.draw_networkx_edges(self.graph, pos, ax = self.ax, edgelist = edges, edge_color = self.grey, width = 3)
+                nx.draw_networkx_edges(self.graph, pos, ax = self.ax, edgelist = added, style = 'dashed', edge_color = self.green, width = 1.5)
+                nx.draw_networkx_edges(self.graph, pos, ax = self.ax, edgelist = removed, style = 'dashed', edge_color = self.red, width = 1.5)
+                #nx.draw_networkx_edges(self.graph, pos, ax = self.ax, edgelist = added, style = 'dashed', color = self.green)
+                #nx.draw_networkx(self.graph, pos, ax = self.ax)
 
 
 

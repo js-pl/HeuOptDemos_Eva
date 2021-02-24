@@ -10,7 +10,7 @@ import numpy as np
 
 from pymhlib.permutation_solution import PermutationSolution
 from pymhlib.solution import TObj
-
+from pymhlib.ts_helper import TabuList
 
 class TSPInstance:
     """An instance of the traveling salesman problem.
@@ -27,7 +27,7 @@ class TSPInstance:
 
     def __init__(self, file_name: str):
         """Read an instance from the specified file."""
-        coordinates = {}
+        self.coordinates = {}
         dimension = None
 
         with open(file_name, "r") as f:
@@ -48,17 +48,17 @@ class TSPInstance:
                     x = int(split_line[1])
                     y = int(split_line[2])
 
-                    coordinates[num] = (x, y)
+                    self.coordinates[num] = (x, y)
 
-        assert len(coordinates) == dimension
+        assert len(self.coordinates) == dimension
 
         # building adjacency matrix
         distances = np.zeros((dimension, dimension))
 
         for i in range(0, dimension):
             for j in range(i + 1, dimension):
-                x1, y1 = coordinates[i]
-                x2, y2 = coordinates[j]
+                x1, y1 = self.coordinates[i]
+                x2, y2 = self.coordinates[j]
                 dist = math.sqrt(math.pow(x2 - x1, 2) + math.pow(y2 - y1, 2))
                 distances[i][j] = distances[j][i] = int(dist)
 
@@ -162,6 +162,62 @@ class TSPSolution(PermutationSolution):
     def crossover(self, other: 'TSPSolution') -> 'TSPSolution':
         """Perform edge recombination."""
         return self.edge_recombination(other)
+
+
+    # not implemented GRASP and Tabu methods
+    def greedy_randomized_construction(self, par, _result):
+        raise NotImplementedError
+
+    def copy_empty(self) -> 'Solution':
+        raise NotImplementedError
+
+    def is_complete_solution(self) -> bool:
+        raise NotImplementedError
+
+    def candidate_list(self) -> dict:
+        raise NotImplementedError
+
+    def restricted_candidate_list(self, cl: dict) -> np.array:
+        """Selects best candidates from candidate list according to parameter k or alpha.
+
+        k and alpha are passed in settings.mh_grc_k and settings.mh_grc_alpha.
+        The decision if k or alpha should be use is passed in dsettings.mh_grc_par  (default=k)"""
+        if settings.mh_grc_par:
+            return self.restricted_candidate_list_k(cl, settings.mh_grc_k)
+        else:
+            return self.restricted_candidate_list_alpha(cl, settings.mh_grc_alpha)
+
+    def restricted_candidate_list_k(self, cl: dict, par) -> np.array:
+        raise NotImplementedError
+
+    def restricted_candidate_list_alpha(self, cl: dict, par) -> np.array:
+        raise NotImplementedError
+
+    def update_solution(self, sel):
+        raise NotImplementedError
+
+    def construct_greedy(self, par, _result):
+        raise NotImplementedError
+        # greedy_sol = self.copy_empty()
+
+        # while not greedy_sol.is_complete_solution():
+            
+        #     cl = greedy_sol.candidate_list()
+        #     rcl = greedy_sol.restricted_candidate_list_k(cl, 1)
+        #     sel = random.choice(rcl)
+        #     greedy_sol.update_solution(sel)
+
+        # self.copy_from(greedy_sol)
+        # self.obj()
+
+
+    def is_tabu(self, tabu_list: TabuList) -> bool:
+        raise NotImplementedError
+
+
+    def get_tabu_attribute(self, sol_old: 'Solution'):
+        raise NotImplementedError
+
 
 
 if __name__ == '__main__':
