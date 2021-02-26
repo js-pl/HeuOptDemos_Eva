@@ -235,7 +235,7 @@ class TSP(ProblemDefinition):
                 Option.CH: [Parameters(InitSolution.random.name, TSPSolution.construct),
                             Parameters(InitSolution.greedy.name, TSPSolution.construct_greedy, value=InitSolution.greedy.value)],
                 Option.LI: [Parameters('k-opt neighborhood search', TSPSolution.local_improve, param_type=int)],
-                Option.SH: [Parameters('random k-opt move', TSPSolution.shaking, param_type=int)]
+                Option.SH: [Parameters('k random node swaps in tour', TSPSolution.shaking, param_type=int)]
             },
             Algorithm.SA: {}
         }

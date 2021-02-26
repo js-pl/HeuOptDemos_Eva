@@ -129,6 +129,8 @@ class TSPSolution(PermutationSolution):
         """2-opt local search."""
         self.two_opt_neighborhood_search(True)
 
+    
+
     def two_opt_move_delta_eval(self, p1: int, p2: int) -> int:
         """ This method performs the delta evaluation for inverting self.x from position p1 to position p2.
 

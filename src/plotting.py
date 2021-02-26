@@ -146,7 +146,6 @@ class Draw(ABC):
                 pass
 
         def load_pc_img(self, log_info: dict, comment: CommentParameters):
-
                 level = Log.StepInter.name.lower()
                 m = log_info.get('m','')
                 status = log_info.get('status','') if not log_info.get('end',False) else 'enditer'
@@ -847,7 +846,25 @@ class MAXSATDraw(Draw):
                 self.ax.text(-1,curr_pos[1], 'current')
 
 
-class TSPDraw(Draw): # TODO: fix this class
+class TSPDraw(Draw):
+        comments = {
+                Option.CH:{
+                        'start': lambda params: f'Constructing initial solution',
+                        'end': lambda params: f'initial solution={InitSolution(params.par).name}'
+                },
+                Option.LI: {
+                        'start': lambda params: f'k={params.par}, {params.par}-opt search',
+                        'end': lambda params: f'objective gain={params.gain}{", no improvement - reached local optimum" if params.no_change else ""}{", found new best solution" if params.better else ""}'
+                },
+                Option.SH: {
+                        'start': lambda params: f'k={params.par}, swapping two nodes k times',
+                        'end': lambda params: f'objective gain={params.gain}{", found new best solution" if params.better else ""}'
+                },
+                Option.RGC:{},
+                Option.TL:{}
+                }
+
+
         def init_graph(self, instance):
                 graph = nx.Graph()
                 nodes = [(i, {'pos': instance.coordinates[i]}) for i in list(instance.coordinates.keys())]
@@ -868,7 +885,9 @@ class TSPDraw(Draw): # TODO: fix this class
         #         self.add_legend()
         #         self.load_pc_img(log_data[i], comment)
 
-
+        def create_comment(self, option: Option, status: str, params: CommentParameters): # TODO: give a default implementaion in main Draw Class?
+                # TODO create comments according to log granularity
+                return self.comments[option][status](params)
 
         def get_grasp_animation(self, i: int, log_data: list):
                 raise NotImplementedError
@@ -876,18 +895,21 @@ class TSPDraw(Draw): # TODO: fix this class
 
 
         def get_gvns_animation(self, i:int, log_data:list):
-                #print("Logdata: ", log_data[i])
                 data = log_data[i]
                 edges = self.edges_from_tour(data['sol'])
                 added = removed = []
                 if i > 0:
                         added, removed = self.get_added_removed_edges(data['sol'], log_data[i-1]['sol'])
 
-                #print(f"i = {i}, Solution: {data['sol']}\nPrev Solution: {log_data[i-1]['sol']}")
                 self.draw_graph(edges, added, removed)
-                
 
-                return CommentParameters()
+                comment_params = CommentParameters()           
+                comment_params.par = data.get('par')
+                comment_params.gain = log_data[i-1].get('obj') - data.get('obj')
+                comment_params.no_change = (added == [])
+
+                self.plot_description['comment'] = self.create_comment(Option[data.get('m','li').upper()],data.get('status'),comment_params)
+                return comment_params
 
         def edges_from_tour(self, tour):
                 edges = []
@@ -914,35 +936,15 @@ class TSPDraw(Draw): # TODO: fix this class
                 raise NotImplementedError
                 pass
 
-        def add_description(self, i, log_info: list):
-                data = log_info[i]
-
-                if data.get('status') == 'start' and i == 0:
-                        data['best'] = 0
-                        data['obj'] = 0
-                        self.plot_description['phase'] = f'{self.problem.value} Instance'
-                else:
-                        self.plot_description['phase'] = self.phases.get(data.get('m',''),'')
-
-                phase = self.plot_description['phase']
-                
-                if self.log_granularity == Log.Cycle and not data.get('m','').startswith('ch'):
-                        if self.algorithm == Algorithm.GVNS:
-                                phase = 'Shaking + Local Search'
-                        if self.algorithm == Algorithm.GRASP:
-                                phase = 'Randomized Greedy Construction + Local Search'
-
-
-                self.ax.text(0,1, '\n'.join((
-                '%s: %s' % (phase, self.plot_description['comment'] ),
-                'Best Objective: %d' % (data.get('best',self.plot_description['best']), ),
-                'Current Objective: %d' % (data.get('obj',self.plot_description['obj']),))), horizontalalignment='left', verticalalignment='top', transform=self.ax.transAxes)
-
-
-                self.plot_description.update({'phase': '', 'comment': [], 'best':0, 'obj':0}) #reset description
-
 
         def add_legend(self):
+                legend_elements = (
+                                        Line2D([0], [0], marker=None, linestyle='-', color=self.grey),
+                                        Line2D([0], [0], marker=None, linestyle='--', color=self.green), 
+                                        Line2D([0], [0], marker=None, linestyle='--', color=self.red))
+                description = ('Tour','Added','Removed')
+
+                self.ax.legend(legend_elements, description,  ncol=1, handlelength=1, borderpad=0.7, columnspacing=0, loc='lower left')
                 pass
 
 
