@@ -939,13 +939,13 @@ class TSPDraw(Draw):
 
         def add_legend(self):
                 legend_elements = (
-                                        Line2D([0], [0], marker=None, linestyle='-', color=self.grey),
-                                        Line2D([0], [0], marker=None, linestyle='--', color=self.green), 
-                                        Line2D([0], [0], marker=None, linestyle='--', color=self.red))
+                                Line2D([0], [0], marker=None, linestyle='-', color=self.grey),
+                                Line2D([0], [0], marker=None, linestyle='--', color=self.green), 
+                                Line2D([0], [0], marker=None, linestyle='--', color=self.red)
+                )
                 description = ('Tour','Added','Removed')
 
                 self.ax.legend(legend_elements, description,  ncol=1, handlelength=1, borderpad=0.7, columnspacing=0, loc='lower left')
-                pass
 
 
 
