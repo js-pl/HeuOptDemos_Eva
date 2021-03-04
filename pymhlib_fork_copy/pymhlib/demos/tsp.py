@@ -110,7 +110,7 @@ class TSPSolution(PermutationSolution):
             raise ValueError("Invalid length of solution")
         super().check()
 
-    def construct(self, par, _result):
+    def construct(self, par, _result): # todo add greedy initialization
         """Scheduler method that constructs a new solution.
 
         Here we just call initialize.
@@ -130,7 +130,7 @@ class TSPSolution(PermutationSolution):
         """2-opt local search."""
         assert(par>1)
 
-        if par == 2:
+        if par < 3:
             self.two_opt_neighborhood_search(True)
         else:
             self.k_opt(par)

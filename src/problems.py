@@ -39,6 +39,11 @@ class Option(enum.Enum):
     RGC = 'Randomized Greedy Construction'
     TL = 'Tabu List'
 
+    #SA
+    TEMP = 'Initial Temperature'
+    ALPHA = 'Alpha'
+    EQUI_ITER = 'Equi-iter'
+
 class InitSolution(enum.Enum):
     random = 0
     greedy = 1
@@ -237,7 +242,11 @@ class TSP(ProblemDefinition):
                 Option.LI: [Parameters('k-opt neighborhood search', TSPSolution.local_improve, param_type=int)],
                 Option.SH: [Parameters('k random node swaps in tour', TSPSolution.shaking, param_type=int)]
             },
-            Algorithm.SA: {}
+            Algorithm.SA: {
+                Option.TEMP: [Parameters('Initial Temperature', param_type=float)],
+                Option.ALPHA: [Parameters('Alpha', param_type=float)],
+                Option.EQUI_ITER: [Parameters('Equi. iters.', param_type=int)],
+            }
         }
         super().__init__(Problem.TSP, options)
 

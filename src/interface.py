@@ -195,6 +195,13 @@ class InterfaceVisualisation():
                         params.options[Option.RGC] = [(self.optionsHandles[Option.RGC].children[0].value,self.optionsHandles[Option.RGC].children[1].value)]
                 if Option.TL in self.optionsHandles:
                         params.options[Option.TL] = [(o.description,o.value) for o in self.optionsHandles[Option.TL].children[1:]]
+                if Option.TEMP in self.optionsHandles:
+                        params.options[Option.TEMP] = self.optionsHandles[Option.TEMP].value
+                if Option.ALPHA in self.optionsHandles:
+                        params.options[Option.ALPHA] = self.optionsHandles[Option.ALPHA].value
+                if Option.EQUI_ITER in self.optionsHandles:
+                        params.options[Option.EQUI_ITER] = self.optionsHandles[Option.EQUI_ITER].value
+
                 # add settings params
                 params.iterations = self.settingsWidget.children[0].children[0].value
                 params.seed = self.settingsWidget.children[0].children[1].value
@@ -280,8 +287,25 @@ class InterfaceVisualisation():
                         return self.get_grasp_options(options)
                 if algo == Algorithm.TS:
                         return self.get_ts_options(options)
+                if algo == Algorithm.SA:
+                        return self.get_sa_options(options)
                 return ()
 
+        def get_sa_options(self, options: dict):
+                #todo here: maybe avoid hardcoding the widget options, although it may make sense in the case of sa
+                init_temp = widgets.BoundedIntText(value=30, min=1, description='Init. Temp.')
+                alpha = widgets.FloatSlider(value=0.95, min=0.01, max=0.99, step=0.01, description='Alpha')
+                equi_iter = widgets.BoundedIntText(value = 1000,min = 1,description='Equi. Iters.')
+                
+                self.optionsHandles[Option.TEMP] = init_temp
+                self.optionsHandles[Option.ALPHA] = alpha
+                self.optionsHandles[Option.EQUI_ITER] = equi_iter
+                
+                init_temp_box = widgets.VBox([init_temp])
+                alpha_box = widgets.VBox([alpha])
+                equi_iter_box = widgets.VBox([equi_iter])
+                
+                return(init_temp_box, alpha_box, equi_iter_box)
 
         # define option widgets for each algorithm
         def get_gvns_options(self, options: dict):

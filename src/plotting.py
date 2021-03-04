@@ -95,6 +95,7 @@ class Draw(ABC):
                 if self.algorithm == Algorithm.GRASP:
                         comment = self.get_grasp_animation(i,log_data)
 
+                print(log_data)
                 self.add_description(i, log_data)
                 self.add_legend()
                 self.load_pc_img(log_data[i], comment)
@@ -860,8 +861,10 @@ class TSPDraw(Draw):
                         'start': lambda params: f'k={params.par}, swapping two nodes k times',
                         'end': lambda params: f'objective gain={params.gain}{", found new best solution" if params.better else ""}'
                 },
-                Option.RGC:{},
-                Option.TL:{}
+                Algorithm.SA: {
+                        'start': lambda params: f'SA start',
+                        'end': lambda params: f'SA end'
+                }
                 }
 
 

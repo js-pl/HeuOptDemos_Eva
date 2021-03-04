@@ -15,6 +15,7 @@ from pymhlib.log import init_logger
 from pymhlib import demos
 from pymhlib.gvns import GVNS
 from pymhlib.ts import TS
+from pymhlib.sa import SA, Method
 
 # module imports
 from .problems import Problem, Algorithm, Option, MAXSAT, MISP, Configuration, ProblemDefinition
@@ -143,7 +144,9 @@ def run_algorithm(config: Configuration, visualisation: bool=False):
 
     if config.algorithm == Algorithm.TS:
         run_ts(solution, config)
-        
+    
+    if config.algorithm == Algorithm.SA:
+        run_sa(solution, config)
     return solution
 
 
@@ -186,6 +189,7 @@ def run_grasp(solution, config: Configuration):
 
 
 def run_ts(solution, config: Configuration):
+    print(config.options)
 
     prob = problems[config.problem]
     ch = [ prob.get_method(Algorithm.TS, Option.CH, m[0], m[1]) for m in config.options[Option.CH] ]
@@ -199,7 +203,20 @@ def run_ts(solution, config: Configuration):
     logging.getLogger("pymhlib_iter").handlers[0].flush()
 
 
+def run_sa(solution, config : Configuration): # todo maybe add construction option
+    own_settings = {
+        'ma_sa_T_init': config.options[Option.TEMP],
+        'mh_sa_alpha': config.options[Option.ALPHA],
+        'mn_sa_equi_iter': config.options[Option.EQUI_ITER]
+    }
+    solution_class = type(solution)
 
+    alg = SA(solution, [Method("ch", solution_class.construct, 0)], solution_class.random_move_delta_eval,
+            solution_class.apply_neighborhood_move, iter_cb = None, own_settings = own_settings )
+    alg.run()
+    alg.method_statistics()
+    alg.main_results()
+    logging.getLogger("pymhlib_iter").handlers[0].flush()
 
 
 
