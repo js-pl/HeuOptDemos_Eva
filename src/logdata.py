@@ -104,9 +104,11 @@ def create_log_data(data: list()):
             vis_data.append(create_gvns_data(data[end:len_end]))
         if method in ['rgc']:
             vis_data += create_grasp_data(data[start:len_end])
+        if method in ['sa']:
+            vis_data.append(create_sa_data(data[start:end]))
+            vis_data.append(create_sa_data(data[end:len_end]))
 
         i = len_end
-
     return vis_data
 
 
@@ -140,6 +142,10 @@ def create_grasp_data(data: list()):
     entries.append(create_gvns_data(data[end_i:]))
     return entries
 
+def create_sa_data(data: list()):
+    entries = {k:v for x in data if type(x) == dict for k,v in x.items()}
+    entries['status'] = data[0]
+    return entries
         
 def cast_line(line: str):
     if not ':' in line:

@@ -88,6 +88,7 @@ class TSPSolution(PermutationSolution):
     def __init__(self, inst: TSPInstance):
         super().__init__(inst.n, inst=inst)
         self.obj_val_valid = False
+        self.k_opt_segment_starts_dict = {}
 
     def copy(self):
         sol = TSPSolution(self.inst)
@@ -138,20 +139,23 @@ class TSPSolution(PermutationSolution):
 
     def k_opt(self, k):
         """Best improvement k-opt local search."""
-        permutations = list(itertools.permutations(list(range(1, k))))
+        permutations = list(itertools.permutations(list(range(1, k)))) 
         possible_flips = int(math.pow(2, k - 1))
-        all_segment_starts = self.all_k_opt_segment_starts(k, 0, self.inst.n)
+
+        if not k in self.k_opt_segment_starts_dict:
+            self.k_opt_segment_starts_dict[k] = self.all_k_opt_segment_starts(k, 0, self.inst.n)
     
         best = (None, None, None, 0) # (segment_starts, permutation, flips, delta)
 
-        for segment_starts in all_segment_starts:           
-            for i in range(math.factorial(k - 1)): # iterate over possible segment permutations with fixed initial segment
+        for segment_starts in self.k_opt_segment_starts_dict[k]:           
+            #for i in range(math.factorial(k - 1)): # iterate over possible segment permutations with fixed initial segment
+            for permutation in permutations: # iterate over possible segment permutations with fixed initial segment
                 for j in range(possible_flips): # iterate over all possible segment flips with fixed initial segment
                     # i.e. for flips = [1, 0, 0, 1] reverse the second and fifth segment
                     flips = [(j >> l) & 1 for l in range(possible_flips.bit_length() - 1)]
-                    delta = self.k_opt_move_delta_eval(segment_starts, permutations[i], flips)
+                    delta = self.k_opt_move_delta_eval(segment_starts, permutation, flips)
                     if delta < best[3]:
-                        best = (segment_starts, permutations[i], flips, delta)
+                        best = (segment_starts, permutation, flips, delta)
                     #todo best improvement/first improvement handling
         if best[3] < 0:
             self.apply_k_opt_move(self.k_opt_segments(k, best[0]), best[1], best[2], best[3])
@@ -166,6 +170,7 @@ class TSPSolution(PermutationSolution):
 
     def all_k_opt_segment_starts(self, k: int, j: int, n: int):
         """todo"""
+
         if k == 0:
             return [[]]
 
@@ -182,7 +187,7 @@ class TSPSolution(PermutationSolution):
 
 
     def k_opt_move_delta_eval(self, segment_starts, permutation, flips):
-        k = len(segment_starts)
+        k = len(segment_starts) # (1, 3, 2)
         segment_ends = []
         for i in range(k):
             segment_ends.append((segment_starts[(i+1)%k] - 1) % self.inst.n)

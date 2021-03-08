@@ -41,15 +41,18 @@ class Result:
         - changed: if false, the solution has not been changed by the method application
         - terminate: if true, a termination condition has been fulfilled
         - log_info: customized log info
+        - step_log_info: customized log info for visualization
     """
-    __slots__ = ('changed', 'terminate', 'log_info')
+    __slots__ = ('changed', 'terminate', 'log_info', 'step_log_info')
 
     def __init__(self):
         self.changed = True
         self.terminate = False
         self.log_info = None
+        self.step_log_info = None
 
     def __repr__(self):
+        # todo: think about wether or not to add step_log_info here
         return f"(changed={self.changed}, terminate={self.terminate}, log_info={self.log_info})"
 
 
@@ -203,9 +206,11 @@ class Scheduler(ABC):
         new_incumbent = self.update_incumbent(sol, t_end - self.time_start)
         ##### logging for visualisation
         if self.step_logger.hasHandlers():
-            sol_str, inc_str = f'{sol}'.replace('\n',' '), f'{self.incumbent}'.replace('\n',' ') 
+            sol_str, inc_str = f'{sol}'.replace('\n',' '), f'{self.incumbent}'.replace('\n',' ')
+            res_info = f'\n{res.step_log_info}' if res.step_log_info else ''
             step_info = f'END\nSOL: {sol_str}\nOBJ: {sol.obj()}\nM: {method.name}\n' + \
-                f'PAR: {method.par}\nINC: {inc_str}\nBEST: {self.incumbent.obj()}\nBETTER: {new_incumbent}'
+                f'PAR: {method.par}\nINC: {inc_str}\nBEST: {self.incumbent.obj()}\nBETTER: {new_incumbent}' + \
+                res_info
             self.step_logger.info(step_info)
         #################
         terminate = self.check_termination()

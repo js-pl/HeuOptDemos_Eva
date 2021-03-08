@@ -42,6 +42,9 @@ class CommentParameters:
         thres: float = None
         ll: int = 0
         asp: bool = False
+        temp: float = 0
+        delta: int = 0
+        accepted: bool = False
 
 class Draw(ABC):
 
@@ -94,8 +97,9 @@ class Draw(ABC):
                         comment = self.get_gvns_animation(i,log_data)
                 if self.algorithm == Algorithm.GRASP:
                         comment = self.get_grasp_animation(i,log_data)
+                if self.algorithm == Algorithm.SA:
+                        comment = self.get_sa_animation(i, log_data)
 
-                print(log_data)
                 self.add_description(i, log_data)
                 self.add_legend()
                 self.load_pc_img(log_data[i], comment)
@@ -112,6 +116,10 @@ class Draw(ABC):
 
         @abstractmethod
         def get_ts_animation(self, i:int, log_data:list):
+                pass
+
+        @abstractmethod
+        def get_sa_animation(self, i: int, log_data: list):
                 pass
 
         def add_description(self, i, log_info: list):
@@ -350,6 +358,8 @@ class MISPDraw(Draw):
                 self.draw_graph(data.get('inc',[]))
                 return comment_params
 
+        def get_sa_animation(self, i: int, log_data: list):
+                raise NotImplementedError
 
         def add_legend(self):
 
@@ -754,6 +764,9 @@ class MAXSATDraw(Draw):
                         bbox = dict(boxstyle="circle",fc="white", ec=c, pad=0.2) if k == sel else None
                         self.ax.text(pos[0],pos[1]+0.2+(0.05*np.sign(k)), v, {'color': c, 'ha': 'center', 'va': 'center','fontweight':'bold','bbox': bbox})
 
+        def get_sa_animation(self, i: int, log_data: list):
+                raise NotImplementedError
+
         def add_legend(self):
                 legend_elements = (
                                         Line2D([0], [0], marker='s', linestyle='none', markeredgewidth=0,
@@ -862,7 +875,7 @@ class TSPDraw(Draw):
                         'end': lambda params: f'objective gain={params.gain}{", found new best solution" if params.better else ""}'
                 },
                 Algorithm.SA: {
-                        'start': lambda params: f'SA start',
+                        'start': lambda params: f'SA start', # todo: stopped here
                         'end': lambda params: f'SA end'
                 }
                 }
@@ -874,19 +887,6 @@ class TSPDraw(Draw):
                 graph.add_nodes_from(nodes)
                 return graph
 
-        # def get_animation(self, i: int, log_data: list):
-        #         self.reset_graph()
-        #         comment = None
-        #         if self.algorithm == Algorithm.TS:
-        #                 comment = self.get_ts_animation(i,log_data)
-        #         if self.algorithm == Algorithm.GVNS:
-        #                 comment = self.get_gvns_animation(i,log_data)
-        #         if self.algorithm == Algorithm.GRASP:
-        #                 comment = self.get_grasp_animation(i,log_data)
-
-        #         self.add_description(i, log_data)
-        #         self.add_legend()
-        #         self.load_pc_img(log_data[i], comment)
 
         def create_comment(self, option: Option, status: str, params: CommentParameters): # TODO: give a default implementaion in main Draw Class?
                 # TODO create comments according to log granularity
@@ -926,9 +926,6 @@ class TSPDraw(Draw):
         def get_added_removed_edges(self, tour, prev_tour):
                 edges = set(self.edges_from_tour(tour))
                 prev_edges = set(self.edges_from_tour(prev_tour))
-        
-                #added = [(edge[0], edge[1], {'style': 'dashed', 'color':self.green}) for edge in edges.difference(prev_edges)]
-                #removed = [(edge[0], edge[1], {'style': 'dashed', 'color':self.red}) for edge in prev_edges.difference(edges)]
 
                 added = edges.difference(prev_edges)
                 removed = prev_edges.difference(edges)
@@ -940,13 +937,41 @@ class TSPDraw(Draw):
                 pass
 
 
+        def get_sa_animation(self, i: int, log_data: list):
+                data = log_data[i]
+                edges = self.edges_from_tour(data['sol'])
+                added = removed = []
+
+                comment_params = CommentParameters()           
+                comment_params.par = data.get('par')
+                comment_params.gain = log_data[i-1].get('obj') - data.get('obj')
+                comment_params.no_change = (added == [])
+
+
+                if data['m'].upper() == Algorithm.SA:
+                        print("printing data: ", data)
+                        added, removed = self.get_added_removed_edges(data['sol'], log_data[i-1]['sol'])
+                        comment_params.temp = data['temp']
+                        comment_params.delta = data['delta']
+                        comment_params.accepted = data['accepted']
+
+                self.draw_graph(edges, added, removed)
+
+                
+
+                # todo: draw edges that were discarded?
+
+                self.plot_description['comment'] = self.create_comment(Option[data.get('m').upper()], data.get('status'), comment_params)
+                return comment_params
+
         def add_legend(self):
                 legend_elements = (
                                 Line2D([0], [0], marker=None, linestyle='-', color=self.grey),
                                 Line2D([0], [0], marker=None, linestyle='--', color=self.green), 
-                                Line2D([0], [0], marker=None, linestyle='--', color=self.red)
+                                Line2D([0], [0], marker=None, linestyle='--', color=self.red),
+                                Line2D([0], [0], marker=None, linestyle='--', color=self.yellow)
                 )
-                description = ('Tour','Added','Removed')
+                description = ('Tour','Added','Removed', 'Discarded')
 
                 self.ax.legend(legend_elements, description,  ncol=1, handlelength=1, borderpad=0.7, columnspacing=0, loc='lower left')
 
@@ -958,17 +983,12 @@ class TSPDraw(Draw):
         def draw_graph(self, edges = [], added = [], removed = []):
                 self.ax.clear()
                 self.ax.set_aspect('equal')
-                #self.graph.add_edges_from(added, style = 'dashed', edge_color=self.green)
-                #removed_to_draw = [(edge[0], edge[1], {'style': 'dashed', 'color':self.red, 'weight':8}) for edge in removed]
-                #print(removed_to_draw)
-                # self.graph.add_edges_from(removed_to_draw)
+
                 pos = nx.get_node_attributes(self.graph, 'pos')
                 nx.draw_networkx_nodes(self.graph, pos, ax = self.ax, node_color = self.black, node_size = 75)
                 nx.draw_networkx_edges(self.graph, pos, ax = self.ax, edgelist = edges, edge_color = self.grey, width = 3)
                 nx.draw_networkx_edges(self.graph, pos, ax = self.ax, edgelist = added, style = 'dashed', edge_color = self.green, width = 1.5)
                 nx.draw_networkx_edges(self.graph, pos, ax = self.ax, edgelist = removed, style = 'dashed', edge_color = self.red, width = 1.5)
-                #nx.draw_networkx_edges(self.graph, pos, ax = self.ax, edgelist = added, style = 'dashed', color = self.green)
-                #nx.draw_networkx(self.graph, pos, ax = self.ax)
 
 
 

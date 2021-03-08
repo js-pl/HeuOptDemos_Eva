@@ -11,10 +11,12 @@ from typing import List, Callable
 import time
 from math import exp
 import numpy as np
+import logging
 
 from pymhlib.scheduler import Method, Scheduler, MethodStatistics
 from pymhlib.settings import get_settings_parser
 from pymhlib.solution import Solution, TObj
+
 
 parser = get_settings_parser()
 parser.add_argument("--mh_sa_T_init", type=float, default=30,
@@ -82,6 +84,15 @@ class SA(Scheduler):
         def sa_iteration(sol: Solution, _par, result):
             neighborhood_move, delta_obj = self.random_move_delta_eval(sol)
             acceptance = self.metropolis_criterion(sol, delta_obj)
+            
+            if logging.getLogger("pymhlib_step").hasHandlers():
+                if acceptance:
+                    result.step_log_info = SAInfo(delta_obj, self.temperature, acceptance)
+                else:
+                    discarded_sol = sol.copy()
+                    self.apply_neighborhood_move(discarded_sol, neighborhood_move)
+                    result.step_log_info = SAInfo(delta_obj, self.temperature, acceptance, discarded_sol)
+
             if acceptance:
                 self.apply_neighborhood_move(sol, neighborhood_move)
                 sol.obj_val = sol.obj_val + delta_obj
@@ -106,3 +117,19 @@ class SA(Scheduler):
         assert self.incumbent_valid or self.meths_ch
         self.perform_sequentially(sol, self.meths_ch)
         self.sa(sol)
+
+
+class SAInfo():
+    """A class holding information """
+    def __init__(self, delta, temperature, acceptance, discarded_sol = None):
+        self.delta = delta
+        self.temperature = temperature
+        self.acceptance = acceptance
+        self.discarded_sol = discarded_sol
+
+    def __str__(self):
+        if self.acceptance:
+            return f"TEMP: {self.temperature}\nDELTA: {self.delta}\nACCEPT: {self.acceptance}"
+        else:
+            disc_sol_str = str(self.discarded_sol).replace('\n', ' ')
+            return f"TEMP: {self.temperature}\nDELTA: {self.delta}\nACCEPT: {self.acceptance}, DISC_SOL: {disc_sol_str}"

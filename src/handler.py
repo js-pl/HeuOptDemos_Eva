@@ -189,7 +189,6 @@ def run_grasp(solution, config: Configuration):
 
 
 def run_ts(solution, config: Configuration):
-    print(config.options)
 
     prob = problems[config.problem]
     ch = [ prob.get_method(Algorithm.TS, Option.CH, m[0], m[1]) for m in config.options[Option.CH] ]
