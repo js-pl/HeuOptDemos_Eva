@@ -22,7 +22,7 @@ vis_data_path = 'instances' + os.path.sep
 class Problem(enum.Enum):
     MAXSAT = 'MAX-SAT'
     MISP = 'MAX-Independent Set'
-    TSP = 'Travelling Salesman Problem'
+    TSP = 'TSP'
     GC =  'Graph Coloring'
 
 class Algorithm(enum.Enum):
@@ -39,7 +39,8 @@ class Option(enum.Enum):
     RGC = 'Randomized Greedy Construction'
     TL = 'Tabu List'
 
-    #SA
+    # SA options
+    SA = 'Simulated Annealing'
     TEMP = 'Initial Temperature'
     ALPHA = 'Alpha'
     EQUI_ITER = 'Equi-iter'

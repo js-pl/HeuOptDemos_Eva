@@ -129,9 +129,9 @@ class TSPSolution(PermutationSolution):
 
     def local_improve(self, par, _result):
         """2-opt local search."""
-        assert(par>1)
-
-        if par < 3:
+        if par < 2:
+            pass
+        elif par == 2:
             self.two_opt_neighborhood_search(True)
         else:
             self.k_opt(par)

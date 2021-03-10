@@ -293,9 +293,9 @@ class InterfaceVisualisation():
 
         def get_sa_options(self, options: dict):
                 #todo here: maybe avoid hardcoding the widget options, although it may make sense in the case of sa
-                init_temp = widgets.BoundedIntText(value=30, min=1, description='Init. Temp.')
+                init_temp = widgets.BoundedIntText(value=200, min=1, max=10000000, description='Init. Temp.')
                 alpha = widgets.FloatSlider(value=0.95, min=0.01, max=0.99, step=0.01, description='Alpha')
-                equi_iter = widgets.BoundedIntText(value = 1000,min = 1,description='Equi. Iters.')
+                equi_iter = widgets.BoundedIntText(value = 100,min = 1, max=1000000, description='Equi. Iters.')
                 
                 self.optionsHandles[Option.TEMP] = init_temp
                 self.optionsHandles[Option.ALPHA] = alpha

@@ -204,9 +204,9 @@ def run_ts(solution, config: Configuration):
 
 def run_sa(solution, config : Configuration): # todo maybe add construction option
     own_settings = {
-        'ma_sa_T_init': config.options[Option.TEMP],
+        'mh_sa_T_init': float(config.options[Option.TEMP]),
         'mh_sa_alpha': config.options[Option.ALPHA],
-        'mn_sa_equi_iter': config.options[Option.EQUI_ITER]
+        'mh_sa_equi_iter': config.options[Option.EQUI_ITER]
     }
     solution_class = type(solution)
 

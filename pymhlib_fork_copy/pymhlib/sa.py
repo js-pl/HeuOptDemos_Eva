@@ -80,7 +80,6 @@ class SA(Scheduler):
 
     def sa(self, sol: Solution):
         """Perform simulated annealing with geometric cooling on given solution."""
-
         def sa_iteration(sol: Solution, _par, result):
             neighborhood_move, delta_obj = self.random_move_delta_eval(sol)
             acceptance = self.metropolis_criterion(sol, delta_obj)
@@ -132,4 +131,4 @@ class SAInfo():
             return f"TEMP: {self.temperature}\nDELTA: {self.delta}\nACCEPT: {self.acceptance}"
         else:
             disc_sol_str = str(self.discarded_sol).replace('\n', ' ')
-            return f"TEMP: {self.temperature}\nDELTA: {self.delta}\nACCEPT: {self.acceptance}, DISC_SOL: {disc_sol_str}"
+            return f"TEMP: {self.temperature}\nDELTA: {self.delta}\nACCEPT: {self.acceptance}\nDISC_SOL: {disc_sol_str}"

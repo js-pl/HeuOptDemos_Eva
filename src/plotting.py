@@ -8,6 +8,7 @@ import networkx as nx
 import numpy as np
 import matplotlib.pyplot as plt
 import statistics
+import math
 
 from .problems import InitSolution, Problem, Algorithm, Option
 from abc import ABC, abstractmethod
@@ -44,7 +45,7 @@ class CommentParameters:
         asp: bool = False
         temp: float = 0
         delta: int = 0
-        accepted: bool = False
+        accept: bool = False
 
 class Draw(ABC):
 
@@ -52,7 +53,8 @@ class Draw(ABC):
 
 
         phases = {'ch':'Construction', 'li': 'Local Search', 'sh': 'Shaking', 'rgc': 'Randomized Greedy Construction', 
-                        'cl':'Candidate List', 'rcl': 'Restricted Candidate List', 'sel':'Selection from RCL'}
+                        'cl':'Candidate List', 'rcl': 'Restricted Candidate List', 'sel':'Selection from RCL',
+                        'sa': 'Random neighborhood move'}
 
         plot_description = {'phase': '',
                                 'comment': [],
@@ -874,11 +876,18 @@ class TSPDraw(Draw):
                         'start': lambda params: f'k={params.par}, swapping two nodes k times',
                         'end': lambda params: f'objective gain={params.gain}{", found new best solution" if params.better else ""}'
                 },
-                Algorithm.SA: {
-                        'start': lambda params: f'SA start', # todo: stopped here
-                        'end': lambda params: f'SA end'
+                Option.SA: {
+                        'start': lambda params: f'Choosing a random 2-opt neighborhood move', # todo: stopped here
+                        'end': lambda params: f'T={round(params.temp, 2)} ' + (
+                                f'Improved solution with delta={params.delta}' if params.accept and params.delta < 0 
+                                else f'Worse solution with delta={params.delta} accepted, P < {round(math.exp(-abs(params.delta) / params.temp), 5)}' 
+                                if params.accept and params.delta >= 0 else 
+                                f'Worse solution with delta={params.delta} rejected, P > {round(math.exp(-abs(params.delta) / params.temp), 5)}'
+                        )
                 }
                 }
+
+
 
 
         def init_graph(self, instance):
@@ -888,7 +897,7 @@ class TSPDraw(Draw):
                 return graph
 
 
-        def create_comment(self, option: Option, status: str, params: CommentParameters): # TODO: give a default implementaion in main Draw Class?
+        def create_comment(self, option: Option, status: str, params: CommentParameters):
                 # TODO create comments according to log granularity
                 return self.comments[option][status](params)
 
@@ -948,19 +957,18 @@ class TSPDraw(Draw):
                 comment_params.no_change = (added == [])
 
 
-                if data['m'].upper() == Algorithm.SA:
-                        print("printing data: ", data)
-                        added, removed = self.get_added_removed_edges(data['sol'], log_data[i-1]['sol'])
-                        comment_params.temp = data['temp']
-                        comment_params.delta = data['delta']
-                        comment_params.accepted = data['accepted']
-
-                self.draw_graph(edges, added, removed)
-
-                
-
-                # todo: draw edges that were discarded?
-
+                if Option[data['m'].upper()] == Option.SA:
+                        comment_params.temp = data.get('temp', log_data[i+1])
+                        comment_params.delta = data.get('delta', 0)
+                        comment_params.accept = data.get('accept', True)
+                        if data.get('accept', True):
+                                added, removed = self.get_added_removed_edges(data['sol'], log_data[i-1]['sol'])
+                        else:
+                                removed, added = self.get_added_removed_edges(data['disc_sol'], data['sol'])
+                        self.draw_graph(edges, added, removed, data.get('accept', True))
+                else:
+                        self.draw_graph(edges, added, removed)
+                        
                 self.plot_description['comment'] = self.create_comment(Option[data.get('m').upper()], data.get('status'), comment_params)
                 return comment_params
 
@@ -969,9 +977,10 @@ class TSPDraw(Draw):
                                 Line2D([0], [0], marker=None, linestyle='-', color=self.grey),
                                 Line2D([0], [0], marker=None, linestyle='--', color=self.green), 
                                 Line2D([0], [0], marker=None, linestyle='--', color=self.red),
-                                Line2D([0], [0], marker=None, linestyle='--', color=self.yellow)
+                                Line2D([0], [0], marker=None, linestyle='--', color=self.yellow),
+                                Line2D([0], [0], marker=None, linestyle='--', color=self.blue),
                 )
-                description = ('Tour','Added','Removed', 'Discarded')
+                description = ('Tour','Added','Removed', 'Rejected added edges', 'Rejected removed edges')
 
                 self.ax.legend(legend_elements, description,  ncol=1, handlelength=1, borderpad=0.7, columnspacing=0, loc='lower left')
 
@@ -980,16 +989,31 @@ class TSPDraw(Draw):
         def reset_graph(self):
                 self.graph.remove_edges_from(list(self.graph.edges()))
 
-        def draw_graph(self, edges = [], added = [], removed = []):
+        def draw_graph(self, edges = [], added = [], removed = [], accept=True):
+                """
+                
+                """
                 self.ax.clear()
                 self.ax.set_aspect('equal')
+
+                if accept:
+                        added_color = self.green
+                        removed_color = self.red
+                        added_style = "dashed"
+                        removed_style = "dashed"
+                else:
+                        added_color = self.blue
+                        removed_color = self.yellow
+                        added_style = "dashed"
+                        removed_style = "dashed"
 
                 pos = nx.get_node_attributes(self.graph, 'pos')
                 nx.draw_networkx_nodes(self.graph, pos, ax = self.ax, node_color = self.black, node_size = 75)
                 nx.draw_networkx_edges(self.graph, pos, ax = self.ax, edgelist = edges, edge_color = self.grey, width = 3)
-                nx.draw_networkx_edges(self.graph, pos, ax = self.ax, edgelist = added, style = 'dashed', edge_color = self.green, width = 1.5)
-                nx.draw_networkx_edges(self.graph, pos, ax = self.ax, edgelist = removed, style = 'dashed', edge_color = self.red, width = 1.5)
-
+                nx.draw_networkx_edges(self.graph, pos, ax = self.ax, edgelist = added,
+                                        style = added_style, edge_color = added_color, width = 1.5)
+                nx.draw_networkx_edges(self.graph, pos, ax = self.ax, edgelist = removed,
+                                        style = removed_style, edge_color = removed_color, width = 1.5)
 
 
 def get_visualisation(prob: Problem, alg: Algorithm, instance, log_granularity: Log):
